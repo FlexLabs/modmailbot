@@ -47,6 +47,8 @@ const defaultConfig = {
   "port": 8890,
   "url": null,
 
+  "mongoDSN": null,
+
   "dbDir": path.join(__dirname, '..', 'db'),
   "knex": null,
 
