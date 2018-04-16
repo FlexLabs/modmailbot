@@ -1,4 +1,3 @@
-const threads = require('../data/threads');
 const tags = require('../data/tags');
 const config = require('../config');
 const utils = require('../utils');
@@ -20,10 +19,10 @@ module.exports = bot => {
       isAnonymous = true;
     }
 
-    const resolvedTag = await tags.getTag(tag);
+    const resolvedTag = await tags.getTag(msg.channel.guild.id, tag);
     if (! resolvedTag) return;
 
-    await thread.replyToUser(msg.member, resolvedTag.content, null, isAnonymous);
+    await thread.replyToUser(msg.member, resolvedTag.content, [], isAnonymous);
     msg.delete();
   });
 
