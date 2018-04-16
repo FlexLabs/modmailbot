@@ -8,6 +8,7 @@ const blocked = require('./data/blocked');
 const threads = require('./data/threads');
 
 const reply = require('./modules/reply');
+const tags = require('./modules/tags');
 const close = require('./modules/close');
 const snippets = require('./modules/snippets');
 const logs = require('./modules/logs');
@@ -161,6 +162,7 @@ module.exports = {
     // Load modules
     console.log('Loading modules...');
     await reply(bot);
+    await tags(bot);
     await close(bot);
     await logs(bot);
     await block(bot);
