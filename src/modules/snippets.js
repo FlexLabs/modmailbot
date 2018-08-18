@@ -97,12 +97,7 @@ module.exports = bot => {
       return;
     }
 
-    let isAnonymous = snippet.isAnonymous;
-
-    if (args[1] === 'anon') {
-      text = args.slice(2).join(' ').trim();
-      isAnonymous = true;
-    }
+    let isAnonymous = true;
 
     await snippets.del(trigger);
     await snippets.add(trigger, text, isAnonymous);
