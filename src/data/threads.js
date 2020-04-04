@@ -98,7 +98,7 @@ async function createNewThreadForUser(user, quiet = false) {
 
   // Post some info to the beginning of the new thread
   const mainGuild = utils.getMainGuild();
-  const member = (mainGuild ? await bot.getRESTGuildMember(mainGuild.id, user.id) : null);
+  const member = mainGuild ? await bot.getRESTGuildMember(mainGuild.id, user.id) : null;
   if (! member) console.log(`[INFO] Member ${user.id} not found in main guild ${config.mainGuildId}`);
 
   let mainGuildNickname = member && member.nick || user.username;
