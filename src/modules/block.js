@@ -13,17 +13,20 @@ module.exports = bot => {
       msg.channel.createMessage(`Blocked <@${userId}> (id ${userId}) from modmail`);
     }
 
-    let logText = `**Blocked:** ${thread.user_name} (${thread.user_id}) was blocked.`;
+    let logText = `**Blocked:** `;
 
     if (! thread && args.length > 0) {
       // User mention/id as argument
-      const userId = utils.getUserMention(args.join(' '));
+      const userId = utils.getUserMention(args[0]);
       if (! userId) return;
 
+      const user = bot.users.get(userId);
       const reason = args.slice(1).join(' ').trim();
 
+      logText += `${(user ? `${user.username}#${user.discriminator}` : 'Unable to fetch username')} (${userId}) was blocked`;
+
       if (reason && reason.length) {
-        logText = `**Blocked:** ${thread.user_name} (${thread.user_id}) was blocked for ${reason}`;
+        logText += ` for ${reason}`;
       }
 
       utils.postLog(logText);
@@ -39,9 +42,11 @@ module.exports = bot => {
 
       let text = `You have been blocked.`;
 
+      logText += `${thread.user_name} (${thread.user_id}) was blocked`;
+
       if (reason && reason.length) {
         text = `You have been blocked for ${reason}`;
-        logText = `**Blocked:** ${thread.user_name} (${thread.user_id}) was blocked for ${reason}`;
+        logText += ` for ${reason}`;
       }
 
       if (msg.attachments.length) await attachments.saveAttachmentsInMessage(msg);
@@ -60,17 +65,20 @@ module.exports = bot => {
       msg.channel.createMessage(`Unblocked <@${userId}> (id ${userId}) from modmail`);
     }
 
-    let logText = `**Unblocked:** ${thread.user_name} (${thread.user_id}) was unblocked.`;
+    let logText = `**Unblocked:** `;
 
     if (! thread && args.length > 0) {
       // User mention/id as argument
-      const userId = utils.getUserMention(args.join(' '));
+      const userId = utils.getUserMention(args[0]);
       if (! userId) return;
 
+      const user = bot.users.get(userId);
       const reason = args.slice(1).join(' ').trim();
 
+      logText += `${(user ? `${user.username}#${user.discriminator}` : 'Unable to fetch username')} (${userId}) was unblocked`;
+
       if (reason && reason.length) {
-        logText = `**Unblocked:** ${thread.user_name} (${thread.user_id}) was unblocked for ${reason}`;
+        logText += ` for ${reason}`;
       }
 
       utils.postLog(logText);
@@ -79,8 +87,10 @@ module.exports = bot => {
     } else if (thread) {
       const reason = args.join(' ').trim();
 
+      logText += `${thread.user_name} (${thread.user_id}) was unblocked`;
+
       if (reason && reason.length) {
-        logText = `**Unblocked:** ${thread.user_name} (${thread.user_id}) was unblocked for ${reason}`;
+        logText += ` for ${reason}`;
       }
 
       utils.postLog(logText);
