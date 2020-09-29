@@ -7,10 +7,9 @@ module.exports = bot => {
   const addInboxServerCommand = (...args) => threadUtils.addInboxServerCommand(bot, ...args);
 
   addInboxServerCommand('block', async (msg, args, thread) => {
-    async function block(userId) {
-      const user = bot.users.get(userId);
-      await blocked.block(userId, (user ? `${user.username}#${user.discriminator}` : ''), msg.author.id);
-      msg.channel.createMessage(`Blocked <@${userId}> (id ${userId}) from modmail`);
+    async function block(user) {
+      await blocked.block(user.id, `${user.username}#${user.discriminator}`, msg.author.id);
+      msg.channel.createMessage(`Blocked <@${user.id}> (id ${user.id}) from modmail`);
     }
 
     let logText = `**Blocked:** `;
@@ -20,10 +19,12 @@ module.exports = bot => {
       const userId = utils.getUserMention(args.shift());
       if (! userId) return;
 
-      const user = bot.users.get(userId);
+      const user = await bot.getRESTUser(userId).catch(() => null);
+      if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, 'User not found!');
+
       const reason = args.join(' ').trim();
 
-      logText += `${(user ? `${user.username}#${user.discriminator}` : 'Unable to fetch username')} (${userId}) was blocked`;
+      logText += `${user.username}#${user.discriminator} (${userId}) was blocked`;
 
       if (reason && reason.length) {
         logText += ` for ${reason}`;
@@ -31,8 +32,9 @@ module.exports = bot => {
 
       utils.postLog(logText);
 
-      block(userId);
+      block(user);
     } else if (thread) {
+      const user = await bot.getRESTUser(thread.user_id);
       const reason = args.join(' ').trim();
       let isAnonymous = false;
 
@@ -55,11 +57,11 @@ module.exports = bot => {
       utils.postLog(logText);
 
       // Calling !block without args in a modmail thread blocks the user of that thread
-      block(thread.user_id);
+      block(user);
     }
   });
 
-  addInboxServerCommand('unblock', (msg, args, thread) => {
+  addInboxServerCommand('unblock', async (msg, args, thread) => {
     async function unblock(userId) {
       await blocked.unblock(userId);
       msg.channel.createMessage(`Unblocked <@${userId}> (id ${userId}) from modmail`);
@@ -72,10 +74,12 @@ module.exports = bot => {
       const userId = utils.getUserMention(args.shift());
       if (! userId) return;
 
-      const user = bot.users.get(userId);
+      const user = await bot.getRESTUser(userId).catch(() => null);
+      if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, 'User not found!');
+
       const reason = args.join(' ').trim();
 
-      logText += `${(user ? `${user.username}#${user.discriminator}` : 'Unable to fetch username')} (${userId}) was unblocked`;
+      logText += `${user.username}#${user.discriminator} (${userId}) was unblocked`;
 
       if (reason && reason.length) {
         logText += ` for ${reason}`;
