@@ -17,11 +17,11 @@ module.exports = bot => {
 
     if (! thread && args.length > 0) {
       // User mention/id as argument
-      const userId = utils.getUserMention(args[0]);
+      const userId = utils.getUserMention(args.shift());
       if (! userId) return;
 
       const user = bot.users.get(userId);
-      const reason = args.slice(1).join(' ').trim();
+      const reason = args.join(' ').trim();
 
       logText += `${(user ? `${user.username}#${user.discriminator}` : 'Unable to fetch username')} (${userId}) was blocked`;
 
@@ -69,11 +69,11 @@ module.exports = bot => {
 
     if (! thread && args.length > 0) {
       // User mention/id as argument
-      const userId = utils.getUserMention(args[0]);
+      const userId = utils.getUserMention(args.shift());
       if (! userId) return;
 
       const user = bot.users.get(userId);
-      const reason = args.slice(1).join(' ').trim();
+      const reason = args.join(' ').trim();
 
       logText += `${(user ? `${user.username}#${user.discriminator}` : 'Unable to fetch username')} (${userId}) was unblocked`;
 
