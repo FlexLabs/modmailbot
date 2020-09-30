@@ -1,25 +1,25 @@
-const Eris = require('eris');
-const transliterate = require('transliteration');
-const moment = require('moment');
-const uuid = require('uuid');
-const humanizeDuration = require('humanize-duration');
+const transliterate = require("transliteration");
+const moment = require("moment");
+const uuid = require("uuid");
+const humanizeDuration = require("humanize-duration");
+const Eris = require("eris");
 
-const bot = require('../bot');
-const knex = require('../knex');
-const config = require('../config');
-const utils = require('../utils');
-const notes = require('../data/notes')
+const bot = require("../bot");
+const knex = require("../knex");
+const config = require("../config");
+const utils = require("../utils");
+const notes = require("../data/notes");
 
-const Thread = require('./Thread');
-const { THREAD_STATUS } = require('./constants');
+const Thread = require("./Thread");
+const { THREAD_STATUS } = require("./constants");
 
 /**
  * @param {String} id
  * @returns {Promise<Thread>}
  */
 async function findById(id) {
-  const thread = await knex('threads')
-    .where('id', id)
+  const thread = await knex("threads")
+    .where("id", id)
     .first();
 
   return (thread ? new Thread(thread) : null);
@@ -30,9 +30,9 @@ async function findById(id) {
  * @returns {Promise<Thread>}
  */
 async function findOpenThreadByUserId(userId) {
-  const thread = await knex('threads')
-    .where('user_id', userId)
-    .where('status', THREAD_STATUS.OPEN)
+  const thread = await knex("threads")
+    .where("user_id", userId)
+    .where("status", THREAD_STATUS.OPEN)
     .first();
 
   return (thread ? new Thread(thread) : null);
@@ -48,13 +48,13 @@ async function findOpenThreadByUserId(userId) {
 async function createNewThreadForUser(user, quiet = false) {
   const existingThread = await findOpenThreadByUserId(user.id);
   if (existingThread) {
-    throw new Error('Attempted to create a new thread for a user with an existing open thread!');
+    throw new Error("Attempted to create a new thread for a user with an existing open thread!");
   }
 
   // Use the user's name+discrim for the thread channel's name
   // Channel names are particularly picky about what characters they allow, so we gotta do some clean-up
   let cleanName = transliterate.slugify(user.username);
-  if (cleanName === '') cleanName = 'unknown';
+  if (cleanName === "") cleanName = "unknown";
   cleanName = cleanName.slice(0, 95); // Make sure the discrim fits
 
   const channelName = `${cleanName}-${user.discriminator}`;
@@ -64,7 +64,7 @@ async function createNewThreadForUser(user, quiet = false) {
   // Attempt to create the inbox channel for this thread
   let createdChannel;
   try {
-    createdChannel = await utils.getInboxGuild().createChannel(channelName, null, 'New ModMail thread', config.newThreadCategoryId);
+    createdChannel = await utils.getInboxGuild().createChannel(channelName, null, "New ModMail thread", config.newThreadCategoryId);
   } catch (err) {
     console.error(`Error creating modmail channel for ${user.username}#${user.discriminator}!`);
     throw err;
@@ -76,7 +76,7 @@ async function createNewThreadForUser(user, quiet = false) {
     user_id: user.id,
     user_name: `${user.username}#${user.discriminator}`,
     channel_id: createdChannel.id,
-    created_at: moment.utc().format('YYYY-MM-DD HH:mm:ss')
+    created_at: moment.utc().format("YYYY-MM-DD HH:mm:ss")
   });
 
   const newThread = await findById(newThreadId);
@@ -86,7 +86,7 @@ async function createNewThreadForUser(user, quiet = false) {
     if (config.mentionRole) {
       await newThread.postNonLogMessage({
         content: `${utils.getInboxMention()}New modmail thread (${newThread.user_name})`,
-        disableEveryone: false
+        allowedMentions: { everyone: false }
       });
     }
     
@@ -98,7 +98,7 @@ async function createNewThreadForUser(user, quiet = false) {
 
   // Post some info to the beginning of the new thread
   const mainGuild = utils.getMainGuild();
-  const member = mainGuild ? await bot.getRESTGuildMember(mainGuild.id, user.id).catch(e => null) : null;
+  const member = mainGuild ? await bot.getRESTGuildMember(mainGuild.id, user.id).catch(() => null) : null;
   if (! member) console.log(`[INFO] Member ${user.id} not found in main guild ${config.mainGuildId}`);
 
   let mainGuildNickname = member && member.nick || user.username;
@@ -106,12 +106,12 @@ async function createNewThreadForUser(user, quiet = false) {
   const userLogCount = await getClosedThreadCountByUserId(user.id);
   const accountAge = humanizeDuration(Date.now() - user.createdAt, {largest: 2});
   let displayNote;
-  let userNotes = await notes.get(user.id)
+  let userNotes = await notes.get(user.id);
   if (userNotes && userNotes.length) {
     let note = userNotes.slice(-1)[0];
     displayNote = `**Note:** ${note.note} - [${note.created_at}] (${note.created_by_name})\n`;
   } else
-    displayNote = '';
+    displayNote = "";
   const infoHeader = `NAME **${mainGuildNickname}**\nMENTION ${user.mention}\nID **${user.id}**\nACCOUNT AGE **${accountAge}**\n`
     + `LOGS **${userLogCount}**\n${displayNote}────────────────────────────────`;
 
@@ -128,10 +128,10 @@ async function createNewThreadForUser(user, quiet = false) {
  */
 async function createThreadInDB(data) {
   const threadId = uuid.v4();
-  const now = moment.utc().format('YYYY-MM-DD HH:mm:ss');
+  const now = moment.utc().format("YYYY-MM-DD HH:mm:ss");
   const finalData = Object.assign({created_at: now, is_legacy: 0}, data, {id: threadId});
 
-  await knex('threads').insert(finalData);
+  await knex("threads").insert(finalData);
 
   return threadId;
 }
@@ -141,8 +141,8 @@ async function createThreadInDB(data) {
  * @returns {Promise<Thread>}
  */
 async function findByChannelId(channelId) {
-  const thread = await knex('threads')
-    .where('channel_id', channelId)
+  const thread = await knex("threads")
+    .where("channel_id", channelId)
     .first();
 
   return (thread ? new Thread(thread) : null);
@@ -153,9 +153,9 @@ async function findByChannelId(channelId) {
  * @returns {Promise<Thread>}
  */
 async function findOpenThreadByChannelId(channelId) {
-  const thread = await knex('threads')
-    .where('channel_id', channelId)
-    .where('status', THREAD_STATUS.OPEN)
+  const thread = await knex("threads")
+    .where("channel_id", channelId)
+    .where("status", THREAD_STATUS.OPEN)
     .first();
 
   return (thread ? new Thread(thread) : null);
@@ -166,9 +166,9 @@ async function findOpenThreadByChannelId(channelId) {
  * @returns {Promise<Thread>}
  */
 async function findSuspendedThreadByChannelId(channelId) {
-  const thread = await knex('threads')
-    .where('channel_id', channelId)
-    .where('status', THREAD_STATUS.SUSPENDED)
+  const thread = await knex("threads")
+    .where("channel_id", channelId)
+    .where("status", THREAD_STATUS.SUSPENDED)
     .first();
 
   return (thread ? new Thread(thread) : null);
@@ -179,18 +179,18 @@ async function findSuspendedThreadByChannelId(channelId) {
  * @returns {Promise<Thread[]>}
  */
 async function getClosedThreadsByUserId(userId) {
-  const threads = await knex('threads')
-    .where('status', THREAD_STATUS.CLOSED)
-    .where('user_id', userId)
+  const threads = await knex("threads")
+    .where("status", THREAD_STATUS.CLOSED)
+    .where("user_id", userId)
     .select();
 
   return threads.map(thread => new Thread(thread));
 }
 
 async function deleteClosedThreadsByUserId(userId) {
-  await knex('threads')
-      .where('status', THREAD_STATUS.CLOSED)
-      .where('user_id', userId)
+  await knex("threads")
+      .where("status", THREAD_STATUS.CLOSED)
+      .where("user_id", userId)
       .delete();
 }
 
@@ -199,10 +199,10 @@ async function deleteClosedThreadsByUserId(userId) {
  * @returns {Promise<number>}
  */
 async function getClosedThreadCountByUserId(userId) {
-  const row = await knex('threads')
-    .where('status', THREAD_STATUS.CLOSED)
-    .where('user_id', userId)
-    .first(knex.raw('COUNT(id) AS thread_count'));
+  const row = await knex("threads")
+    .where("status", THREAD_STATUS.CLOSED)
+    .where("user_id", userId)
+    .first(knex.raw("COUNT(id) AS thread_count"));
 
   return parseInt(row.thread_count, 10);
 }
@@ -215,12 +215,12 @@ async function findOrCreateThreadForUser(user) {
 }
 
 async function getThreadsThatShouldBeClosed() {
-  const now = moment.utc().format('YYYY-MM-DD HH:mm:ss');
-  const threads = await knex('threads')
-    .where('status', THREAD_STATUS.OPEN)
-    .whereNotNull('scheduled_close_at')
-    .where('scheduled_close_at', '<=', now)
-    .whereNotNull('scheduled_close_at')
+  const now = moment.utc().format("YYYY-MM-DD HH:mm:ss");
+  const threads = await knex("threads")
+    .where("status", THREAD_STATUS.OPEN)
+    .whereNotNull("scheduled_close_at")
+    .where("scheduled_close_at", "<=", now)
+    .whereNotNull("scheduled_close_at")
     .select();
 
   return threads.map(thread => new Thread(thread));

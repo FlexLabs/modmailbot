@@ -1,8 +1,12 @@
 {
   "root": true,
 
+  "plugins": ["jsdoc"],
+
+  "extends": ["eslint:recommended"],
+
   "parserOptions": {
-    "ecmaVersion": 8,
+    "ecmaVersion": 2020,
     "sourceType": "module",
     "ecmaFeatures": {
       "experimentalObjectRestSpread": true
@@ -10,7 +14,8 @@
   },
 
   "env": {
-    "node": true
+    "node": true,
+    "es6": true
   },
 
   "rules": {
@@ -22,6 +27,11 @@
         "!": true,
         "!!": true
       }
-    }]
+    }],
+    "quotes": "error",
+    "semi": "error",
+    "no-prototype-builtins": "off",
+    "no-empty": "off",
+    "jsdoc/no-undefined-types": 1
   }
 }

@@ -1,5 +1,5 @@
-const Eris = require('eris');
-const config = require('./config');
+const Eris = require("eris");
+const config = require("./config");
 
 const bot = new Eris.CommandClient(config.token, {
   getAllUsers: true,
@@ -8,7 +8,8 @@ const bot = new Eris.CommandClient(config.token, {
     everyone: false,
     users: true,
     roles: false,
-  }
+  },
+  intents: ["guilds", "guildMembers", "guildMessages", "guildMessageTyping", "directMessages", "directMessageTyping"] // Hopefully this is all that's needed?
 }, {
   prefix: config.prefix,
   ignoreSelf: true,

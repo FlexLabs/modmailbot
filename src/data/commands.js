@@ -1,7 +1,11 @@
-const db = require('../dynodb');
+const db = require("../dynodb");
 
+/**
+ * @param {String} name
+ * @returns {Promise<{ _id: any; name: string; _state: number; [s: string]: any; }>}
+ */
 async function getCommand(name) {
-	return await db.models.Command.findOne({ _state: 42, name }).lean();
+	return db.models.Command.findOne({ _state: 42, name }).lean();
 }
 
 module.exports = {

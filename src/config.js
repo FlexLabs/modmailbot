@@ -1,9 +1,9 @@
-const path = require('path');
+const path = require("path");
 
 let userConfig;
 
 try {
-  userConfig = require('../config');
+  userConfig = require("../config");
 } catch (e) {
   throw new Error(`Config file could not be found or read! The error given was: ${e.message}`);
 }
@@ -68,10 +68,10 @@ const defaultConfig = {
 
   "mongoDSN": null,
 
-  "dbDir": path.join(__dirname, '..', 'db'),
+  "dbDir": path.join(__dirname, "..", "db"),
   "knex": null,
 
-  "logDir": path.join(__dirname, '..', 'logs'),
+  "logDir": path.join(__dirname, "..", "logs"),
 
   "dataFactory": false,
 
@@ -79,11 +79,11 @@ const defaultConfig = {
   "dashAuthUsers": null,
   "clientId": null,
   "clientSecret": null,
-  "redirectPath": '/login',
+  "redirectPath": "/login",
 };
 
-const required = ['token', 'mailGuildId', 'mainGuildId', 'logChannelId'];
-const requiredAuth = ['clientId', 'clientSecret', 'redirectPath'];
+const required = ["token", "mailGuildId", "mainGuildId", "logChannelId"];
+const requiredAuth = ["clientId", "clientSecret", "redirectPath"];
 
 const finalConfig = Object.assign({}, defaultConfig);
 
@@ -95,19 +95,19 @@ for (const [prop, value] of Object.entries(userConfig)) {
   finalConfig[prop] = value;
 }
 
-if (! finalConfig['knex']) {
-  finalConfig['knex'] = {
-    client: 'sqlite',
+if (! finalConfig["knex"]) {
+  finalConfig["knex"] = {
+    client: "sqlite",
     connection: {
-      filename: path.join(finalConfig.dbDir, 'data.sqlite')
+      filename: path.join(finalConfig.dbDir, "data.sqlite")
     },
     useNullAsDefault: true
   };
 }
 
-Object.assign(finalConfig['knex'], {
+Object.assign(finalConfig["knex"], {
   migrations: {
-    directory: path.join(finalConfig.dbDir, 'migrations')
+    directory: path.join(finalConfig.dbDir, "migrations")
   }
 });
 
@@ -119,9 +119,9 @@ for (const opt of required) {
 }
 
 if (finalConfig.dashAuthRoles || finalConfig.dashAuthUsers) {
-  let missingAuth = requiredAuth.filter(opt => ! finalConfig[opt])
+  let missingAuth = requiredAuth.filter(opt => ! finalConfig[opt]);
   if (missingAuth.length) {
-    console.error(`Missing settings required by "dashAuth": ${missingAuth.join(' ')}`);
+    console.error(`Missing settings required by "dashAuth": ${missingAuth.join(" ")}`);
     process.exit(1);
   }
 }

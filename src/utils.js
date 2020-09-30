@@ -1,40 +1,39 @@
-const Eris = require('eris');
-const bot = require('./bot');
-const moment = require('moment');
-const publicIp = require('public-ip');
-const attachments = require('./data/attachments');
-const config = require('./config');
+const bot = require("./bot");
+const moment = require("moment");
+const publicIp = require("public-ip");
+const attachments = require("./data/attachments");
+const config = require("./config");
 
 class BotError extends Error {}
 
-const userMentionRegex = /^<@\!?([0-9]+?)>$/;
+const userMentionRegex = /^<@!?([0-9]+?)>$/;
 
 let inboxGuild = null;
 let mainGuild = null;
 let logChannel = null;
 
 /**
- * @returns {Eris~Guild}
+ * @returns {Eris.Guild}
  */
 function getInboxGuild() {
   if (! inboxGuild) inboxGuild = bot.guilds.find(g => g.id === config.mailGuildId);
-  if (! inboxGuild) throw new BotError('The bot is not on the modmail (inbox) server!');
+  if (! inboxGuild) throw new BotError("The bot is not on the modmail (inbox) server!");
   return inboxGuild;
 }
 
 /**
- * @returns {Eris~Guild}
+ * @returns {Eris.Guild}
  */
 function getMainGuild() {
   if (! mainGuild) mainGuild = bot.guilds.find(g => g.id === config.mainGuildId);
-  if (! mainGuild) console.warn('[WARN] The bot is not on the main server! If this is intentional, you can ignore this warning.');
+  if (! mainGuild) console.warn("[WARN] The bot is not on the main server! If this is intentional, you can ignore this warning.");
   return mainGuild;
 }
 
 /**
  * Returns the designated log channel, or the default channel if none is set
  * @param bot
- * @returns {Eris~TextChannel}
+ * @returns {Eris.TextChannel}
  */
 function getLogChannel() {
   const inboxGuild = getInboxGuild();
@@ -46,7 +45,7 @@ function getLogChannel() {
   }
 
   if (! logChannel) {
-    throw new BotError('Log channel not found!');
+    throw new BotError("Log channel not found!");
   }
 
   return logChannel;
@@ -65,12 +64,12 @@ function postError(str) {
 
 function handleError(error) {
   bot.executeWebhook(config.errorWebhookId, config.errorWebhookToken, {
-    content: '**Error:**\n'
+    content: "**Error:**\n"
       + `\`\`\`js\n${error.stack}\n\`\`\``
   }).catch(() => { // If no webhook configs are supplied, promise will be rejected
-    getLogChannel().createMessage('**Error:**\n'
-      + `\`\`\`js\n${error.stack}\n\`\`\``)
-  })
+    getLogChannel().createMessage("**Error:**\n"
+      + `\`\`\`js\n${error.stack}\n\`\`\``);
+  });
 }
 
 /**
@@ -142,7 +141,7 @@ function getUserMention(str) {
  * @returns {String}
  */
 function getTimestamp(...momentArgs) {
-  return moment.utc(...momentArgs).format('[Today] [at] hh:mm A');
+  return moment.utc(...momentArgs).format("[Today] [at] hh:mm A");
 }
 
 /**
@@ -151,7 +150,7 @@ function getTimestamp(...momentArgs) {
  * @returns {String}
  */
 function disableLinkPreviews(str) {
-  return str.replace(/(^|[^<])(https?:\/\/\S+)/ig, '$1<$2>');
+  return str.replace(/(^|[^<])(https?:\/\/\S+)/ig, "$1<$2>");
 }
 
 /**
@@ -159,7 +158,7 @@ function disableLinkPreviews(str) {
  * @param {String} path
  * @returns {Promise<String>}
  */
-async function getSelfUrl(path = '') {
+async function getSelfUrl(path = "") {
   if (config.url) {
     return `${config.url}/${path}`;
   } else {
@@ -171,8 +170,8 @@ async function getSelfUrl(path = '') {
 
 /**
  * Returns the highest hoisted role of the given member
- * @param {Eris~Member} member
- * @returns {Eris~Role}
+ * @param {Eris.Member} member
+ * @returns {Eris.Role}
  */
 function getMainRole(member) {
   const roles = member.roles.map(id => member.guild.roles.get(id));
@@ -203,9 +202,9 @@ function chunk(items, chunkSize) {
  */
 function trimAll(str) {
   return str
-    .split('\n')
+    .split("\n")
     .map(str => str.trim())
-    .join('\n');
+    .join("\n");
 }
 
 /**
@@ -220,17 +219,17 @@ function convertDelayStringToMS(str) {
 
   str = str.trim();
 
-  while (str !== '' && (match = str.match(regex)) !== null) {
-    if (match[2] === 'd') ms += match[1] * 1000 * 60 * 60 * 24;
-    else if (match[2] === 'h') ms += match[1] * 1000 * 60 * 60;
-    else if (match[2] === 'm') ms += match[1] * 1000 * 60;
-    else if (match[2] === 's' || ! match[2]) ms += match[1] * 1000;
+  while (str !== "" && (match = str.match(regex)) !== null) {
+    if (match[2] === "d") ms += match[1] * 1000 * 60 * 60 * 24;
+    else if (match[2] === "h") ms += match[1] * 1000 * 60 * 60;
+    else if (match[2] === "m") ms += match[1] * 1000 * 60;
+    else if (match[2] === "s" || ! match[2]) ms += match[1] * 1000;
 
     str = str.slice(match[0].length);
   }
 
   // Invalid delay string
-  if (str !== '') {
+  if (str !== "") {
     return null;
   }
 
@@ -238,9 +237,9 @@ function convertDelayStringToMS(str) {
 }
 
 function getInboxMention() {
-  if (config.mentionRole == null) return '';
-  else if (config.mentionRole === 'here') return '@here ';
-  else if (config.mentionRole === 'everyone') return '@everyone ';
+  if (config.mentionRole == null) return "";
+  else if (config.mentionRole === "here") return "@here ";
+  else if (config.mentionRole === "everyone") return "@everyone ";
   else return `<@&${config.mentionRole}> `;
 }
 
@@ -267,7 +266,7 @@ function setDataModelProps(target, props) {
         target[prop] = null;
       } else {
         // Set the value as a string in the same format it's returned in SQLite
-        target[prop] = moment.utc(props[prop]).format('YYYY-MM-DD HH:mm:ss');
+        target[prop] = moment.utc(props[prop]).format("YYYY-MM-DD HH:mm:ss");
       }
     } else {
       target[prop] = props[prop];
@@ -276,7 +275,7 @@ function setDataModelProps(target, props) {
 }
 
 function regEscape(str) {
-  return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  return str.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
 }
 
 module.exports = {

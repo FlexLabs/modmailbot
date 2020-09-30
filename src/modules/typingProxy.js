@@ -1,7 +1,10 @@
-const config = require('../config');
+const config = require("../config");
 const threads = require("../data/threads");
 const Eris = require("eris");
 
+/**
+ * @param {Eris.CommandClient} bot
+ */
 module.exports = bot => {
   // Typing proxy: forwarding typing events between the DM and the modmail thread
   if(config.typingProxy || config.typingProxyReverse) {

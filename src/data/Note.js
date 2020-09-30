@@ -1,4 +1,4 @@
-const utils = require('../utils')
+const utils = require("../utils");
 
 /**
  * @property {String} user_id
@@ -10,7 +10,7 @@ const utils = require('../utils')
 
 class Note {
   constructor(props) {
-    utils.setDataModelProps(this, props)
+    utils.setDataModelProps(this, props);
   }
 }
 

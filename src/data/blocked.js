@@ -1,5 +1,5 @@
-const moment = require('moment');
-const knex = require('../knex');
+const moment = require("moment");
+const knex = require("../knex");
 
 /**
  * Checks whether userId is blocked
@@ -7,8 +7,8 @@ const knex = require('../knex');
  * @returns {Promise<Boolean>}
  */
 async function isBlocked(userId) {
-  const row = await knex('blocked_users')
-    .where('user_id', userId)
+  const row = await knex("blocked_users")
+    .where("user_id", userId)
     .first();
 
   return !! row;
@@ -19,28 +19,28 @@ async function isBlocked(userId) {
  * @param {String} userId
  * @param {String} userName
  * @param {String} blockedBy
- * @returns {Promise}
+ * @returns {Promise<number[]>}
  */
-async function block(userId, userName = '', blockedBy = null) {
+async function block(userId, userName = "", blockedBy = null) {
   if (await isBlocked(userId)) return;
 
-  return knex('blocked_users')
+  return knex("blocked_users")
     .insert({
       user_id: userId,
       user_name: userName,
       blocked_by: blockedBy,
-      blocked_at: moment.utc().format('YYYY-MM-DD HH:mm:ss')
+      blocked_at: moment.utc().format("YYYY-MM-DD HH:mm:ss")
     });
 }
 
 /**
  * Unblocks the given userId
  * @param {String} userId
- * @returns {Promise}
+ * @returns {Promise<number>}
  */
 async function unblock(userId) {
-  return knex('blocked_users')
-    .where('user_id', userId)
+  return knex("blocked_users")
+    .where("user_id", userId)
     .delete();
 }
 

@@ -1,19 +1,21 @@
-const path = require('path');
-const fs = require('fs');
-const {promisify} = require('util');
+const Eris = require("eris");
+const path = require("path");
+const fs = require("fs");
+const {promisify} = require("util");
 const utils = require("../utils");
 const threadUtils = require("../threadUtils");
 
 const access = promisify(fs.access);
 const readFile = promisify(fs.readFile);
 
-const GIT_DIR = path.join(__dirname, '..', '..', '.git');
+const GIT_DIR = path.join(__dirname, "..", "..", ".git");
 
+/**
+ * @param {Eris.CommandClient} bot
+ */
 module.exports = bot => {
-  const addInboxServerCommand = (...args) => threadUtils.addInboxServerCommand(bot, ...args);
-
-  addInboxServerCommand('version', async (msg, args, thread) => {
-    const packageJson = require('../../package.json');
+  threadUtils.addInboxServerCommand(bot, "version", async (msg, args, thread) => {
+    const packageJson = require("../../package.json");
     const packageVersion = packageJson.version;
 
     let response = `Modmail v${packageVersion}`;
@@ -28,12 +30,12 @@ module.exports = bot => {
 
     if (isGit) {
       let commitHash;
-      const HEAD = await readFile(path.join(GIT_DIR, 'HEAD'), {encoding: 'utf8'});
+      const HEAD = await readFile(path.join(GIT_DIR, "HEAD"), {encoding: "utf8"});
 
-      if (HEAD.startsWith('ref:')) {
+      if (HEAD.startsWith("ref:")) {
         // Branch
         const ref = HEAD.match(/^ref: (.*)$/m)[1];
-        commitHash = (await readFile(path.join(GIT_DIR, ref), {encoding: 'utf8'})).trim();
+        commitHash = (await readFile(path.join(GIT_DIR, ref), {encoding: "utf8"})).trim();
       } else {
         // Detached head
         commitHash = HEAD.trim();

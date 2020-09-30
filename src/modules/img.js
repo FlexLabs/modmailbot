@@ -1,22 +1,33 @@
+const Eris = require("eris");
 const threadUtils = require("../threadUtils");
-const { getSelfUrl, regEscape } = require('../utils');
+const { getSelfUrl, regEscape } = require("../utils");
 
 const DISCORD_REGEX = /(https:\/\/(canary\.|beta\.)?discord(app)?\.com\/channels\/\d{17,19}\/\d{17,19}\/)?\d{17,19}/g;
-const REPLACE_REGEX = (str) => new RegExp(regEscape(str), 'g');
-const ATTACHMENT_REGEX = (str) => new RegExp(`${regEscape(str)}(?:(?! ).)*`, 'g');
-const DISCORD_ATTACHMENT_REGEX = (str) => new RegExp(str, 'g');
+/**
+ * @param {String} str 
+ */
+const REPLACE_REGEX = (str) => new RegExp(regEscape(str), "g");
+/**
+ * @param {String} str 
+ */
+const ATTACHMENT_REGEX = (str) => new RegExp(`${regEscape(str)}(?:(?! ).)*`, "g");
+/**
+ * @param {String} str 
+ */
+const DISCORD_ATTACHMENT_REGEX = (str) => new RegExp(str, "g");
 
+/**
+ * @param {Eris.CommandClient} bot
+ */
 module.exports = bot => {
-  const addInboxServerCommand = (...args) => threadUtils.addInboxServerCommand(bot, ...args);
-
-  addInboxServerCommand('img', async (msg, args, thread) => {
+  threadUtils.addInboxServerCommand(bot, "img", async (msg, args, thread) => {
     if (! thread) return;
-    if (! args.length) return msg.channel.createMessage('<:dynoError:696561633425621078> Provide message or attachment URL(s)');
-    const [selfURL, dmChannel] = await Promise.all([getSelfUrl('/attachments'), bot.getDMChannel(thread.user_id)]);
+    if (! args.length) return msg.channel.createMessage("<:dynoError:696561633425621078> Provide message or attachment URL(s)");
+    const [selfURL, dmChannel] = await Promise.all([getSelfUrl("/attachments"), bot.getDMChannel(thread.user_id)]);
     if (! dmChannel) return;
 
     const discordURLs = await Promise.all(msg.content.match(DISCORD_REGEX).map(async url => {
-      const asArray = url.split('/');
+      const asArray = url.split("/");
       const messageID = asArray[asArray.length - 1];
       try {
         const { content } = await msg.channel.getMessage(messageID);
@@ -31,10 +42,10 @@ module.exports = bot => {
     });
 
     const attachments = msg.content.match(ATTACHMENT_REGEX(selfURL));
-    if (! attachments.length) return msg.channel.createMessage('<:dynoError:696561633425621078> Could not find an attachment');
-    const urls = attachments.join('\n').replace(DISCORD_ATTACHMENT_REGEX(selfURL), `https://cdn.discordapp.com/attachments/${dmChannel.id}/`);
+    if (! attachments.length) return msg.channel.createMessage("<:dynoError:696561633425621078> Could not find an attachment");
+    const urls = attachments.join("\n").replace(DISCORD_ATTACHMENT_REGEX(selfURL), `https://cdn.discordapp.com/attachments/${dmChannel.id}/`);
     msg.channel.createMessage(urls);
   });
 
-  bot.registerCommandAlias('att', 'img');
+  bot.registerCommandAlias("att", "img");
 };

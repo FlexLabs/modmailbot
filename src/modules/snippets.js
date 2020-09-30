@@ -1,16 +1,18 @@
-const threads = require('../data/threads');
-const snippets = require('../data/snippets');
-const config = require('../config');
-const utils = require('../utils');
-const threadUtils = require('../threadUtils');
+const Eris = require("eris");
+const threads = require("../data/threads");
+const snippets = require("../data/snippets");
+const config = require("../config");
+const utils = require("../utils");
+const threadUtils = require("../threadUtils");
 
+/**
+ * @param {Eris.CommandClient} bot
+ */
 module.exports = bot => {
-  const addInboxServerCommand = (...args) => threadUtils.addInboxServerCommand(bot, ...args);
-
   /**
    * When a staff member uses a snippet (snippet prefix + trigger word), find the snippet and post it as a reply in the thread
    */
-  bot.on('messageCreate', async msg => {
+  bot.on("messageCreate", async msg => {
     if (! utils.messageIsOnInboxServer(msg)) return;
     if (! utils.isStaff(msg.member)) return;
 
@@ -21,7 +23,7 @@ module.exports = bot => {
     const thread = await threads.findByChannelId(msg.channel.id);
     if (! thread) return;
 
-    const trigger = msg.content.replace(config.snippetPrefix, '').toLowerCase();
+    const trigger = msg.content.replace(config.snippetPrefix, "").toLowerCase();
     const snippet = await snippets.get(trigger);
     if (! snippet) return;
 
@@ -30,29 +32,29 @@ module.exports = bot => {
   });
 
   // Show or add a snippet
-  addInboxServerCommand('snippet', async (msg, args, thread) => {
+  threadUtils.addInboxServerCommand(bot, "snippet", async (msg, args, thread) => {
     const trigger = args[0];
-    if (! trigger) return
+    if (! trigger) return;
 
     const snippet = await snippets.get(trigger);
-    let text = args.slice(1).join(' ').trim();
+    let text = args.slice(1).join(" ").trim();
     let isAnonymous = config.snippetAnonDefault || false;
 
-    if (args[1] === 'anon') {
-      text = args.slice(2).join(' ').trim();
+    if (args[1] === "anon") {
+      text = args.slice(2).join(" ").trim();
       isAnonymous = true;
     }
 
     if (snippet) {
-      if (args[1] === 'raw') {
+      if (args[1] === "raw") {
         // Post the raw snippet in a codeblock if it exists.
-        utils.postSystemMessageWithFallback(msg.channel, thread, `\`${config.snippetPrefix}${trigger}\` replies ${snippet.is_anonymous ? 'anonymously ' : ''}with:\n\`\`\`\n${snippet.body}\`\`\``);
+        utils.postSystemMessageWithFallback(msg.channel, thread, `\`${config.snippetPrefix}${trigger}\` replies ${snippet.is_anonymous ? "anonymously " : ""}with:\n\`\`\`\n${snippet.body}\`\`\``);
       } else if (text) {
         // If the snippet exists and we're trying to create a new one, inform the user the snippet already exists
         utils.postSystemMessageWithFallback(msg.channel, thread, `Snippet "${trigger}" already exists! You can edit or delete it with ${config.prefix}edit_snippet and ${config.prefix}delete_snippet respectively.`);
       } else {
         // If the snippet exists and we're NOT trying to create a new one, show info about the existing snippet
-        utils.postSystemMessageWithFallback(msg.channel, thread, `\`${config.snippetPrefix}${trigger}\` replies ${snippet.is_anonymous ? 'anonymously ' : ''}with:\n${snippet.body}`);
+        utils.postSystemMessageWithFallback(msg.channel, thread, `\`${config.snippetPrefix}${trigger}\` replies ${snippet.is_anonymous ? "anonymously " : ""}with:\n${snippet.body}`);
       }
     } else {
       if (text) {
@@ -66,9 +68,9 @@ module.exports = bot => {
     }
   });
 
-  bot.registerCommandAlias('s', 'snippet');
+  bot.registerCommandAlias("s", "snippet");
 
-  addInboxServerCommand('delete_snippet', async (msg, args, thread) => {
+  threadUtils.addInboxServerCommand(bot, "delete_snippet", async (msg, args, thread) => {
     const trigger = args[0];
     if (! trigger) return;
 
@@ -82,13 +84,13 @@ module.exports = bot => {
     utils.postSystemMessageWithFallback(msg.channel, thread, `Snippet "${trigger}" deleted!`);
   });
 
-  bot.registerCommandAlias('ds', 'delete_snippet');
+  bot.registerCommandAlias("ds", "delete_snippet");
 
-  addInboxServerCommand('edit_snippet', async (msg, args, thread) => {
+  threadUtils.addInboxServerCommand(bot, "edit_snippet", async (msg, args, thread) => {
     const trigger = args[0];
     if (! trigger) return;
 
-    let text = args.slice(1).join(' ').trim();
+    let text = args.slice(1).join(" ").trim();
     if (! text) return;
     
     const snippet = await snippets.get(trigger);
@@ -105,13 +107,13 @@ module.exports = bot => {
     utils.postSystemMessageWithFallback(msg.channel, thread, `Snippet "${trigger}" edited!`);
   });
 
-  bot.registerCommandAlias('es', 'edit_snippet');
+  bot.registerCommandAlias("es", "edit_snippet");
 
-  addInboxServerCommand('snippets', async (msg, args, thread) => {
+  threadUtils.addInboxServerCommand(bot, "snippets", async (msg, args, thread) => {
     const allSnippets = await snippets.all();
     const triggers = allSnippets.map(s => s.trigger);
     triggers.sort();
 
-    utils.postSystemMessageWithFallback(msg.channel, thread, `Available snippets (prefix ${config.snippetPrefix}):\n${triggers.join(', ')}`);
+    utils.postSystemMessageWithFallback(msg.channel, thread, `Available snippets (prefix ${config.snippetPrefix}):\n${triggers.join(", ")}`);
   });
 };

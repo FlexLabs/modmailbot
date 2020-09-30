@@ -1,12 +1,20 @@
-const threadUtils = require('../threadUtils');
+const Eris = require("eris");
+const threadUtils = require("../threadUtils");
+const attachments = require("../data/attachments");
 const blocked = require("../data/blocked");
-const config = require('../config');
+const config = require("../config");
 const utils = require("../utils");
 
+/**
+ * @param {Eris.CommandClient} bot
+ */
 module.exports = bot => {
   const addInboxServerCommand = (...args) => threadUtils.addInboxServerCommand(bot, ...args);
 
-  addInboxServerCommand('block', async (msg, args, thread) => {
+  addInboxServerCommand("block", async (msg, args, thread) => {
+    /**
+     * @param {String} userId 
+     */
     async function block(user) {
       await blocked.block(user.id, `${user.username}#${user.discriminator}`, msg.author.id);
       msg.channel.createMessage(`Blocked <@${user.id}> (id ${user.id}) from modmail`);
@@ -20,9 +28,9 @@ module.exports = bot => {
       if (! userId) return;
 
       const user = await bot.getRESTUser(userId).catch(() => null);
-      if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, 'User not found!');
+      if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");
 
-      const reason = args.join(' ').trim();
+      const reason = args.join(" ").trim();
 
       logText += `${user.username}#${user.discriminator} (${userId}) was blocked`;
 
@@ -35,14 +43,14 @@ module.exports = bot => {
       block(user);
     } else if (thread) {
       const user = await bot.getRESTUser(thread.user_id);
-      const reason = args.join(' ').trim();
+      const reason = args.join(" ").trim();
       let isAnonymous = false;
 
       if (config.replyAnonDefault === true) {
         isAnonymous = true;
       }
 
-      let text = `You have been blocked.`;
+      let text = "You have been blocked.";
 
       logText += `${thread.user_name} (${thread.user_id}) was blocked`;
 
@@ -61,7 +69,7 @@ module.exports = bot => {
     }
   });
 
-  addInboxServerCommand('unblock', async (msg, args, thread) => {
+  addInboxServerCommand("unblock", async (msg, args, thread) => {
     async function unblock(userId) {
       await blocked.unblock(userId);
       msg.channel.createMessage(`Unblocked <@${userId}> (id ${userId}) from modmail`);
@@ -75,11 +83,12 @@ module.exports = bot => {
       if (! userId) return;
 
       const user = await bot.getRESTUser(userId).catch(() => null);
-      if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, 'User not found!');
+      if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");
 
-      const reason = args.join(' ').trim();
+      const reason = args.join(" ").trim();
 
       logText += `${user.username}#${user.discriminator} (${userId}) was unblocked`;
+
 
       if (reason && reason.length) {
         logText += ` for ${reason}`;
@@ -89,7 +98,7 @@ module.exports = bot => {
 
       unblock(userId);
     } else if (thread) {
-      const reason = args.join(' ').trim();
+      const reason = args.join(" ").trim();
 
       logText += `${thread.user_name} (${thread.user_id}) was unblocked`;
 

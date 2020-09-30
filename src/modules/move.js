@@ -1,42 +1,53 @@
-const config = require('../config');
-const Eris = require('eris');
-const threadUtils = require('../threadUtils');
-const transliterate = require("transliteration");
+const Eris = require("eris");
+const config = require("../config");
+const threadUtils = require("../threadUtils");
 
+/**
+ * @param {Eris.CommandClient} bot
+ */
 module.exports = bot => {
-  const addInboxServerCommand = (...args) => threadUtils.addInboxServerCommand(bot, ...args);
-
+  /**
+   * @param {Eris.GuildTextableChannel} channel
+   */
   async function clearThreadOverwrites(channel) {
     const overwrites = channel.permissionOverwrites;
     if (! overwrites) return;
     let promises = [];
     for (let o of overwrites.values()) {
       if (o.id === channel.guild.id) continue;
-      promises.push(channel.deletePermission(o.id, 'Moving modmail thread.'));
+      promises.push(channel.deletePermission(o.id, "Moving modmail thread."));
     }
 
     return await Promise.all(promises);
   }
 
+  /**
+   * @param {Eris.GuildTextableChannel} channel
+   * @param {Eris.CategoryChannel} category
+   */
   function syncThreadChannel(channel, category) {
     const overwrites = category.permissionOverwrites;
     if (! overwrites) return;
     for (let o of overwrites.values()) {
       if (o.id === channel.guild.id) continue;
-      channel.editPermission(o.id, o.allow || null, o.deny || null, o.type, 'Moving modmail thread.');
+      // @ts-ignore #993
+      channel.editPermission(o.id, o.allow || null, o.deny || null, o.type, "Moving modmail thread.");
     }
   }
 
-  addInboxServerCommand('move', async (msg, args, thread) => {
+  threadUtils.addInboxServerCommand(bot, "move", async (msg, args, thread) => {
     if (! config.allowMove) return;
 
     if (! thread) return;
 
     const searchStr = args[0];
-    if (! searchStr || searchStr.trim() === '') return;
+    if (! searchStr || searchStr.trim() === "") return;
 
     // const normalizedSearchStr = transliterate.slugify(searchStr);
 
+    /**
+     * @type {Eris.CategoryChannel[]}
+     */
     const categories = msg.channel.guild.channels.filter(c => {
       if (config.allowedCategories && config.allowedCategories.length) {
         if (config.allowedCategories.find(id => id === c.id)) {
@@ -51,9 +62,12 @@ module.exports = bot => {
 
     if (categories.length === 0) return;
 
+    /**
+     * @type {Eris.CategoryChannel}
+     */
     const targetCategory = categories.find(c => c.name.toLowerCase() === searchStr.toLowerCase() || c.name.toLowerCase().startsWith(searchStr.toLowerCase()));
     if (! targetCategory) {
-      return thread.postSystemMessage('No matching category.');
+      return thread.postSystemMessage("No matching category.");
     }
 
     // See if any category name contains a part of the search string
@@ -82,16 +96,19 @@ module.exports = bot => {
     // }
 
     // const targetCategory = containsRankings[0][0];
+    /**
+     * @type {Eris.GuildTextableChannel}
+     */
     const threadChannel = msg.channel.guild.channels.get(thread.channel_id);
 
     await clearThreadOverwrites(threadChannel);
 
     bot.editChannel(thread.channel_id, {
       parentID: targetCategory.id
-    }).then(channel => syncThreadChannel(threadChannel, targetCategory));
+    }).then(() => syncThreadChannel(threadChannel, targetCategory));
 
     thread.postSystemMessage(`Thread moved to ${targetCategory.name.toUpperCase()}`);
   });
 
-  bot.registerCommandAlias('m', 'move');
+  bot.registerCommandAlias("m", "move");
 };

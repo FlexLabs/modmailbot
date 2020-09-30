@@ -1,11 +1,16 @@
+const Eris = require("eris");
+const SSE = require("express-sse");
 const utils = require("../utils");
 const threadUtils = require("../threadUtils");
 const threads = require("../data/threads");
 
+/**
+ * 
+ * @param {Eris.CommandClient} bot 
+ * @param {SSE} sse 
+ */
 module.exports = (bot, sse) => {
-  const addInboxServerCommand = (...args) => threadUtils.addInboxServerCommand(bot, ...args);
-
-  addInboxServerCommand('newthread', async (msg, args, thread) => {
+  threadUtils.addInboxServerCommand(bot, "newthread", async (msg, args, thread) => {
     if (args.length === 0) return;
 
     const userId = utils.getUserMention(args[0]);
@@ -13,7 +18,7 @@ module.exports = (bot, sse) => {
 
     const user = bot.users.get(userId);
     if (! user) {
-      utils.postSystemMessageWithFallback(msg.channel, thread, 'User not found!');
+      utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");
       return;
     }
 
@@ -26,7 +31,7 @@ module.exports = (bot, sse) => {
     const createdThread = await threads.createNewThreadForUser(user, true);
     createdThread.postSystemMessage(`Thread was opened by ${msg.author.username}#${msg.author.discriminator}`);
     
-    sse.send({ thread: createdThread }, 'threadOpen')
+    sse.send({ thread: createdThread }, "threadOpen", null);
 
     if (thread) {
       msg.delete();

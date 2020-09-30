@@ -1,60 +1,61 @@
-const Eris = require('eris');
-const SSE = require('express-sse');
+const Eris = require("eris");
+const SSE = require("express-sse");
 
-const config = require('./config');
-const bot = require('./bot');
-const Queue = require('./queue');
-const utils = require('./utils');
-const blocked = require('./data/blocked');
-const threads = require('./data/threads');
+const config = require("./config");
+const bot = require("./bot");
+const Queue = require("./queue");
+const utils = require("./utils");
+const blocked = require("./data/blocked");
+const threads = require("./data/threads");
 
-const reply = require('./modules/reply');
-const purge = require('./modules/purge');
-const tags = require('./modules/tags');
-const command = require('./modules/command');
-const close = require('./modules/close');
-const snippets = require('./modules/snippets');
-const logs = require('./modules/logs');
-const move = require('./modules/move');
-const block = require('./modules/block');
-const suspend = require('./modules/suspend');
-const webserver = require('./modules/webserver');
-const greeting = require('./modules/greeting');
-const typingProxy = require('./modules/typingProxy');
-const version = require('./modules/version');
-const newthread = require('./modules/newthread');
-const notes = require('./modules/notes');
-const idcmd = require('./modules/id');
-const ping = require('./modules/ping');
-const fixAttachment = require('./modules/img');
-const pull = require('./modules/pull');
-const restart = require('./modules/restart');
+const reply = require("./modules/reply");
+const purge = require("./modules/purge");
+const tags = require("./modules/tags");
+const command = require("./modules/command");
+const close = require("./modules/close");
+const snippets = require("./modules/snippets");
+const logs = require("./modules/logs");
+const move = require("./modules/move");
+const block = require("./modules/block");
+const suspend = require("./modules/suspend");
+const webserver = require("./modules/webserver");
+const greeting = require("./modules/greeting");
+const typingProxy = require("./modules/typingProxy");
+const version = require("./modules/version");
+const newthread = require("./modules/newthread");
+const notes = require("./modules/notes");
+const idcmd = require("./modules/id");
+const ping = require("./modules/ping");
+const fixAttachment = require("./modules/img");
+const pull = require("./modules/pull");
+const restart = require("./modules/restart");
+const info = require("./modules/info");
 
 const attachments = require("./data/attachments");
-const {ACCIDENTAL_THREAD_MESSAGES} = require('./data/constants');
+const {ACCIDENTAL_THREAD_MESSAGES} = require("./data/constants");
 
 const messageQueue = new Queue();
 const sse = new SSE();
 
 // Once the bot has connected, set the status/"playing" message
-bot.on('ready', () => {
+bot.on("ready", () => {
   bot.editStatus(null, {name: config.status});
-  console.log('Connected! Now listening to DMs.');
-  let guild = bot.guilds.get(config.mainGuildId)
-  let roles = []
-  let users = []
-  let channels = []
+  console.log("Connected! Now listening to DMs.");
+  let guild = bot.guilds.get(config.mainGuildId);
+  let roles = [];
+  let users = [];
+  let channels = [];
   for (let role of guild.roles.values())
-    roles.push({ id: role.id, name: role.name, color: role.color })
+    roles.push({ id: role.id, name: role.name, color: role.color });
   for (let member of guild.members.values())
-    users.push({ id: member.id, name: member.username, discrim: member.discriminator })
+    users.push({ id: member.id, name: member.username, discrim: member.discriminator });
   for (let channel of guild.channels.values())
-    channels.push({ id: channel.id, name: channel.name })
+    channels.push({ id: channel.id, name: channel.name });
   sse.updateInit({
     roles: roles,
     users: users,
     channels: channels
-  })
+  });
   webserver(bot, sse);
 });
 
@@ -63,7 +64,7 @@ bot.on('ready', () => {
  * 1) If alwaysReply is enabled, reply to the user
  * 2) If alwaysReply is disabled, save that message as a chat message in the thread
  */
-bot.on('messageCreate', async msg => {
+bot.on("messageCreate", async msg => {
   if (! utils.messageIsOnInboxServer(msg)) return;
   if (msg.author.bot) return;
 
@@ -92,14 +93,14 @@ bot.on('messageCreate', async msg => {
  * 1) Find the open modmail thread for this user, or create a new one
  * 2) Post the message as a user reply in the thread
  */
-bot.on('messageCreate', async msg => {
+bot.on("messageCreate", async msg => {
   if (! (msg.channel instanceof Eris.PrivateChannel)) return;
   if (msg.author.bot) return;
   if (msg.type !== 0) return; // Ignore pins etc.
 
   if (await blocked.isBlocked(msg.author.id)) return;
 
-  if (msg.content.length > 1900) return msg.channel.createMessage(`Your message is too long to be recieved by Dave. (${msg.content.length}/1900)`)
+  if (msg.content.length > 1900) return msg.channel.createMessage(`Your message is too long to be recieved by Dave. (${msg.content.length}/1900)`);
   // Private message handling is queued so e.g. multiple message in quick succession don't result in multiple channels being created
   messageQueue.add(async () => {
     let thread = await threads.findOpenThreadByUserId(msg.author.id);
@@ -110,7 +111,7 @@ bot.on('messageCreate', async msg => {
       if (config.ignoreAccidentalThreads && msg.content && ACCIDENTAL_THREAD_MESSAGES.includes(msg.content.trim().toLowerCase())) return;
 
       if (config.ignoreNonAlphaMessages && msg.content) {
-        const content = msg.content.replace(/[^a-zA-Z]/g, '');
+        const content = msg.content.replace(/[^a-zA-Z]/g, "");
         if (! content || ! content.length) {
           return msg.channel.createMessage(config.genericResponse);
         }
@@ -156,8 +157,8 @@ bot.on('messageCreate', async msg => {
               text = `^${utils.regEscape(match)}$`;
             }
       
-            return msg.content.match(new RegExp(text, 'i'));
-          }
+            return msg.content.match(new RegExp(text, "i"));
+          };
 
           if (Array.isArray(o.match)) {
             for (let m of o.match) {
@@ -175,7 +176,7 @@ bot.on('messageCreate', async msg => {
 
       thread = await threads.createNewThreadForUser(msg.author);
 
-      sse.send({ thread }, 'threadOpen')
+      sse.send({ thread }, "threadOpen");
     }
 
     await thread.receiveUserReply(msg, sse);
@@ -187,13 +188,13 @@ bot.on('messageCreate', async msg => {
  * 1) If that message was in DMs, and we have a thread open with that user, post the edit as a system message in the thread
  * 2) If that message was moderator chatter in the thread, update the corresponding chat message in the DB
  */
-bot.on('messageUpdate', async (msg, oldMessage) => {
+bot.on("messageUpdate", async (msg, oldMessage) => {
   if (! msg || ! msg.author) return;
   if (msg.author.bot) return;
   if (await blocked.isBlocked(msg.author.id)) return;
 
   // Old message content doesn't persist between bot restarts
-  const oldContent = oldMessage && oldMessage.content || '*Unavailable due to bot restart*';
+  const oldContent = oldMessage && oldMessage.content || "*Unavailable due to bot restart*";
   const newContent = msg.content;
 
   // Ignore bogus edit events with no changes
@@ -228,14 +229,14 @@ async function deleteMessage(thread, msg) {
 /**
  * When a staff message is deleted in a modmail thread, delete it from the database as well
  */
-bot.on('messageDelete', async msg => {
+bot.on("messageDelete", async msg => {
   const thread = await threads.findOpenThreadByChannelId(msg.channel.id);
   if (! thread) return;
 
   deleteMessage(thread, msg);
 });
 
-bot.on('messageDeleteBulk', async messages => {
+bot.on("messageDeleteBulk", async messages => {
   const channel = messages[0].channel;
 
   const thread = await threads.findOpenThreadByChannelId(channel.id);
@@ -249,7 +250,7 @@ bot.on('messageDeleteBulk', async messages => {
 /**
  * When the bot is mentioned on the main server, ping staff in the log channel about it
  */
-bot.on('messageCreate', async msg => {
+bot.on("messageCreate", async msg => {
   if (! utils.messageIsOnMainServer(msg)) return;
   if (! msg.mentions.some(user => user.id === bot.user.id)) return;
 
@@ -268,7 +269,7 @@ bot.on('messageCreate', async msg => {
 module.exports = {
   async start() {
     // Load modules
-    console.log('Loading modules...');
+    console.log("Loading modules...");
     await reply(bot, sse);
     await purge(bot);
     await tags(bot);
@@ -289,9 +290,10 @@ module.exports = {
     await fixAttachment(bot);
     await pull(bot);
     await restart(bot);
+    await info(bot);
 
     // Connect to Discord
-    console.log('Connecting to Discord...');
+    console.log("Connecting to Discord...");
     await bot.connect();
   }
 };

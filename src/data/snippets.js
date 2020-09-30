@@ -1,14 +1,14 @@
-const moment = require('moment');
-const knex = require('../knex');
-const Snippet = require('./Snippet');
+const moment = require("moment");
+const knex = require("../knex");
+const Snippet = require("./Snippet");
 
 /**
  * @param {String} trigger
  * @returns {Promise<Snippet>}
  */
 async function getSnippet(trigger) {
-  const snippet = await knex('snippets')
-    .where('trigger', trigger)
+  const snippet = await knex("snippets")
+    .where("trigger", trigger)
     .first();
 
   return (snippet ? new Snippet(snippet) : null);
@@ -23,12 +23,12 @@ async function getSnippet(trigger) {
 async function addSnippet(trigger, body, isAnonymous = true, createdBy = 0) {
   if (await getSnippet(trigger)) return;
 
-  return knex('snippets').insert({
+  return knex("snippets").insert({
     trigger,
     body,
     is_anonymous: isAnonymous ? 1 : 0,
     created_by: createdBy,
-    created_at: moment.utc().format('YYYY-MM-DD HH:mm:ss')
+    created_at: moment.utc().format("YYYY-MM-DD HH:mm:ss")
   });
 }
 
@@ -37,8 +37,8 @@ async function addSnippet(trigger, body, isAnonymous = true, createdBy = 0) {
  * @returns {Promise<void>}
  */
 async function deleteSnippet(trigger) {
-  return knex('snippets')
-    .where('trigger', trigger)
+  return knex("snippets")
+    .where("trigger", trigger)
     .delete();
 }
 
@@ -46,7 +46,7 @@ async function deleteSnippet(trigger) {
  * @returns {Promise<Snippet[]>}
  */
 async function getAllSnippets() {
-  const snippets = await knex('snippets')
+  const snippets = await knex("snippets")
     .select();
 
   return snippets.map(s => new Snippet(s));
