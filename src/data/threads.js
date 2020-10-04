@@ -97,6 +97,8 @@ async function createNewThreadForUser(user, quiet = false) {
   }
 
   // Post some info to the beginning of the new thread
+  const now = Date.now();
+
   const mainGuild = utils.getMainGuild();
   const member = mainGuild ? await bot.getRESTGuildMember(mainGuild.id, user.id).catch(() => null) : null;
   if (! member) console.log(`[INFO] Member ${user.id} not found in main guild ${config.mainGuildId}`);
@@ -104,7 +106,11 @@ async function createNewThreadForUser(user, quiet = false) {
   let mainGuildNickname = member && member.nick || user.username;
     
   const userLogCount = await getClosedThreadCountByUserId(user.id);
-  const accountAge = humanizeDuration(Date.now() - user.createdAt, {largest: 2});
+  const accountAge = humanizeDuration(now - user.createdAt, {largest: 2});
+  let memberFor;
+  if (member) {
+    memberFor = humanizeDuration(now - member.joinedAt, {largest: 2});
+  }
   let displayNote;
   let userNotes = await notes.get(user.id);
   if (userNotes && userNotes.length) {
@@ -113,7 +119,7 @@ async function createNewThreadForUser(user, quiet = false) {
   } else
     displayNote = "";
   const infoHeader = `NAME **${mainGuildNickname}**\nMENTION ${user.mention}\nID **${user.id}**\nACCOUNT AGE **${accountAge}**\n`
-    + `LOGS **${userLogCount}**\n${displayNote}────────────────────────────────`;
+    + `MEMBER FOR **${memberFor}**\nLOGS **${userLogCount}**\n${displayNote}────────────────────────────────`;
 
   await newThread.postSystemMessage(infoHeader);
 

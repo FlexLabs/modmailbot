@@ -12,6 +12,8 @@ module.exports = bot => {
   threadUtils.addInboxServerCommand(bot, "info", async (msg, args, thread) => {
     if (! thread) return;
 
+    const now = Date.now();
+
     const user = bot.users.get(thread.user_id);
     const mainGuild = utils.getMainGuild();
     const member = mainGuild ? await bot.getRESTGuildMember(mainGuild.id, user.id).catch(() => null) : null;
@@ -19,7 +21,11 @@ module.exports = bot => {
     let mainGuildNickname = member && member.nick || user.username;
       
     const userLogCount = await threads.getClosedThreadCountByUserId(user.id);
-    const accountAge = humanizeDuration(Date.now() - user.createdAt, {largest: 2});
+    const accountAge = humanizeDuration(now - user.createdAt, {largest: 2});
+    let memberFor;
+    if (member) {
+      memberFor = humanizeDuration(now - member.joinedAt, {largest: 2});
+    }
     let displayNote;
     let userNotes = await notes.get(user.id);
     if (userNotes && userNotes.length) {
@@ -28,7 +34,7 @@ module.exports = bot => {
     } else
       displayNote = "";
     const infoHeader = `NAME **${mainGuildNickname}**\nMENTION ${user.mention}\nID **${user.id}**\nACCOUNT AGE **${accountAge}**\n`
-      + `LOGS **${userLogCount}**\n${displayNote}────────────────────────────────`;
+      + `MEMBER FOR **${memberFor}**\nLOGS **${userLogCount}**\n${displayNote}────────────────────────────────`;
   
     await thread.postSystemMessage(infoHeader);
   });
