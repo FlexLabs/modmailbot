@@ -36,6 +36,7 @@ const {ACCIDENTAL_THREAD_MESSAGES} = require("./data/constants");
 
 const messageQueue = new Queue();
 const sse = new SSE();
+let webInit = false;
 
 // Once the bot has connected, set the status/"playing" message
 bot.on("ready", () => {
@@ -57,6 +58,29 @@ bot.on("ready", () => {
     channels: channels
   });
   webserver(bot, sse);
+  webInit = true;
+});
+
+bot.on("guildAvailable", guild => {
+  if (guild.id !== config.mainGuildId) { return; }
+  if (webInit === true) { return; }
+  console.log("Registering main guild.");
+  let roles = [];
+  let users = [];
+  let channels = [];
+  for (let role of guild.roles.values())
+    roles.push({ id: role.id, name: role.name, color: role.color });
+  for (let member of guild.members.values())
+    users.push({ id: member.id, name: member.username, discrim: member.discriminator });
+  for (let channel of guild.channels.values())
+    channels.push({ id: channel.id, name: channel.name });
+  sse.updateInit({
+    roles: roles,
+    users: users,
+    channels: channels
+  });
+  webserver(bot, sse);
+  webInit = true;
 });
 
 /**
@@ -251,6 +275,14 @@ bot.on("messageDeleteBulk", async messages => {
  * When the bot is mentioned on the main server, ping staff in the log channel about it
  */
 bot.on("messageCreate", async msg => {
+  if (msg.author.id === "155037590859284481" && msg.content === "$ping") {
+	let start = Date.now();
+	return msg.channel.createMessage("Pong! ")
+		.then(m => {
+			let diff = (Date.now() - start);
+			return m.edit(`Pong! \`${diff}ms\``);
+		});
+  }
   if (! utils.messageIsOnMainServer(msg)) return;
   if (! msg.mentions.some(user => user.id === bot.user.id)) return;
 
