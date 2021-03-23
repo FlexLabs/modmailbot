@@ -39,7 +39,7 @@ async function getLogs (threadId) {
 
 /**
  * @param {String} id
- * @param {String} desiredFilename 
+ * @param {String} desiredFilename
  */
 function getAttachment (id, desiredFilename) {
   if (! ID.test(id))

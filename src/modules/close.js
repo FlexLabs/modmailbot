@@ -8,8 +8,8 @@ const utils = require("../utils");
 const threads = require("../data/threads");
 
 /**
- * @param {Eris.CommandClient} bot 
- * @param {SSE} sse 
+ * @param {Eris.CommandClient} bot
+ * @param {SSE} sse
  */
 module.exports = (bot, sse) => {
   /**

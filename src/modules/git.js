@@ -12,7 +12,7 @@ async function exec(command, options) { // My very elaborate asynchronous stream
   return new Promise((res, rej) => {
     let output = "";
     /**
-     * @param {Buffer|String} data 
+     * @param {Buffer|String} data
      */
     const writeFunction = (data) => {
       output += `${data}`; // Buffer.toString()

@@ -7,7 +7,7 @@ const Eris = require("eris");
  */
 module.exports = bot => {
   // Typing proxy: forwarding typing events between the DM and the modmail thread
-  if(config.typingProxy || config.typingProxyReverse) {
+  if (config.typingProxy || config.typingProxyReverse) {
     bot.on("typingStart", async (channel, user) => {
       // config.typingProxy: forward user typing in a DM to the modmail thread
       if (config.typingProxy && (channel instanceof Eris.PrivateChannel)) {

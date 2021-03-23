@@ -2,11 +2,11 @@ const Eris = require("eris");
 const threadUtils = require("../threadUtils");
 
 /**
- * @param {Eris.CommandClient} bot 
+ * @param {Eris.CommandClient} bot
  */
 module.exports = bot => {
   threadUtils.addInboxServerCommand(bot, "dmlink", async (msg, args, thread) => {
-    if(! thread) return;
+    if (! thread) return;
     if (! args[0]) return "Provide a message ID";
     const [dmChannel, threadMessage] = await Promise.all([
       bot.getDMChannel(thread.user_id),

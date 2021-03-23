@@ -11,7 +11,7 @@ const utils = require("../utils");
 module.exports = bot => {
   threadUtils.addInboxServerCommand(bot, "block", async (msg, args, thread) => {
     /**
-     * @param {Eris.User} user 
+     * @param {Eris.User} user
      */
     async function block(user) {
       await blocked.block(user.id, `${user.username}#${user.discriminator}`, msg.author.id);

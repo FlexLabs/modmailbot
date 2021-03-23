@@ -5,7 +5,7 @@ const config = require("../config");
 
 /**
  * 
- * @param {Eris.CommandClient} bot 
+ * @param {Eris.CommandClient} bot
  */
 module.exports = bot => {
   if (! config.enableGreeting) return;

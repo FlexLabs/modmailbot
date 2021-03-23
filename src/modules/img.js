@@ -4,15 +4,15 @@ const { getSelfUrl, regEscape } = require("../utils");
 
 const DISCORD_REGEX = /(https:\/\/(canary\.|beta\.)?discord(app)?\.com\/channels\/\d{17,19}\/\d{17,19}\/)?\d{17,19}/g;
 /**
- * @param {String} str 
+ * @param {String} str
  */
 const REPLACE_REGEX = (str) => new RegExp(regEscape(str), "g");
 /**
- * @param {String} str 
+ * @param {String} str
  */
 const ATTACHMENT_REGEX = (str) => new RegExp(`${regEscape(str)}(?:(?! ).)*`, "g");
 /**
- * @param {String} str 
+ * @param {String} str
  */
 const DISCORD_ATTACHMENT_REGEX = (str) => new RegExp(str, "g");
 

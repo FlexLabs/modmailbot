@@ -430,8 +430,8 @@ class Thread {
       console.log(`Closing thread ${this.id}`);
       await this.postToThreadChannel("Closing thread...");
     }
-    
-    if(! author) {
+
+    if (! author) {
       let newThread = await knex("threads")
         .where("id", this.id)
         .first();

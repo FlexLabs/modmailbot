@@ -28,7 +28,8 @@ module.exports = bot => {
         return `\`${formattedDate}\`: <${logUrl}>`;
       }));
 
-      if(! userThreads || ! userThreads.length) return msg.channel.createMessage("No logs found.");
+      if (! userThreads || ! userThreads.length) return msg.channel.createMessage("No logs found.");
+
       const message = `**Log files for <@${userId}>:**\n${threadLines.join("\n")}`;
 
       // Send the list of logs in chunks of 15 lines per message

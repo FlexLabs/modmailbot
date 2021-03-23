@@ -34,7 +34,7 @@ module.exports = bot => {
       displayNote = "";
     const infoHeader = `NAME **${mainGuildNickname}**\nMENTION ${user.mention}\nID **${user.id}**\nACCOUNT AGE **${accountAge}**\n`
       + `MEMBER FOR **${memberFor}**\nLOGS **${userLogCount}**\n${displayNote}────────────────────────────────`;
-  
+
     await thread.postSystemMessage(infoHeader);
   });
 };

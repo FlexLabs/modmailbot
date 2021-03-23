@@ -106,7 +106,7 @@ function getUrl(attachmentId, desiredName = null) {
 
 /**
  * Converts an attachment to a message file
- * @param {Eris.Attachment} attachment 
+ * @param {Eris.Attachment} attachment
  * @returns {Promise<Eris.MessageFile>}
  */
 async function attachmentToFile(attachment) {
