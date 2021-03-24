@@ -134,6 +134,8 @@ async function formatAttachment(attachment) {
  * @returns {String|null}
  */
 function getUserMention(str) {
+  if (! str) return null;
+
   str = str.trim();
 
   if (str.match(/^[0-9]+$/)) {
