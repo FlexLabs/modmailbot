@@ -20,7 +20,7 @@ module.exports = bot => {
 
     let logText = "**Blocked:** ";
 
-    if (! thread && args.length > 0) {
+    if (! thread) {
       // User mention/id as argument
       const userId = utils.getUserMention(args.shift());
       if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
@@ -39,7 +39,7 @@ module.exports = bot => {
       utils.postLog(logText);
 
       block(user);
-    } else if (thread) {
+    } else {
       const user = await bot.getRESTUser(thread.user_id);
       const reason = args.join(" ").trim();
       let isAnonymous = false;
@@ -75,7 +75,7 @@ module.exports = bot => {
 
     let logText = "**Unblocked:** ";
 
-    if (! thread && args.length > 0) {
+    if (! thread) {
       // User mention/id as argument
       const userId = utils.getUserMention(args.shift());
       if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
