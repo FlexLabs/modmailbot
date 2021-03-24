@@ -7,7 +7,7 @@ const threadUtils = require("../threadUtils");
 module.exports = bot => {
   threadUtils.addInboxServerCommand(bot, "dmlink", async (msg, args, thread) => {
     if (! thread) return;
-    if (! args[0]) return "Provide a message ID";
+    if (! args[0]) return msg.channel.createMessage("Please provide a message ID!");
     const [dmChannel, threadMessage] = await Promise.all([
       bot.getDMChannel(thread.user_id),
       thread.getThreadMessageFromThread(args[0])
