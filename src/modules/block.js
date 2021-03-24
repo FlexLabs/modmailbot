@@ -23,7 +23,7 @@ module.exports = bot => {
     if (! thread && args.length > 0) {
       // User mention/id as argument
       const userId = utils.getUserMention(args.shift());
-      if (! userId) return;
+      if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
 
       const user = await bot.getRESTUser(userId).catch(() => null);
       if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");
@@ -78,7 +78,7 @@ module.exports = bot => {
     if (! thread && args.length > 0) {
       // User mention/id as argument
       const userId = utils.getUserMention(args.shift());
-      if (! userId) return;
+      if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
 
       const user = await bot.getRESTUser(userId).catch(() => null);
       if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");

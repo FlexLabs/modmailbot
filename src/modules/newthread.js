@@ -14,7 +14,7 @@ module.exports = (bot, sse) => {
     if (args.length === 0) return;
 
     const userId = utils.getUserMention(args[0]);
-    if (! userId) return;
+    if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
 
     const user = bot.users.get(userId);
     if (! user) {
