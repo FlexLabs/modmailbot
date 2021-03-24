@@ -367,10 +367,10 @@ class Thread {
       .first();
   }
 
-  async getThreadMessageFromThread(msg) {
+  async getThreadMessageFromThread(msgID) {
     return knex("thread_messages")
       .where("thread_id", this.id)
-      .where("thread_message_id", msg.id)
+      .where("thread_message_id", msgID)
       .first();
   }
 
