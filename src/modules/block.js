@@ -95,7 +95,7 @@ module.exports = bot => {
       utils.postLog(logText);
 
       unblock(userId);
-    } else if (thread) {
+    } else {
       const reason = args.join(" ").trim();
 
       logText += `${thread.user_name} (${thread.user_id}) was unblocked`;
