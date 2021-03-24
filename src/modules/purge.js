@@ -15,7 +15,7 @@ module.exports = bot => {
 
 	if (msg.member.roles && msg.member.roles.includes(config.inboxAdminRoleId)) {
 		// @ts-ignore
-		const channel = await bot.getDMChannel(thread.user_id);
+		const channel = await thread.getDMChannel();
 		if (! channel || ! channel.id) {
 			return thread.postSystemMessage("Error getting DM Channel");
 		}
@@ -47,7 +47,7 @@ module.exports = bot => {
 		if (! thread) return;
 
 		// @ts-ignore
-		const channel = await bot.getDMChannel(thread.user_id);
+		const channel = await thread.getDMChannel();
 		if (! channel || ! channel.id) {
 			return thread.postSystemMessage("Error getting DM Channel");
 		}

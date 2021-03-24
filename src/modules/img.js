@@ -22,7 +22,7 @@ const DISCORD_ATTACHMENT_REGEX = (str) => new RegExp(str, "g");
 module.exports = bot => {
   threadUtils.addInboxServerCommand(bot, "img", async (msg, args, thread) => {
     if (! thread) return;
-    const [selfURL, dmChannel] = await Promise.all([getSelfUrl("attachments"), bot.getDMChannel(thread.user_id)]);
+    const [selfURL, dmChannel] = await Promise.all([getSelfUrl("attachments"), thread.getDMChannel()]);
     if (! dmChannel) return;
 
     const discordURLsRegex = msg.content.match(DISCORD_REGEX);
