@@ -12,7 +12,7 @@ module.exports = bot => {
       thread.getDMChannel(),
       thread.getThreadMessageFromThread(args[0])
     ]);
-    if (! threadMessage || threadMessage.message_type !== 3) return msg.channel.createMessage("Message not found!");
+    if (! threadMessage || (threadMessage.message_type !== 3 && threadMessage.message_type !== 4)) return msg.channel.createMessage("Message not found!");
     return msg.channel.createMessage(`https://discord.com/channels/@me/${dmChannel.id}/${threadMessage.dm_message_id}`);
   });
 };
