@@ -5,7 +5,7 @@ const utils = require("../utils");
 module.exports = (bot) => {
   bot.registerCommand("stats", (msg) => {
     if (! utils.isStaff(msg.member)) return;
-    bot.createMessage(msg.channel.id, 
+    bot.createMessage(msg.channel.id,
       `Process uptime: ${humanizeDuration(process.uptime() * 1000, { largest: 2 })}\n`
       + `Bot uptime: ${humanizeDuration(bot.uptime, { largest: 2 })}\n`
       + `Memory Usage: ${process.memoryUsage().rss / 1024 / 1024}MB\nPID: ${process.pid}\nVersion: ${process.version}`

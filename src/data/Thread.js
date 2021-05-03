@@ -337,7 +337,6 @@ class Thread {
     ]);
 
     const mainGuildNickname = member && member.nick && `(${member.nick})`;
-
     const accountAge = humanizeDuration(now - user.createdAt, {largest: 2});
     const memberFor = member ? humanizeDuration(now - member.joinedAt, {largest: 2}) : "UNAVAILABLE";
     const roles = member && member.roles.map((r) => member.guild.roles.get(r)).sort((a, b) => b.position - a.position);
@@ -355,8 +354,8 @@ class Thread {
       {name: "User", value: `${user.mention} ${user.username}#${user.discriminator} ${mainGuildNickname || ""}`, inline: true},
       {name: "Account age", value: accountAge, inline: true},
       {name: "Member for", value: memberFor, inline: true},
-      {name: "Logs", value: `${userLogCount}`, inline: true},
       {name: "Thread ID", value: this.id, inline: true},
+      {name: "Logs", value: `${userLogCount}`, inline: true},
       {name: `Last note (${userNotes.length})`, value: displayNote, inline: false},
       {name: `Roles (${roles.length})`, value: roleList, inline: false},
     ];
