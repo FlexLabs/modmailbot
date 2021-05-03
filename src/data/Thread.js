@@ -351,7 +351,7 @@ class Thread {
     }
 
     const fields = [
-      {name: "User", value: `${user.mention} ${user.username}#${user.discriminator} ${mainGuildNickname || ""}`, inline: true},
+      {name: "User", value: `${user.username}#${user.discriminator} ${mainGuildNickname || ""}`, inline: true},
       {name: "Account age", value: accountAge, inline: true},
       {name: "Member for", value: memberFor, inline: true},
       {name: "Thread ID", value: this.id, inline: true},
