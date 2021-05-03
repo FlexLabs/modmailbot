@@ -26,7 +26,7 @@ module.exports = (bot, sse) => {
       let str = "there is another open thread with this user";
 
       if (channel) {
-        if (channel.permissionsOf(msg.member.id).has("readMessages")) {
+        if (channel.permissionsOf(msg.member.id).has("viewChannel")) {
           str += `: <#${channel.id}>`;
         } else {
           const parent = msg.channel.guild.channels.get(channel.parentID);
