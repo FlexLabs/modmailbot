@@ -24,7 +24,21 @@ module.exports = (bot, sse) => {
 
     const existingThread = await threads.findOpenThreadByUserId(user.id);
     if (existingThread) {
-      utils.postSystemMessageWithFallback(msg.channel, thread, `Cannot create a new thread; there is another open thread with this user: <#${existingThread.channel_id}>`);
+      let channel = msg.channel.guild.channels.get(existingThread.channel_id);
+      let str = "there is another open thread with this user";
+
+      if (channel) {
+        if (channel.permissionsOf(msg.member.id).has("readMessages")) {
+          str += `: <#${channel.id}>`;
+        } else {
+          const parent = msg.channel.guild.channels.get(channel.parentID);
+          str += parent ? ` in the **${parent.name}** category` : " in a hidden channel";
+        }
+      } else {
+        str += `: <#${existingThread.channel_id}>`;
+      }
+
+      utils.postSystemMessageWithFallback(msg.channel, thread, `Cannot create a new thread; ${str}.`);
       return;
     }
 
