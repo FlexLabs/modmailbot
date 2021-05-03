@@ -11,8 +11,6 @@ const threads = require("../data/threads");
  */
 module.exports = (bot, sse) => {
   threadUtils.addInboxServerCommand(bot, "newthread", async (msg, args, thread) => {
-    if (args.length === 0) return;
-
     const userId = utils.getUserMention(args[0]);
     if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
 
