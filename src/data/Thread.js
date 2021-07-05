@@ -255,7 +255,7 @@ class Thread {
       }
 
       if (systemMessage) {
-        setTimeout(() => systemMessage.delete(), 30000);
+        setTimeout(() => systemMessage.delete().catch(() => null), 30000);
       }
     }
   }
@@ -296,7 +296,7 @@ class Thread {
       // Channel not found
       if (e.code === 10003) {
         console.log(`[INFO] Auto-closing thread with ${this.user_name} because the channel no longer exists`);
-        this.close(bot.user);
+        this.close(bot.user, true);
       } else {
         throw e;
       }
