@@ -4,7 +4,6 @@ const Eris = require("eris");
 const config = require("../config");
 
 /**
- * 
  * @param {Eris.CommandClient} bot
  */
 module.exports = bot => {

@@ -471,7 +471,7 @@ class Thread {
       ...data
     };
     await knex("thread_messages").insert(threadMessage);
-    
+
     if (sse) {
       sse.send({
         message: threadMessage

@@ -32,7 +32,7 @@ async function getLogs (threadId) {
 
   const thread = await threads.findById(threadId);
   if (! thread) return;
-  
+
   return thread.getThreadMessages();
 }
 
@@ -61,9 +61,9 @@ function getAttachment (id, desiredFilename) {
  */
 module.exports = (bot, sse) => {
   const app = express();
-  
+
   app.use(cookieParser());
-  
+
   app.get("/attachments/:id/:name", async (req, res) => {
     let [mime, attachment] = getAttachment(req.params.id, req.params.name) || [];
 
@@ -145,9 +145,9 @@ module.exports = (bot, sse) => {
 
     res.set("Cache-Control", "max-age=3600").redirect(user.avatarURL);
   });
-  
+
   app.get("/stream", sse.init);
-  
+
   if (config.https) {
     const httpsServer = https.createServer({
       key: fs.readFileSync(config.https.privateKey, "utf8"),

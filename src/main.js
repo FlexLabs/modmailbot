@@ -264,8 +264,8 @@ bot.on("messageUpdate", async (msg, oldMessage) => {
 });
 
 /**
- * @param {import('./data/Thread')} thread 
- * @param {Eris.Message} msg 
+ * @param {import('./data/Thread')} thread
+ * @param {Eris.Message} msg
  */
 async function deleteMessage(thread, msg) {
   if (! msg.author) return;
@@ -341,7 +341,7 @@ bot.on("channelDelete", async (channel) => {
   const thread = await threads.findOpenThreadByChannelId(channel.id);
   if (thread) {
     await thread.close(bot.user, false, sse);
-    
+
     const logUrl = await thread.getLogUrl();
     utils.postLog(
       utils.trimAll(`Modmail thread with ${thread.user_name} (${thread.user_id}) was closed due to channel deletion

@@ -103,7 +103,7 @@ module.exports = bot => {
 			await thread.sendCommandToUser(msg.member, { embed }, resolvedCommand, isAnonymous);
 			msg.delete();
 		});
-	
+
 		bot.registerCommandAlias("c", "command");
 	}
 };

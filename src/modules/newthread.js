@@ -5,7 +5,6 @@ const threadUtils = require("../threadUtils");
 const threads = require("../data/threads");
 
 /**
- * 
  * @param {Eris.CommandClient} bot
  * @param {SSE} sse
  */
@@ -42,7 +41,7 @@ module.exports = (bot, sse) => {
 
     const createdThread = await threads.createNewThreadForUser(user, true);
     createdThread.postSystemMessage(`Thread was opened by ${msg.author.username}#${msg.author.discriminator}`);
-    
+
     sse.send({ thread: createdThread }, "threadOpen", null);
 
     if (thread) {

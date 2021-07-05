@@ -78,13 +78,13 @@ async function createNewThreadForUser(user, quiet = false) {
         content: `${utils.getInboxMention()}New modmail thread (${newThread.user_name})`,
       });
     }
-    
+
     // Send auto-reply to the user
     if (config.responseMessage) {
       newThread.postToUser(config.responseMessage);
     }
   }
-  
+
   await newThread.sendThreadInfo().catch((e) => process.emit("unhandledRejection", e));
 
   // Return the thread

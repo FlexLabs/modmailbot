@@ -10,8 +10,8 @@ module.exports = bot => {
     if (! thread) return;
 
     if (! config.inboxAdminRoleId) {
-		return;
-	}
+      return;
+    }
 
 	if (msg.member.roles && msg.member.roles.includes(config.inboxAdminRoleId)) {
 		// @ts-ignore
@@ -42,7 +42,7 @@ module.exports = bot => {
   });
 
 	bot.registerCommandAlias("p", "purge");
-	
+
 	threadUtils.addInboxServerCommand(bot, "undo", async (msg, args, thread) => {
 		if (! thread) return;
 

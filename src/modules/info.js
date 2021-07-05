@@ -7,7 +7,7 @@ const threadUtils = require("../threadUtils");
 module.exports = bot => {
   threadUtils.addInboxServerCommand(bot, "info", async (msg, args, thread) => {
     if (! thread) return;
-    
+
     await thread.sendThreadInfo();
   });
 };

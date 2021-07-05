@@ -12,7 +12,6 @@ const db = require("../dynodb");
  */
 
  /**
-	* 
 	* @param {String} guildId
 	* @param {String} tag
 	* @returns {Promise<TagLean>}

@@ -257,10 +257,9 @@ function getInboxMention() {
 }
 
 /**
- * 
- * @param {Eris.GuildTextableChannel} channel 
- * @param {import('./data/Thread')} thread 
- * @param {Eris.MessageContent} text 
+ * @param {Eris.GuildTextableChannel} channel
+ * @param {import('./data/Thread')} thread
+ * @param {Eris.MessageContent} text
  */
 function postSystemMessageWithFallback(channel, thread, text) {
   if (thread) {

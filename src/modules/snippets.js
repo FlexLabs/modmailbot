@@ -92,7 +92,7 @@ module.exports = bot => {
 
     let text = args.slice(1).join(" ").trim();
     if (! text) return;
-    
+
     const snippet = await snippets.get(trigger);
     if (! snippet) {
       utils.postSystemMessageWithFallback(msg.channel, thread, `Snippet "${trigger}" doesn't exist!`);
