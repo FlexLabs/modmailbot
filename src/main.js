@@ -10,6 +10,7 @@ const threads = require("./data/threads");
 
 const reply = require("./modules/reply");
 const alert = require("./modules/alert");
+const role = require("./modules/role");
 const purge = require("./modules/purge");
 const tags = require("./modules/tags");
 const command = require("./modules/command");
@@ -359,6 +360,7 @@ module.exports = {
     console.log("Loading modules...");
     reply(bot, sse);
     alert(bot);
+    role(bot);
     purge(bot);
     tags(bot);
     command(bot);

@@ -25,6 +25,8 @@ const notes = require("./notes");
  * @property {String} scheduled_close_at
  * @property {String} scheduled_close_id
  * @property {String} scheduled_close_name
+ * @property {String?} alert_users
+ * @property {Object?} staff_role_overrides
  * @property {String} created_at
  */
 class Thread {
@@ -43,7 +45,7 @@ class Thread {
   async replyToUser(moderator, text, replyAttachments = [], isAnonymous = false, sse) {
     // Username to reply with
     let modUsername, logModUsername;
-    const mainRole = utils.getMainRole(moderator);
+    const mainRole = this.getMainRole(moderator);
 
     if (isAnonymous) {
       modUsername = (mainRole ? mainRole.name : "Staff");
@@ -119,7 +121,7 @@ class Thread {
   async sendCommandToUser(moderator, message, command, isAnonymous = false) {
     // Username to reply with
     let modUsername, logModUsername;
-    const mainRole = utils.getMainRole(moderator);
+    const mainRole = this.getMainRole(moderator);
     const text = `[Command Help: ${command.name}]`;
 
     if (isAnonymous) {
@@ -556,7 +558,8 @@ class Thread {
         scheduled_close_at: moment().utc().format("YYYY-MM-DD HH:mm:ss"),
         scheduled_close_id: author.id,
         scheduled_close_name: `${author.username}#${author.discriminator}`,
-        alert_users: null
+        alert_users: null,
+        staff_role_overrides: null
       });
 
     if (sse)
@@ -625,6 +628,85 @@ class Thread {
       .update({
         status: THREAD_STATUS.OPEN
       });
+  }
+
+  /**
+   * @param {String} userId
+   * @param {String} roleId
+   * @returns {Promise<void>}
+   */
+  async setStaffRoleOverride(userId, roleId) {
+    let overrides = await knex("threads")
+      .where("id", this.id)
+      .select("staff_role_overrides")
+      .first();
+
+    if (overrides.staff_role_overrides) {
+      overrides = JSON.parse(overrides.staff_role_overrides);
+    } else {
+      overrides = {};
+    }
+
+    overrides[userId] = roleId;
+
+    await knex("threads")
+      .where("id", this.id)
+      .update({
+        staff_role_overrides: JSON.stringify(overrides)
+      });
+  }
+
+  /**
+   * @param {String} userId
+   * @returns {Promise<void>}
+   */
+  async deleteStaffRoleOverride(userId) {
+    let overrides = await knex("threads")
+      .where("id", this.id)
+      .select("staff_role_overrides")
+      .first();
+
+    if (overrides.staff_role_overrides) {
+      overrides = JSON.parse(overrides.staff_role_overrides);
+
+      if (overrides[userId]) {
+        delete overrides[userId];
+        await knex("threads")
+          .where("id", this.id)
+          .update({
+            staff_role_overrides: JSON.stringify(overrides)
+          });
+      }
+    }
+  }
+
+  /**
+   * @param {String} userId
+   * @returns {String?}
+   */
+  getStaffRoleOverride(userId) {
+    if (this.staff_role_overrides) {
+      return JSON.parse(this.staff_role_overrides)[userId];
+    }
+  }
+
+  /**
+   * @param {Eris.Member} member
+   * @returns {String?}
+   */
+  getMainRole(member) {
+    let role = this.getStaffRoleOverride(member.id);
+
+    if (role) {
+      const guild = member.guild;
+      const override = guild && guild.roles && guild.roles.get(role);
+
+      if (override) {
+        return override;
+      }
+    }
+
+    return utils.getMainRole(member);
   }
 
   /**
