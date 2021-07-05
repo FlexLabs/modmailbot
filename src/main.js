@@ -9,6 +9,7 @@ const blocked = require("./data/blocked");
 const threads = require("./data/threads");
 
 const reply = require("./modules/reply");
+const alert = require("./modules/alert");
 const purge = require("./modules/purge");
 const tags = require("./modules/tags");
 const command = require("./modules/command");
@@ -357,6 +358,7 @@ module.exports = {
     // Load modules
     console.log("Loading modules...");
     reply(bot, sse);
+    alert(bot);
     purge(bot);
     tags(bot);
     command(bot);

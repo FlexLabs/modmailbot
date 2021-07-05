@@ -226,6 +226,17 @@ class Thread {
       thread_message_id: threadMessage.id,
     }, sse);
 
+    if (this.alert_users) {
+      const alerts = this.alert_users.split(", ")
+        .filter(id => id !== this.scheduled_close_id)
+        .map((id, i, arr) => (i == 0 ? "" : (i == arr.length - 1 ? " and " : ", ")) + `<@${id}>`)
+        .join("");
+
+      if (alerts.length) {
+        this.postSystemMessage(`${alerts}, there is a new message from **${this.user_name}**!`);
+      }
+    }
+
     if (this.scheduled_close_at) {
       const now = moment();
       const closedAt = moment(this.scheduled_close_at);
@@ -480,6 +491,42 @@ class Thread {
   }
 
   /**
+   * @param {String} userId
+   * @param {Boolean} status
+   * @returns {Promise<void>}
+   */
+  async alertStatus(userId, status) {
+    let alerts = await knex("threads")
+      .where("id", this.id)
+      .select("alert_users")
+      .first();
+
+    alerts = (alerts.alert_users && alerts.alert_users.split(", ")) || [];
+
+    if (! alerts.includes(userId) && status === true) {
+      alerts.push(userId);
+    } else if (status === false) {
+      const index = alerts.indexOf(userId);
+
+      if (index > -1) {
+        alerts.splice(index, 1);
+      }
+    }
+
+    if (alerts.length > 0) {
+      alerts = alerts.join(", ");
+    } else {
+      alerts = null;
+    }
+
+    await knex("threads")
+      .where("id", this.id)
+      .update({
+        alert_users: alerts
+      });
+  }
+
+  /**
    * @param {Eris.User|{ discriminator: string; id: string; username: string; }} author
    * @param {Boolean} [silent=false]
    * @param {SSE} [sse]
@@ -508,7 +555,8 @@ class Thread {
         status: THREAD_STATUS.CLOSED,
         scheduled_close_at: moment().utc().format("YYYY-MM-DD HH:mm:ss"),
         scheduled_close_id: author.id,
-        scheduled_close_name: `${author.username}#${author.discriminator}`
+        scheduled_close_name: `${author.username}#${author.discriminator}`,
+        alert_users: null
       });
 
     if (sse)
