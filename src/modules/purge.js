@@ -33,6 +33,8 @@ module.exports = bot => {
 		} catch (err) {
 			thread.postSystemMessage(`Error deleting messages: ${err.message}`);
 		}
+	} else {
+		thread.postSystemMessage("I couldn't find any messages to delete.");
 	}
   });
 
@@ -57,6 +59,8 @@ module.exports = bot => {
 			} catch (err) {
 				thread.postSystemMessage(`Error deleting messages: ${err.message}`);
 			}
+		} else {
+			thread.postSystemMessage("I couldn't find a message to delete.");
 		}
 	});
 };
