@@ -57,14 +57,9 @@ module.exports = bot => {
       if (args[0] === "delete") {
         const userId = utils.getUserMention(args.slice(1).join(" "));
         if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
+        if (! msg.member.roles || ! msg.member.roles.includes(config.inboxAdminRoleId)) return;
 
-        if (! config.inboxAdminRoleId) {
-          return;
-        }
-
-        if (msg.member.roles && msg.member.roles.includes(config.inboxAdminRoleId)) {
-          deleteLogs(userId);
-        }
+        deleteLogs(userId);
       }
 
       // User mention/id as argument
