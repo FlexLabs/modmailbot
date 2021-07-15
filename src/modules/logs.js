@@ -59,7 +59,7 @@ module.exports = bot => {
         if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
         if (! msg.member.roles || ! msg.member.roles.includes(config.inboxAdminRoleId)) return;
 
-        deleteLogs(userId);
+        return deleteLogs(userId);
       }
 
       // User mention/id as argument
