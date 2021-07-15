@@ -104,7 +104,16 @@ module.exports = bot => {
 
     bot.editChannel(thread.channel_id, {
       parentID: targetCategory.id
-    }).then(() => syncThreadChannel(threadChannel, targetCategory));
+    }).then(() => { 
+		syncThreadChannel(threadChannel, targetCategory)
+	}).then(() => {
+		bot.createMessage(threadChannel.id, {
+			content: `<@%${config.inboxAdminRoleId}>, a thread has been moved.`,
+			allowedMentions: {
+				roles: true,
+			},
+		});
+	});
 
     thread.postSystemMessage(`Thread moved to ${targetCategory.name.toUpperCase()}`);
   });
