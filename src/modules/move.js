@@ -108,7 +108,7 @@ module.exports = bot => {
 		syncThreadChannel(threadChannel, targetCategory)
 	}).then(() => {
 		bot.createMessage(threadChannel.id, {
-			content: `<@%${config.inboxAdminRoleId}>, a thread has been moved.`,
+			content: `<@&${config.inboxAdminRoleId}>, a thread has been moved.`,
 			allowedMentions: {
 				roles: true,
 			},
