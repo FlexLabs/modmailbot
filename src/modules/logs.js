@@ -2,7 +2,6 @@ const Eris = require("eris");
 const threadUtils = require("../threadUtils");
 const threads = require("../data/threads");
 const moment = require("moment");
-const config = require("../config");
 const utils = require("../utils");
 
 /**
@@ -57,6 +56,8 @@ module.exports = bot => {
       bot.createMessage(msg.channel.id, `Deleted log files for <@!${userId}>`);
     }
 
+    let userId = thread && thread.user_id;
+
     if (args.length > 0) {
       if (args[0] === "delete" && utils.isAdmin(msg.member)) {
         const userId = utils.getUserMention(args.slice(1).join(" "));
@@ -65,15 +66,14 @@ module.exports = bot => {
         return deleteLogs(userId);
       }
 
-      // User mention/id as argument
-      const userId = utils.getUserMention(args.join(" "));
-      if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
-
-      getLogs(userId);
-    } else if (thread) {
-      // Calling !logs without args in a modmail thread returns the logs of the user of that thread
-      getLogs(thread.user_id);
+      userId = utils.getUserMention(args.join(" "));
     }
+
+    if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
+
+    // Calling !logs without args in a modmail thread returns the logs of the user of that thread
+
+    return getLogs(userId);
   });
 
   threadUtils.addInboxServerCommand(bot, "loglink", async (msg, args, thread) => {
