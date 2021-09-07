@@ -1,5 +1,6 @@
 const Eris = require("eris");
 const config = require("../config");
+const utils = require("../utils");
 const threadUtils = require("../threadUtils");
 
 /**
@@ -103,18 +104,31 @@ module.exports = bot => {
 
     bot.editChannel(thread.channel_id, {
       parentID: targetCategory.id
-    }).then(() => { 
-		  syncThreadChannel(threadChannel, targetCategory)
-	  }).then(() => {
-		  bot.createMessage(threadChannel.id, {
-			  content: `<@&${config.inboxAdminRoleId}>, a thread has been moved.`,
-			  allowedMentions: {
-				  roles: true,
-			  },
-		  });
-	  });
+    }).then(() => {
+      syncThreadChannel(threadChannel, targetCategory);
 
-    thread.postSystemMessage(`Thread moved to ${targetCategory.name.toUpperCase()}`);
+      // Make thread private/unprivate
+
+      if (targetCategory.id !== config.newThreadCategoryId) {
+        thread.makePrivate();
+
+        // Ping Admins if necessary
+
+        if (config.adminMentionRole && ! utils.isAdmin(msg.member)) {
+          bot.createMessage(threadChannel.id, {
+            content: `<@&${config.adminMentionRole}>, a thread has been moved.`,
+            allowedMentions: {
+              roles: true
+            }
+          });
+        }
+    } else {
+        thread.makePublic();
+      }
+    }).catch((err) => {
+      utils.handleError(err);
+      return thread.postSystemMessage("Something went wrong while trying to move this thread.");
+    });
   });
 
   bot.registerCommandAlias("m", "move");

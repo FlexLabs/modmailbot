@@ -41,6 +41,7 @@ const defaultConfig = {
 
   "newThreadCategoryId": null,
   "mentionRole": "here",
+  "adminMentionRole": null,
 
   "inboxServerPermission": null,
   "inboxServerRoleId": null,
@@ -102,6 +103,7 @@ for (const [prop, value] of Object.entries(ghConfig)) {
   if (["token", "port", "url", "clientId", "clientSecret", "mongoDSN"].includes(prop)) {
     continue;
 	}
+
 	if (! defaultConfig.hasOwnProperty(prop)) {
     throw new Error(`Invalid option: ${prop}`);
 	}
