@@ -10,6 +10,7 @@ const config = require("../config");
 const oauth2 = require("../oauth2");
 const threads = require("../data/threads");
 const attachments = require("../data/attachments");
+const constants = require("../data/constants");
 const knex = require("../knex");
 
 const THREAD_ID = /^[0-9a-f-]+$/;
@@ -24,16 +25,11 @@ function notfound(res) {
 }
 
 /**
- * @param {String} threadId
+ * @param {express.Response} res
  */
-async function getLogs (threadId) {
-  if (threadId.match(THREAD_ID) === null)
-    return;
-
-  const thread = await threads.findById(threadId);
-  if (! thread) return;
-
-  return thread.getThreadMessages();
+function privateThread(res) {
+  res.status(401);
+  res.json({ message: "401: Private Thread" });
 }
 
 /**
@@ -53,6 +49,14 @@ function getAttachment (id, desiredFilename) {
   const filenameParts = desiredFilename.split(".");
   const ext = (filenameParts.length > 1 ? filenameParts[filenameParts.length - 1] : "bin");
   return [mime.getType(ext), fs.readFileSync(attachmentPath)];
+}
+
+/**
+ * @param {express.Response} res
+ */
+async function viewPrivateThreads(res) {
+  const user = await oauth2.getAuthUser(res.cookies.token);
+  return oauth2.isDashAdmin(user);
 }
 
 /**
@@ -99,6 +103,16 @@ module.exports = (bot, sse) => {
     reverse = reverse != null;
 
     let q = knex("threads");
+
+    // Send necessary threads only
+
+    const viewAll = await viewPrivateThreads(res);
+
+    if (! viewAll) {
+      q.where("isPrivate", 0);
+      q.where("status", constants.THREAD_STATUS.CLOSED);
+    }
+
     if (user)
       q.where("user_id", user);
     else
@@ -122,6 +136,14 @@ module.exports = (bot, sse) => {
     if (! thread)
       return notfound(res);
 
+    if (thread.isPrivate) {
+      const viewAll = await viewPrivateThreads(res);
+
+      if (! viewAll) {
+        return privateThread(res);
+      }
+    }
+
     res.json(thread);
   });
   app.get("/users", async (req, res) => {
@@ -130,9 +152,23 @@ module.exports = (bot, sse) => {
     res.json(users.map(u => ({ id: u.user_id, name: u.user_name })));
   });
   app.get("/logs/:id", async (req, res) => {
-    let logs = await getLogs(req.params.id);
-    if (! logs)
+    const threadId = req.params.id;
+    if (threadId.match(THREAD_ID) === null)
       return notfound(res);
+
+    const thread = await threads.findById(threadId);
+    if (! thread)
+      return notfound(res);
+
+    if (thread.isPrivate) {
+      const viewAll = await viewPrivateThreads(res);
+
+      if (! viewAll) {
+        return privateThread(res);
+      }
+    }
+
+    const logs = await thread.getThreadMessages();
 
     res.json(logs);
   });
