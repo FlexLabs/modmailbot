@@ -52,10 +52,10 @@ function getAttachment (id, desiredFilename) {
 }
 
 /**
- * @param {express.Response} res
+ * @param {express.Request} req
  */
-async function viewPrivateThreads(res) {
-  const user = await oauth2.getAuthUser(res.cookies.token);
+async function viewPrivateThreads(req) {
+  const user = await oauth2.getAuthUser(req.cookies.token);
   return oauth2.isDashAdmin(user);
 }
 
@@ -106,7 +106,7 @@ module.exports = (bot, sse) => {
 
     // Send necessary threads only
 
-    const viewAll = await viewPrivateThreads(res);
+    const viewAll = await viewPrivateThreads(req);
 
     if (! viewAll) {
       q.where("isPrivate", 0);
@@ -137,7 +137,7 @@ module.exports = (bot, sse) => {
       return notfound(res);
 
     if (thread.isPrivate) {
-      const viewAll = await viewPrivateThreads(res);
+      const viewAll = await viewPrivateThreads(req);
 
       if (! viewAll) {
         return privateThread(res);
@@ -161,7 +161,7 @@ module.exports = (bot, sse) => {
       return notfound(res);
 
     if (thread.isPrivate) {
-      const viewAll = await viewPrivateThreads(res);
+      const viewAll = await viewPrivateThreads(req);
 
       if (! viewAll) {
         return privateThread(res);

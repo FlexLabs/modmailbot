@@ -63,7 +63,7 @@ async function getAuthUser (token) {
 
 async function checkAuth (req, res, next) {
   if (req.cookies.token) {
-    req.user = await getAuthUser(res.cookies.token);
+    req.user = await getAuthUser(req.cookies.token);
 
     if (! req.user) {
       return res.redirect("/login");
