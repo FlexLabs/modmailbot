@@ -45,7 +45,7 @@ const defaultConfig = {
   "inboxServerPermission": null,
   "inboxServerRoleId": null,
   "inboxServerRoleIDs": [],
-  "inboxAdminRoleId": null,
+  "inboxAdminRoleIDs": [],
   "alwaysReply": false,
   "alwaysReplyAnon": false,
   "useNicknames": false,

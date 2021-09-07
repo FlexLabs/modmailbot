@@ -84,6 +84,17 @@ function handleError(error) {
 }
 
 /**
+ * Returns whether the given member has an administrator role
+ * @param {Eris.Member} member
+ * @returns {boolean}
+ */
+function isAdmin(member) {
+  if (! config.inboxAdminRoleIDs.length) return false;
+  if (! member) return false;
+  return member.roles.some((r) => config.inboxAdminRoleIDs.includes(r));
+}
+
+/**
  * Returns whether the given member has permission to use modmail commands
  * @param {Eris.Member} member
  * @returns {boolean}
@@ -310,6 +321,7 @@ module.exports = {
   postLog,
   handleError,
 
+  isAdmin,
   isStaff,
   messageIsOnInboxServer,
   messageIsOnMainServer,
@@ -331,5 +343,5 @@ module.exports = {
   setDataModelProps,
 
   regEscape,
-  discordURL,
+  discordURL
 };

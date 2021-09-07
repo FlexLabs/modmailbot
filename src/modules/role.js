@@ -1,5 +1,4 @@
 const Eris = require("eris");
-const config = require("../config");
 const utils = require("../utils");
 const threadUtils = require("../threadUtils");
 
@@ -9,10 +8,7 @@ const threadUtils = require("../threadUtils");
 module.exports = bot => {
   threadUtils.addInboxServerCommand(bot, "role", async (msg, args, thread) => {
     if (! thread) return;
-
-    const isWhitelisted = msg.member.roles && msg.member.roles.find((r) => [config.inboxAdminRoleId, "523021576128692239"].includes(r));
-
-    if (! args[0] || ! isWhitelisted) {
+    if (! args[0] || ! utils.isAdmin(msg.member)) {
       const currentRole = thread.getMainRole(msg.member) || "Staff";
       return utils.postSystemMessageWithFallback(msg.channel, thread, `Your current role for this thread is **${currentRole.name || currentRole}**!`);
     }

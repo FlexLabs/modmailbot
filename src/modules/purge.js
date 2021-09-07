@@ -1,5 +1,5 @@
 const Eris = require("eris");
-const config = require("../config");
+const utils = require("../utils");
 const threadUtils = require("../threadUtils");
 
 /**
@@ -8,7 +8,7 @@ const threadUtils = require("../threadUtils");
 module.exports = bot => {
   threadUtils.addInboxServerCommand(bot, "purge", async (msg, args, thread) => {
     if (! thread) return;
-    if (! msg.member.roles || ! msg.member.roles.includes(config.inboxAdminRoleId)) return;
+    if (! utils.isAdmin(msg.member)) return;
 
 	// @ts-ignore
 	const channel = await thread.getDMChannel();
