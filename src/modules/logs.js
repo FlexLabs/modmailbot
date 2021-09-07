@@ -14,7 +14,14 @@ module.exports = bot => {
      * @param {String} userId
      */
     async function getLogs(userId) {
-      const userThreads = await threads.getClosedThreadsByUserId(userId);
+      let userThreads = await threads.getClosedThreadsByUserId(userId);
+
+      if (! utils.isAdmin(msg.member)) {
+        userThreads = userThreads.filter((t) => ! t.isPrivate);
+      }
+
+      if (! userThreads.length) return bot.createMessage(msg.channel.id, "No logs found.");
+
       // Descending by date
       userThreads.sort((a, b) => {
         if (a.created_at > b.created_at) return -1;
@@ -27,9 +34,6 @@ module.exports = bot => {
         const formattedDate = moment.utc(thread.created_at).format("YYYY-MM-DD HH:mm [UTC]");
         return `\`${formattedDate}\` ${thread.scheduled_close_name}: <${logUrl}>`;
       }));
-
-      if (! userThreads || ! userThreads.length) return bot.createMessage(msg.channel.id, "No logs found.");
-
       const message = `**Log files for <@${userId}>:**\n${threadLines.join("\n")}`;
 
       // Send the list of logs in chunks of 15 lines per message
