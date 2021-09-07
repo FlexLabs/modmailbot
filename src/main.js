@@ -17,6 +17,7 @@ const command = require("./modules/command");
 const close = require("./modules/close");
 const snippets = require("./modules/snippets");
 const logs = require("./modules/logs");
+const hide = require("./modules/hide");
 const move = require("./modules/move");
 const block = require("./modules/block");
 const suspend = require("./modules/suspend");
@@ -346,6 +347,7 @@ module.exports = {
     command(bot);
     close(bot, sse);
     logs(bot);
+    hide(bot);
     block(bot);
     move(bot);
     snippets(bot);

@@ -681,6 +681,28 @@ class Thread {
   }
 
   /**
+   * @returns {Promise<void>}
+   */
+  async makePrivate() {
+    return await knex("threads")
+      .where("id", this.id)
+      .update({
+        isPrivate: true
+      });
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
+  async makePublic() {
+    return await knex("threads")
+      .where("id", this.id)
+      .update({
+        isPrivate: false
+      });
+  }
+
+  /**
    * @param {String} userId
    * @returns {String?}
    */
