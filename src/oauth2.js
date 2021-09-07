@@ -35,33 +35,57 @@ function login (req, res) {
   });
 }
 
+function isDashAdmin (user) {
+  try {
+    const guild = bot.guilds.get(config.mainGuildId);
+    const member = guild.members.get(user.id);
+    return utils.isAdmin(member);
+  } catch (err) {
+    return false;
+  }
+}
+
+async function getAuthUser (token) {
+  let user;
+
+  try {
+    let accessToken = jwt.verify(token, config.clientSecret).token;
+    let response = await superagent.get("https://discord.com/api/users/@me")
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    user = response.body;
+  } catch (err) {
+    return;
+  }
+
+  return user;
+}
+
 async function checkAuth (req, res, next) {
   if (req.cookies.token) {
-    let token = req.cookies.token;
-    try {
-      let accessToken = jwt.verify(token, config.clientSecret).token;
-      let response = await superagent.get("https://discord.com/api/users/@me")
-      .set("Authorization", `Bearer ${accessToken}`);
-      req.user = response.body;
-    } catch (err) {
-      return res.redirect("/login");
-    }
+    req.user = await getAuthUser(res.cookies.token);
+
     if (! req.user) {
       return res.redirect("/login");
     } else {
-      let guild = bot.guilds.get(config.mailGuildId);
-      let member = guild.members.get(req.user.id);
-      let hasRole, isUser;
-      if (config.dashAuthRoles)
-        hasRole = member.roles.some(r => config.dashAuthRoles.includes(r));
-      if (config.dashAuthUsers)
-        isUser = config.dashAuthUsers.includes(member.id);
-      if (isUser || hasRole) {
-        next();
-      } else {
-        res.status(401);
-        res.send("<pre>401 Unauthorized</pre>");
+      const guild = bot.guilds.get(config.mailGuildId);
+      const member = guild && guild.members.get(req.user.id);
+
+      if (member) {
+        let isAuthorized;
+
+        if (config.dashAuthRoles)
+          isAuthorized = member.roles.some(r => config.dashAuthRoles.includes(r));
+        if (config.dashAuthUsers)
+          isAuthorized = config.dashAuthUsers.includes(member.id);
+
+        if (isAuthorized) {
+          return next();
+        }
       }
+
+      res.status(401);
+      res.send("<pre>401 Unauthorized</pre>");
     }
   } else {
     res.redirect("/login");
@@ -70,5 +94,7 @@ async function checkAuth (req, res, next) {
 
 module.exports = {
   login,
+  isDashAdmin,
+  getAuthUser,
   checkAuth,
 };
