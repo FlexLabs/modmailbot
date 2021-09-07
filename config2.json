@@ -1,49 +1,45 @@
 {
-  
-	"mailGuildId": "203039963636301824",
-	"mainGuildId": "203039963636301824",
-	"logChannelId": "434883486113857538",
-  
-	"mentionRole": null,
-	"inboxServerPermission": "voiceMoveMembers",
-	"inboxAdminRoleId": "203040224597508096",
-	"inboxServerRoleIDs": ["203040224597508096", "231095149508296704"],
-  
-	"status": "Message me for help!",
-	"newThreadCategoryId": "434883322284605442",
-  
-	"replyAnonDefault": true,
-	"snippetAnonDefault": true,
-	"typingProxy": true,
-	"ignoreAccidentalThreads": true,
-  
-	"ignoredPrefixes": ["?", "!"],
-	"ignoredPrefixAutorespond": true,
-  
-	"ignoredWords": ["help", "test"],
-	"ignoredWordAutorespond": true,
-  
-	"ignoreNonAlphaMessages": true,
-  
-	"minContentLength": 4,
-  
-	"allowedCategories": ["434883322284605442", "435503373723369472", "429054322555355158", "355893717795864576"],
-  
-	"dashAuthRoles": ["203040224597508096", "231095149508296704"],
-  
-	"allowMove": true,
+  "mailGuildId": "203039963636301824",
+  "mainGuildId": "203039963636301824",
+  "logChannelId": "434883486113857538",
 
-	"dataFactory": true,
-  
-	"autoResponses": [
-	  {
-		"match": ["hi", "hello", "hi!", "hello!", "hi?", "hello?", "hi.", "hello.", "hey", "hey!"],
-		"response": "Hi, this is used for reporting issues to staff members on the Dyno server, if you have something to report or ask, just let us know."
-	  },
-	  {
-		"match": ["invite", "join"],
-		"matchStart": true,
-		"response": "Hi, I can't be invited. This is used for reporting issues to staff members on the Dyno server, if you have something to report or ask, just let us know."
-	  }
-	]
-  }
+  "replyAnonDefault": true,
+  "snippetAnonDefault": true,
+
+  "ignoredWords": ["help", "test"],
+  "ignoredPrefixes": ["?", "!"],
+
+  "ignoredWordAutorespond": true,
+  "ignoredPrefixAutorespond": true,
+  "ignoreNonAlphaMessages": true,
+
+  "minContentLength": 4,
+
+  "newThreadCategoryId": "434883322284605442",
+  "mentionRole": null,
+  "adminMentionRole": "203040224597508096",
+
+  "inboxServerRoleIDs": ["203040224597508096", "523021576128692239", "231095149508296704"],
+  "inboxAdminRoleIDs": ["203040224597508096", "523021576128692239"],
+  "ignoreAccidentalThreads": true,
+  "allowMove": true,
+  "typingProxy": true,
+
+  "allowedCategories": ["434883322284605442", "429054322555355158"],
+
+  "autoResponses": [
+    {
+      "match": ["hi", "hello", "hi!", "hello!", "hi?", "hello?", "hi.", "hello.", "hey", "hey!"],
+      "response": "Hi, this is used for reporting issues to staff members on the Dyno server, if you have something to report or ask, just let us know."
+    },
+    {
+      "match": ["invite", "join"],
+      "matchStart": true,
+      "response": "Hi, I can't be invited. This is used for reporting issues to staff members on the Dyno server, if you have something to report or ask, just let us know."
+    }
+  ],
+
+  "dataFactory": true,
+
+  "dashAuthRoles": ["203040224597508096", "523021576128692239", "231095149508296704"]
+}
