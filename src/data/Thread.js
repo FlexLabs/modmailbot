@@ -575,7 +575,14 @@ class Thread {
      */
     const channel = bot.getChannel(this.channel_id);
     if (channel) {
+      if (this.isPrivate && channel.parentID == config.newThreadCategoryId) {
+        this.makePublic();
+      } else if (! this.isPrivate && channel.parentID != config.newThreadCategoryId) {
+        this.makePrivate();
+      }
+
       console.log(`Deleting channel ${this.channel_id}`);
+
       await channel.delete("Thread closed");
     }
   }
