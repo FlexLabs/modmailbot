@@ -87,7 +87,6 @@ const defaultConfig = {
 
 const required = ["token", "mailGuildId", "mainGuildId", "logChannelId"];
 const requiredAuth = ["clientId", "clientSecret", "redirectPath"];
-
 const finalConfig = Object.assign({}, defaultConfig);
 
 for (const [prop, value] of Object.entries(localConfig)) {
@@ -99,16 +98,16 @@ for (const [prop, value] of Object.entries(localConfig)) {
 }
 
 for (const [prop, value] of Object.entries(ghConfig)) {
-	//protect local only values, just in case
-	if (["token", "port", "url", "clientId", "clientSecret", "mongoDSN"].includes(prop)) {
-		continue;
+  // Protect local only values, just in case
+  if (["token", "port", "url", "clientId", "clientSecret", "mongoDSN"].includes(prop)) {
+    continue;
 	}
 	if (! defaultConfig.hasOwnProperty(prop)) {
-	  throw new Error(`Invalid option: ${prop}`);
+    throw new Error(`Invalid option: ${prop}`);
 	}
-  
+
 	finalConfig[prop] = value;
-  }
+}
 
 if (! finalConfig["knex"]) {
   finalConfig["knex"] = {

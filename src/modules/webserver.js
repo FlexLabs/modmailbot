@@ -91,20 +91,27 @@ module.exports = (bot, sse) => {
      */
     let { limit: lim, page, user, sort_by, reverse } = req.query;
     let limit = parseInt(lim) || 50;
+
     if (limit < 1) limit = 1;
     if (limit > 100) limit = 100;
+
     page = parseInt(page) || 0;
     reverse = reverse != null;
+
     let q = knex("threads");
     if (user)
       q.where("user_id", user);
     else
       q.select("*");
+
     let total = (await q.clone().count())[0]["count(*)"];
+    let offset = page * limit;
+
     if (sort_by)
       q.orderBy(sort_by, reverse ? "asc" : "desc");
+
     q.orderBy("created_at", reverse ? "desc" : "asc");
-    let offset = page * limit;
+
     res.json({
       total: total,
       threads: await q.limit(limit).offset(offset)

@@ -36,7 +36,6 @@ module.exports = bot => {
 
   threadUtils.addInboxServerCommand(bot, "move", async (msg, args, thread) => {
     if (! config.allowMove) return;
-
     if (! thread) return;
 
     const searchStr = args[0];
