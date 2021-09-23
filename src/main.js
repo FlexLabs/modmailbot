@@ -36,7 +36,7 @@ const info = require("./modules/info");
 const setavatar = require("./modules/setavatar");
 const dmlink = require("./modules/dmlink");
 const stats = require("./modules/stats");
-const error = require("./modules/error");
+const say = require("./modules/say");
 
 const attachments = require("./data/attachments");
 const {ACCIDENTAL_THREAD_MESSAGES} = require("./data/constants");
@@ -367,6 +367,6 @@ module.exports = {
     setavatar(bot);
     dmlink(bot);
     stats(bot);
-    error(bot);
+    say(bot);
   }
 };
