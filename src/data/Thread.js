@@ -14,6 +14,7 @@ const ThreadMessage = require("./ThreadMessage");
 
 const {THREAD_MESSAGE_TYPE, THREAD_STATUS} = require("./constants");
 const notes = require("./notes");
+const lastMsgs = new Map();
 
 /**
  * @property {String} id
@@ -230,7 +231,17 @@ class Thread {
 
     if (this.alert_users) {
       const alerts = this.alert_users.split(", ")
-        .filter(id => id !== this.scheduled_close_id)
+        .filter(id => {
+          const wait = lastMsgs.get(`${this.id}-${id}`);
+
+          if (wait && Date.now() - wait < 10000) {
+            return false;
+          }
+
+          lastMsgs.set(`${this.id}-${id}`, Date.now());
+
+          return id !== this.scheduled_close_id;
+        })
         .map((id, i, arr) => (i == 0 ? "" : (i == arr.length - 1 ? " and " : ", ")) + `<@${id}>`)
         .join("");
 
