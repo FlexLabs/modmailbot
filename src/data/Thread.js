@@ -360,20 +360,20 @@ class Thread {
       notes.get(user.id),
     ]);
 
-    const mainGuildNickname = member && member.nick && `(${member.nick})`;
-    const accountAge = humanizeDuration(now - user.createdAt, {largest: 2});
-    const memberFor = member ? humanizeDuration(now - member.joinedAt, {largest: 2}) : "UNAVAILABLE";
-    const roles = member && member.roles.map((r) => member.guild.roles.get(r)).sort((a, b) => b.position - a.position);
-    const roleList = roles ? roles.map((r) => r.name).join(", ") || "NONE" : "UNAVAILABLE";
-    const coloredRoles = roles && roles.filter((r) => r.color !== 0) || [];
-    const highestColor = coloredRoles[0] && coloredRoles[0].color;
-
     let displayNote = "None";
+
     if (userNotes && userNotes.length) {
       const note = userNotes[userNotes.length - 1];
       displayNote = `${note.note} - [${note.created_at}] (${note.created_by_name})`;
     }
 
+    const mainGuildNickname = member && member.nick && `(${member.nick})`;
+    const accountAge = humanizeDuration(now - user.createdAt, {largest: 2});
+    const memberFor = member ? humanizeDuration(now - member.joinedAt, {largest: 2}) : "Unavailable";
+    const roles = member && member.roles.map((r) => member.guild.roles.get(r)).sort((a, b) => b.position - a.position);
+    const roleList = roles ? roles.map((r) => r.name).join(", ") || "None" : "Unavailable";
+    const coloredRoles = roles && roles.filter((r) => r.color !== 0) || [];
+    const highestColor = coloredRoles[0] && coloredRoles[0].color;
     const fields = [
       {name: "User", value: `${user.username}#${user.discriminator} ${mainGuildNickname || ""}`, inline: true},
       {name: "Account age", value: accountAge, inline: true},
