@@ -12,26 +12,26 @@ function login (req, res) {
     if (! code)
       return res.redirect(oauth2url);
     superagent.post("https://discord.com/api/oauth2/token")
-    .type("form")
-    .send({
-      client_id: config.clientId,
-      client_secret: config.clientSecret,
-      grant_type: "authorization_code",
-      code: code,
-      redirect_uri: redirectUri,
-      scope: "identify"
-    }).then(response => {
-      let token = jwt.sign({
-        token: response.body.access_token
-      }, config.clientSecret);
-      res.cookie("token", token, {
-        maxAge: response.body.expires_in * 1000
+      .type("form")
+      .send({
+        client_id: config.clientId,
+        client_secret: config.clientSecret,
+        grant_type: "authorization_code",
+        code: code,
+        redirect_uri: redirectUri,
+        scope: "identify"
+      }).then(response => {
+        let token = jwt.sign({
+          token: response.body.access_token
+        }, config.clientSecret);
+        res.cookie("token", token, {
+          maxAge: response.body.expires_in * 1000
+        });
+        res.redirect("/");
+      }).catch(() => {
+        res.status(401);
+        res.send("<pre>401 Unauthorized</pre>");
       });
-      res.redirect("/");
-    }).catch(() => {
-      res.status(401);
-      res.send("<pre>401 Unauthorized</pre>");
-    });
   });
 }
 

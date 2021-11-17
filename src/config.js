@@ -102,13 +102,13 @@ for (const [prop, value] of Object.entries(ghConfig)) {
   // Protect local only values, just in case
   if (["token", "port", "url", "clientId", "clientSecret", "mongoDSN"].includes(prop)) {
     continue;
-	}
+  }
 
-	if (! defaultConfig.hasOwnProperty(prop)) {
+  if (! defaultConfig.hasOwnProperty(prop)) {
     throw new Error(`Invalid option: ${prop}`);
-	}
+  }
 
-	finalConfig[prop] = value;
+  finalConfig[prop] = value;
 }
 
 if (! finalConfig["knex"]) {

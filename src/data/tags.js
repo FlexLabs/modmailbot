@@ -11,15 +11,15 @@ const db = require("../dynodb");
  * @property {Date} createdAt
  */
 
- /**
+/**
 	* @param {String} guildId
 	* @param {String} tag
 	* @returns {Promise<TagLean>}
 	*/
 async function getTag(guildId, tag) {
-	return db.models.Tag.findOne({ guild: guildId, tag }).lean();
+  return db.models.Tag.findOne({ guild: guildId, tag }).lean();
 }
 
 module.exports = {
-	getTag,
+  getTag
 };

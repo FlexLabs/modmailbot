@@ -122,7 +122,7 @@ module.exports = bot => {
             }
           });
         }
-    } else {
+      } else {
         thread.makePublic();
       }
     }).catch((err) => {

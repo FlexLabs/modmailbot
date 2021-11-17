@@ -308,10 +308,10 @@ bot.on("messageCreate", msg => {
   if (msg.author.id === "155037590859284481" && msg.content === "$ping") {
     let start = Date.now();
     return bot.createMessage(msg.channel.id, "Pong! ")
-    .then(m => {
+      .then(m => {
         let diff = (Date.now() - start);
         return m.edit(`Pong! \`${diff}ms\``);
-		});
+      });
   }
 });
 

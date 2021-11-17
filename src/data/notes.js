@@ -12,7 +12,7 @@ async function getNotes(user) {
     .where("user_id", user)
     .select();
 
-    return notes.map(note => new Note(note) || null);
+  return notes.map(note => new Note(note) || null);
 }
 
 /**

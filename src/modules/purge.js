@@ -37,29 +37,29 @@ module.exports = bot => {
     }
   });
 
-	bot.registerCommandAlias("p", "purge");
+  bot.registerCommandAlias("p", "purge");
 
-	threadUtils.addInboxServerCommand(bot, "undo", async (msg, args, thread) => {
-		if (! thread) return;
+  threadUtils.addInboxServerCommand(bot, "undo", async (msg, args, thread) => {
+    if (! thread) return;
 
-		// @ts-ignore
-		const channel = await thread.getDMChannel();
-		if (! channel || ! channel.id) {
-			return thread.postSystemMessage("Error getting DM Channel");
-		}
+    // @ts-ignore
+    const channel = await thread.getDMChannel();
+    if (! channel || ! channel.id) {
+      return thread.postSystemMessage("Error getting DM Channel");
+    }
 
-		const messages = await bot.getMessages(channel.id, 100);
-		const message = messages.filter(m => m.author.id === bot.user.id)[0];
+    const messages = await bot.getMessages(channel.id, 100);
+    const message = messages.filter(m => m.author.id === bot.user.id)[0];
 
-		if (message) {
-			try {
-				await bot.deleteMessage(channel.id, message.id);
-				thread.postSystemMessage("Purged 1 message.");
-			} catch (err) {
-				thread.postSystemMessage(`Error deleting messages: ${err.message}`);
-			}
-		} else {
-			thread.postSystemMessage("I couldn't find a message to delete.");
-		}
-	});
+    if (message) {
+      try {
+        await bot.deleteMessage(channel.id, message.id);
+        thread.postSystemMessage("Purged 1 message.");
+      } catch (err) {
+        thread.postSystemMessage(`Error deleting messages: ${err.message}`);
+      }
+    } else {
+      thread.postSystemMessage("I couldn't find a message to delete.");
+    }
+  });
 };

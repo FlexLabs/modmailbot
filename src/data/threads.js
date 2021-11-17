@@ -159,9 +159,9 @@ async function getClosedThreadsByUserId(userId) {
 
 async function deleteClosedThreadsByUserId(userId) {
   await knex("threads")
-      .where("status", THREAD_STATUS.CLOSED)
-      .where("user_id", userId)
-      .delete();
+    .where("status", THREAD_STATUS.CLOSED)
+    .where("user_id", userId)
+    .delete();
 }
 
 /**

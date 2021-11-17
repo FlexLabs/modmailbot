@@ -176,14 +176,14 @@ module.exports = (bot, sse) => {
     const user = bot.users.get(req.params.id) || await bot.getRESTUser(req.params.id).catch(
       /** @param {import('eris').DiscordRESTError | import('eris').DiscordHTTPError} e */
       (e) => {
-      if (e.code === 404 || e.code === 10013) {
-        res.status(400).send("<pre>400 Bad Request</pre>");
-      } else {
-        process.emit("unhandledRejection", e);
-        res.status(500).send(`<pre>500 Server Error: ${e}</pre>`);
-      }
-      return null;
-    });
+        if (e.code === 404 || e.code === 10013) {
+          res.status(400).send("<pre>400 Bad Request</pre>");
+        } else {
+          process.emit("unhandledRejection", e);
+          res.status(500).send(`<pre>500 Server Error: ${e}</pre>`);
+        }
+        return null;
+      });
     if (! user) return;
 
     res.set("Cache-Control", "max-age=3600").redirect(user.avatarURL);
