@@ -28,6 +28,7 @@
         "!!": true
       }
     }],
+    "indent": ["error", 2],
     "quotes": "error",
     "semi": "error",
     "no-prototype-builtins": "off",
