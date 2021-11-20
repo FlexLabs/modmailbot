@@ -12,8 +12,6 @@ const reply = require("./modules/reply");
 const alert = require("./modules/alert");
 const role = require("./modules/role");
 const purge = require("./modules/purge");
-const tags = require("./modules/tags");
-const command = require("./modules/command");
 const close = require("./modules/close");
 const snippets = require("./modules/snippets");
 const logs = require("./modules/logs");
@@ -344,8 +342,6 @@ module.exports = {
     alert(bot);
     role(bot);
     purge(bot);
-    tags(bot);
-    command(bot);
     close(bot, sse);
     logs(bot);
     hide(bot);
