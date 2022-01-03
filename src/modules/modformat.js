@@ -14,7 +14,7 @@ module.exports = bot => {
       let idArray = [];
       for await (const message of messages) {
         if (/(?:whois|modlogs|modinfo)\s\d{16,}/.test(message.body)) {
-          idArray.push(message.body.split(" ")[1]);   
+          idArray.push(message.body.split(" ")[1]);
         }}
       let lastItem = " ";
       for (let i = 0; i < idArray.length; i++) {
@@ -22,7 +22,7 @@ module.exports = bot => {
           lastItem = idArray[i];
         }
       }
-      
+
       bot.createMessage(msg.channel.id, `${lastItem} ${reason} | ${thread.id}`.trim());
     } else {
       const reason = args.join(" ").trim();

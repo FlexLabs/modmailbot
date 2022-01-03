@@ -22,7 +22,7 @@ const randoms = [
   "NEVER GONNA LET YOU DOWN",
   "NEVER GONNA RUN AROUND AND DESERT YOU",
   "NEVER GONNA MAKE YOU CRY",
-  "NEVER GONNA TELL A LIE AND HURT YOU", 
+  "NEVER GONNA TELL A LIE AND HURT YOU",
   "Thanks for not providing any arguments, it took me a while to think of all these random responses, I appreciate you."
 ];
 
