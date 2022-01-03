@@ -25,7 +25,8 @@ const defaultConfig = {
   "snippetAnonDefault": false,
 
   "status": "Message me for help!",
-  "responseMessage": "Thank you for your message! Our mod team will reply to you here as soon as possible.",
+  "openingMessage": "Hi there, thanks for reaching out to the Dyno modmail bot. This is the best way to get in contact with the Dyno staff team. Please select what you'd like assistance with from the options below so I can route your request to the correct team.\n\n*Note: We can only offer assistance in English.*",
+  "responseMessage": "Your message has been forwarded to our staff team. A staff member will reply to you here as soon as possible.",
   "ignoredWordResponse": "There are no commands. If you would like to speak with staff, please ask a question here.",
   "ignoredPrefixResponse": "There are no commands. If you would like to speak with staff, please ask a question here.",
   "genericResponse": "If you would like to speak with staff, please ask a question here.",
