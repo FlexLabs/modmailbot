@@ -58,7 +58,9 @@ module.exports = (bot, sse) => {
         // Cancel timed close
         if (thread.scheduled_close_at) {
           await thread.cancelScheduledClose();
-          thread.postSystemMessage("Cancelled scheduled closing");
+          thread.postSystemMessage("Cancelled scheduled closing.");
+        } else {
+          thread.postSystemMessage("This thread is not scheduled to close!");
         }
 
         return;
@@ -67,7 +69,7 @@ module.exports = (bot, sse) => {
         if (thread.scheduled_close_at) {
           message = `Thread scheduled to close\nClosing at ${thread.scheduled_close_at}\nClosing by ${thread.scheduled_close_name} (${thread.scheduled_close_id})`;
         } else {
-          message = "Thread is not scheduled to close";
+          message = "Thread is not scheduled to close!";
         }
         thread.postSystemMessage(message);
         return;
