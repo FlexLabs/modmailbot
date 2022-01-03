@@ -67,9 +67,9 @@ module.exports = (bot, sse) => {
       } else if (args[0] === "status") {
         let message;
         if (thread.scheduled_close_at) {
-          message = `Thread scheduled to close\nClosing at ${thread.scheduled_close_at}\nClosing by ${thread.scheduled_close_name} (${thread.scheduled_close_id})`;
+          message = `Closing at <t:${moment(thread.scheduled_close_at).unix()}:F>\nClosing by ${thread.scheduled_close_name} (${thread.scheduled_close_id})`;
         } else {
-          message = "Thread is not scheduled to close!";
+          message = "This thread is not scheduled to close!";
         }
         thread.postSystemMessage(message);
         return;
