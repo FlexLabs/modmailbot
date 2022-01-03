@@ -347,7 +347,10 @@ class Thread {
     await this.postToThreadChannel(content, file);
   }
 
-  async sendThreadInfo() {
+  /**
+   * @param {String} topic If the user opened the thread, this will be the label of which ever button they pressed
+   */
+  async sendThreadInfo(topic) {
     const now = Date.now();
     const user = bot.users.get(this.user_id);
     const [
@@ -378,11 +381,27 @@ class Thread {
       {name: "User", value: `${user.username}#${user.discriminator} ${mainGuildNickname || ""}`, inline: true},
       {name: "Account age", value: accountAge, inline: true},
       {name: "Member for", value: memberFor, inline: true},
-      {name: "Thread ID", value: this.id, inline: true},
-      {name: "Logs", value: `${userLogCount}`, inline: true},
-      {name: `Last note (${userNotes.length})`, value: displayNote, inline: false},
-      {name: `Roles (${roles && roles.length || 0})`, value: roleList, inline: false},
+      {name: `Thread ID (${userLogCount} Logs)`, value: this.id, inline: true}
     ];
+
+    if (topic) {
+      fields.push({
+        name: "Topic",
+        value: topic,
+        inline: true
+      });
+    }
+
+    fields.push(
+      {
+        name: `Last note (${userNotes.length})`,
+        value: displayNote
+      },
+      {
+        name: `Roles (${roles && roles.length || 0})`,
+        value: roleList
+      }
+    );
 
     await this.postSystemMessage({
       content: user.mention,

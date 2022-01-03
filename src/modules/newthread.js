@@ -39,7 +39,7 @@ module.exports = (bot, sse) => {
       return;
     }
 
-    const createdThread = await threads.createNewThreadForUser(user, true);
+    const createdThread = await threads.createNewThreadForUser(user, null, true);
     createdThread.postSystemMessage(`Thread was opened by ${msg.author.username}#${msg.author.discriminator}`);
 
     sse.send({ thread: createdThread }, "threadOpen", null);
