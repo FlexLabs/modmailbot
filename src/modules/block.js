@@ -10,104 +10,59 @@ const utils = require("../utils");
  */
 module.exports = bot => {
   threadUtils.addInboxServerCommand(bot, "block", async (msg, args, thread) => {
-    /**
-     * @param {Eris.User} user
-     */
-    async function block(user) {
-      await blocked.block(user.id, `${user.username}#${user.discriminator}`, msg.author.id);
-      bot.createMessage(msg.channel.id, `Blocked <@${user.id}> (id ${user.id}) from modmail`);
-    }
+    const userId = (thread && thread.user_id) || utils.getUserMention(args.shift());
+    if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
 
-    let logText = "**Blocked:** ";
-
-    if (! thread) {
-      // User mention/id as argument
-      const userId = utils.getUserMention(args.shift());
-      if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
-
-      const user = await bot.getRESTUser(userId).catch(() => null);
+    let user = bot.users.get(userId);
+    if (! user) {
+      user = await bot.getRESTUser(userId).catch(() => null);
       if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");
-
-      const reason = args.join(" ").trim();
-
-      logText += `${user.username}#${user.discriminator} (${userId}) was blocked`;
-
-      if (reason && reason.length) {
-        logText += ` for ${reason}`;
-      }
-
-      utils.postLog(logText);
-
-      block(user);
-    } else {
-      const user = await bot.getRESTUser(thread.user_id);
-      const reason = args.join(" ").trim();
-      let isAnonymous = false;
-
-      if (config.replyAnonDefault === true) {
-        isAnonymous = true;
-      }
-
-      let text = "You have been blocked.";
-
-      logText += `${thread.user_name} (${thread.user_id}) was blocked`;
-
-      if (reason && reason.length) {
-        text = `You have been blocked for ${reason}`;
-        logText += ` for ${reason}`;
-      }
-
-      if (msg.attachments.length) await attachments.saveAttachmentsInMessage(msg);
-      await thread.replyToUser(msg.member, text, msg.attachments, isAnonymous);
-
-      utils.postLog(logText);
-
-      // Calling !block without args in a modmail thread blocks the user of that thread
-      block(user);
     }
+
+    const isBlocked = await blocked.isBlocked(msg.author.id);
+    if (isBlocked) return utils.postSystemMessageWithFallback(msg.channel, thread, `${user.username}#${user.discriminator} is already blocked!`);
+
+    const reason = args.join(" ").trim();
+
+    if (thread) {
+      let text = `You have been blocked${reason ? ` for ${reason}` : "."}`;
+      if (msg.attachments.length) await attachments.saveAttachmentsInMessage(msg);
+      await thread.replyToUser(msg.member, text, msg.attachments, config.replyAnonDefault);
+    }
+
+    let logText = `**Blocked:** ${user.username}#${user.discriminator} (${user.id}) was blocked`;
+
+    if (reason) {
+      logText += ` for ${reason}`;
+    }
+
+    utils.postLog(logText);
+    await blocked.block(user.id, `${user.username}#${user.discriminator}`, msg.author.id);
+    return utils.postSystemMessageWithFallback(msg.channel, thread, `Blocked <@${user.id}> (${user.id}) from modmail!`);
   });
 
   threadUtils.addInboxServerCommand(bot, "unblock", async (msg, args, thread) => {
-    async function unblock(userId) {
-      await blocked.unblock(userId);
-      bot.createMessage(msg.channel.id, `Unblocked <@${userId}> (id ${userId}) from modmail`);
-    }
+    const userId = (thread && thread.user_id) || utils.getUserMention(args.shift());
+    if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
 
-    let logText = "**Unblocked:** ";
-
-    if (! thread) {
-      // User mention/id as argument
-      const userId = utils.getUserMention(args.shift());
-      if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
-
-      const user = await bot.getRESTUser(userId).catch(() => null);
+    let user = bot.users.get(userId);
+    if (! user) {
+      user = await bot.getRESTUser(userId).catch(() => null);
       if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");
-
-      const reason = args.join(" ").trim();
-
-      logText += `${user.username}#${user.discriminator} (${userId}) was unblocked`;
-
-
-      if (reason && reason.length) {
-        logText += ` for ${reason}`;
-      }
-
-      utils.postLog(logText);
-
-      unblock(userId);
-    } else {
-      const reason = args.join(" ").trim();
-
-      logText += `${thread.user_name} (${thread.user_id}) was unblocked`;
-
-      if (reason && reason.length) {
-        logText += ` for ${reason}`;
-      }
-
-      utils.postLog(logText);
-
-      // Calling !unblock without args in a modmail thread unblocks the user of that thread
-      unblock(thread.user_id);
     }
+
+    const isBlocked = await blocked.isBlocked(msg.author.id);
+    if (! isBlocked) return utils.postSystemMessageWithFallback(msg.channel, thread, `${user.username}#${user.discriminator} isn't blocked!`);
+
+    let reason = args.join(" ").trim();
+    let logText = `**Unblocked:** ${user.username}#${user.discriminator} (${userId}) was unblocked`;
+
+    if (reason) {
+      logText += ` for ${reason}`;
+    }
+
+    utils.postLog(logText);
+    await blocked.unblock(userId);
+    return utils.postSystemMessageWithFallback(msg.channel, thread, `Unblocked <@${userId}> (${userId}) from modmail!`);
   });
 };
