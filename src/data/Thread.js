@@ -182,13 +182,24 @@ class Thread {
    * @returns {Promise<void>}
    */
   async receiveUserReply(msg, sse) {
-    let content = msg.content;
-    if (msg.content.trim() === "" && msg.embeds.length) {
-      content = "<message contains embeds>";
+    let logContent = msg.content;
+    let extraContent = [];
+
+    if (msg.embeds.length) {
+      extraContent.push(`${msg.embeds.length} embed${msg.embeds.length == 1 ? "" : "s"}`);
     }
 
-    let threadContent = `**${msg.author.username}#${msg.author.discriminator}:** ${content}`;
-    let logContent = msg.content;
+    const stickers = msg.stickerItems && msg.stickerItems.map((s) => s.name);
+
+    if (stickers && stickers.length) {
+      extraContent.push(`${stickers.length} sticker${stickers.length == 1 ? "" : "s"} (${stickers.join(", ")})`);
+    }
+
+    if (extraContent.length) {
+      logContent += `\n\n<message contains ${extraContent.join(" & ")}>`;
+    }
+
+    let threadContent = `**${msg.author.username}#${msg.author.discriminator}:** ${logContent}`;
 
     if (config.threadTimestamps) {
       const timestamp = utils.getTimestamp(msg.timestamp, "x");
