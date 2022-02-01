@@ -298,7 +298,7 @@ bot.on("interactionCreate", async (interaction) => {
   if (interaction.data.custom_id === "cancelThread") {
     interaction.createMessage("Cancelled thread, your message won't be forwarded to staff members.");
   } else if (interaction.data.custom_id === "dynoSupport") {
-    interaction.createMessage("You can get Dyno support in the server in the following channels:\n<#240777175802839040> English support\n<#395821744696590338> Soutien français\n<#395821762669051904> Internationale Unterstützung / Suporte internacional / Apoyo internacional / Uluslararası destek / الدعم الدولي");
+    interaction.createMessage("You can get Dyno support in the server in the following channels:\n<#240777175802839040> English support\n<#395821744696590338> Soutien en français\n<#395821762669051904> Internationale Unterstützung / Suporte internacional / Apoyo internacional / Uluslararası destek / الدعم الدولي");
   } else {
     let thread;
     let clicked = message.components[0].components.find((c) => c.custom_id === interaction.data.custom_id);
