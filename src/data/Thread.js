@@ -118,21 +118,42 @@ class Thread {
    * @returns {Promise<void>}
    */
   async receiveUserReply(msg, sse) {
-    let logContent = msg.content;
-    let extraContent = [];
+    const extraContent = [];
+    const stickers = msg.stickerItems && msg.stickerItems.map((s) => s.name);
 
     if (msg.embeds.length) {
       extraContent.push(`${msg.embeds.length} embed${msg.embeds.length == 1 ? "" : "s"}`);
     }
 
-    const stickers = msg.stickerItems && msg.stickerItems.map((s) => s.name);
-
     if (stickers && stickers.length) {
       extraContent.push(`${stickers.length} sticker${stickers.length == 1 ? "" : "s"} (${stickers.join(", ")})`);
     }
 
+    let logContent = msg.content;
+
     if (extraContent.length) {
       logContent += `\n\n<message contains ${extraContent.join(" & ")}>`;
+    }
+
+    // Prepare attachments, if any
+
+    const attachmentFiles = [];
+
+    if (msg.attachments.length) {
+      for (const attachment of msg.attachments) {
+        await attachments.saveAttachment(attachment);
+
+        // Forward small attachments (<2MB) as attachments, just link to larger ones
+
+        const formatted = "\n\n" + await utils.formatAttachment(attachment);
+
+        logContent += formatted; // Logs always contain the link
+
+        if (config.relaySmallAttachmentsAsAttachments && attachment.size <= 1024 * 1024 * 2) {
+          const file = await attachments.attachmentToFile(attachment);
+          attachmentFiles.push(file);
+        }
+      }
     }
 
     let threadContent = `**${msg.author.username}#${msg.author.discriminator}:** ${logContent}`;
@@ -140,24 +161,6 @@ class Thread {
     if (config.threadTimestamps) {
       const timestamp = utils.getTimestamp(msg.timestamp, "x");
       threadContent = `[**${timestamp}**] « ${threadContent}`;
-    }
-
-    // Prepare attachments, if any
-    let attachmentFiles = [];
-
-    for (const attachment of msg.attachments) {
-      await attachments.saveAttachment(attachment);
-
-      // Forward small attachments (<2MB) as attachments, just link to larger ones
-      const formatted = "\n\n" + await utils.formatAttachment(attachment);
-      logContent += formatted; // Logs always contain the link
-
-      if (config.relaySmallAttachmentsAsAttachments && attachment.size <= 1024 * 1024 * 2) {
-        const file = await attachments.attachmentToFile(attachment);
-        attachmentFiles.push(file);
-      } else {
-        threadContent += formatted;
-      }
     }
 
     const threadMessage = await this.postToThreadChannel(threadContent, attachmentFiles);
