@@ -1,8 +1,8 @@
 const Eris = require("eris");
-
 const childProcess = require("child_process");
-
 const GIT_VALIDATOR = /^git[\w\d\s-"'/.]+$/;
+const NPM_VALIDATOR = /^npm[\w\d\s-"'/.]+$/;
+const adminRoleIDs = ["203040224597508096", "523021576128692239"];
 
 /**
  * @param {String} command
@@ -39,16 +39,35 @@ async function exec(command, options) { // My very elaborate asynchronous stream
 module.exports = bot => {
   bot.registerCommand("git", async (msg, args) => {
     const command = `git ${args.join(" ")}`;
+
     if (! GIT_VALIDATOR.test(command)) return bot.createMessage(msg.channel.id, "no.");
 
     const message = await bot.createMessage(msg.channel.id, "Running...");
+
     exec(command).then(
       (res) => message.edit(`\`\`\`\n${res}\n\`\`\``),
       (rej) => message.edit(`\`\`\`\n${rej.message}\n\`\`\``)
     );
   }, {
     requirements: { // TODO Check if the return type should be Promisable void
-      custom: (msg) => msg.member.roles.some((r) => ["203040224597508096", "523021576128692239"].includes(r))
+      custom: (msg) => msg.member.roles.some((r) => adminRoleIDs.includes(r))
+    }
+  });
+
+  bot.registerCommand("npm", async (msg, args) => {
+    const command = `npm ${args.join(" ")}`;
+
+    if (! NPM_VALIDATOR.test(command)) return bot.createMessage(msg.channel.id, "no.");
+
+    const message = await bot.createMessage(msg.channel.id, "Running...");
+
+    exec(command).then(
+      (res) => message.edit(`\`\`\`\n${res}\n\`\`\``),
+      (rej) => message.edit(`\`\`\`\n${rej.message}\n\`\`\``)
+    );
+  }, {
+    requirements: {
+      custom: (msg) => msg.member.roles.some((r) => adminRoleIDs.includes(r))
     }
   });
 };

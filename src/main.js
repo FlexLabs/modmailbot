@@ -28,7 +28,7 @@ const notes = require("./modules/notes");
 const idcmd = require("./modules/id");
 const ping = require("./modules/ping");
 const fixAttachment = require("./modules/img");
-const git = require("./modules/git");
+const exec = require("./modules/exec");
 const restart = require("./modules/restart");
 const info = require("./modules/info");
 const setavatar = require("./modules/setavatar");
@@ -453,7 +453,7 @@ module.exports = {
     idcmd(bot);
     ping(bot);
     fixAttachment(bot);
-    git(bot);
+    exec(bot);
     restart(bot);
     info(bot);
     setavatar(bot);
