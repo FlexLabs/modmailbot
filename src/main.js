@@ -329,9 +329,7 @@ bot.on("interactionCreate", async (interaction) => {
  * 2) If that message was moderator chatter in the thread, update the corresponding chat message in the DB
  */
 bot.on("messageUpdate", async (msg, oldMessage) => {
-  if (! msg || ! msg.author) return;
-  if (msg.channel.guildID || ! (await utils.messageIsOnInboxServer(msg)) && utils.isStaff(msg.member)) return;
-  if (msg.author.bot) return;
+  if (! msg || ! msg.author || msg.author.bot) return;
   if (await blocked.isBlocked(msg.author.id)) return;
   if (msg.content.length > 1900) return bot.createMessage(msg.channel.id, `Your edited message (<${utils.discordURL("@me", msg.channel.id, msg.id)}>) is too long to be recieved by Dave. (${msg.content.length}/1900)`);
 
@@ -343,7 +341,7 @@ bot.on("messageUpdate", async (msg, oldMessage) => {
   if (newContent.trim() === oldContent.trim()) return;
 
   // 1) Edit in DMs
-  if (msg.channel instanceof Eris.PrivateChannel) {
+  if (! msg.guildID) {
     const thread = await threads.findOpenThreadByUserId(msg.author.id);
     const oldThreadMessage = await thread.getThreadMessageFromDM(msg);
     const editMessage = `**EDITED <${utils.discordURL(mainGuildId, thread.channel_id, oldThreadMessage.thread_message_id)}>:**\n${newContent}`;
