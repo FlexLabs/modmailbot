@@ -100,7 +100,7 @@ class Thread {
       body: logContent,
       is_anonymous: (isAnonymous ? 1 : 0),
       dm_message_id: dmMessage.id,
-      thread_message_id: threadMessage.id,
+      thread_message_id: threadMessage.id
     }, sse);
 
     if (this.scheduled_close_at) {
@@ -237,7 +237,7 @@ class Thread {
       body: logContent,
       is_anonymous: 0,
       dm_message_id: msg.id,
-      thread_message_id: threadMessage.id,
+      thread_message_id: threadMessage.id
     }, sse);
 
     if (this.alert_users) {
@@ -342,7 +342,7 @@ class Thread {
       body: typeof text === "string" ? text : (text.content + text.embed ? " <embed>" : "").trim(),
       is_anonymous: 0,
       dm_message_id: msg.id,
-      thread_message_id: msg.id,
+      thread_message_id: msg.id
     });
 
     // return the message so we can delete it if we want.
@@ -438,7 +438,7 @@ class Thread {
       body: msg.content,
       is_anonymous: 0,
       dm_message_id: msg.id,
-      thread_message_id: msg.id,
+      thread_message_id: msg.id
     }, sse);
   }
 
@@ -455,7 +455,7 @@ class Thread {
       body: msg.content,
       is_anonymous: 0,
       dm_message_id: msg.id,
-      thread_message_id: msg.id,
+      thread_message_id: msg.id
     }, sse);
   }
 
@@ -505,12 +505,13 @@ class Thread {
    * @returns {Promise<void>}
    */
   async addThreadMessageToDB(data, sse) {
-    let threadMessage = {
+    const threadMessage = {
       thread_id: this.id,
       created_at: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
       is_anonymous: 0,
       ...data
     };
+
     await knex("thread_messages").insert(threadMessage);
 
     if (sse) {
