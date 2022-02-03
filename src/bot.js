@@ -1,7 +1,7 @@
 const Eris = require("eris");
 const config = require("./config");
 
-const bot = new Eris.CommandClient(config.token, {
+const bot = new Eris.CommandClient(`Bot ${config.token}`, {
   getAllUsers: true,
   restMode: true,
   allowedMentions: {
