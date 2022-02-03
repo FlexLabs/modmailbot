@@ -11,15 +11,18 @@ const utils = require("../utils");
 module.exports = bot => {
   threadUtils.addInboxServerCommand(bot, "block", async (msg, args, thread) => {
     const userId = (thread && thread.user_id) || utils.getUserMention(args.shift());
+
     if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
 
     let user = bot.users.get(userId);
+
     if (! user) {
       user = await bot.getRESTUser(userId).catch(() => null);
       if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");
     }
 
-    const isBlocked = await blocked.isBlocked(msg.author.id);
+    const isBlocked = await blocked.isBlocked(user.id);
+
     if (isBlocked) return utils.postSystemMessageWithFallback(msg.channel, thread, `${user.username}#${user.discriminator} is already blocked!`);
 
     const reason = args.join(" ").trim();
@@ -43,15 +46,18 @@ module.exports = bot => {
 
   threadUtils.addInboxServerCommand(bot, "unblock", async (msg, args, thread) => {
     const userId = (thread && thread.user_id) || utils.getUserMention(args.shift());
+
     if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
 
     let user = bot.users.get(userId);
+
     if (! user) {
       user = await bot.getRESTUser(userId).catch(() => null);
       if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");
     }
 
-    const isBlocked = await blocked.isBlocked(msg.author.id);
+    const isBlocked = await blocked.isBlocked(user.id);
+
     if (! isBlocked) return utils.postSystemMessageWithFallback(msg.channel, thread, `${user.username}#${user.discriminator} isn't blocked!`);
 
     let reason = args.join(" ").trim();
