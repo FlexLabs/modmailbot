@@ -19,7 +19,7 @@ module.exports = bot => {
       if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");
     }
 
-    const isBlocked = await blocked.isBlocked(msg.author.id);
+    const isBlocked = await blocked.isBlocked(user.id);
     if (isBlocked) return utils.postSystemMessageWithFallback(msg.channel, thread, `${user.username}#${user.discriminator} is already blocked!`);
 
     const reason = args.join(" ").trim();
@@ -51,7 +51,7 @@ module.exports = bot => {
       if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");
     }
 
-    const isBlocked = await blocked.isBlocked(msg.author.id);
+    const isBlocked = await blocked.isBlocked(user.id);
     if (! isBlocked) return utils.postSystemMessageWithFallback(msg.channel, thread, `${user.username}#${user.discriminator} isn't blocked!`);
 
     let reason = args.join(" ").trim();
