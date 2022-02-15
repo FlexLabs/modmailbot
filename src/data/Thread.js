@@ -357,7 +357,7 @@ class Thread {
       content: user.mention,
       embed: {
         fields,
-        footer: {text: member.id},
+        footer: {text: user.id},
         timestamp: new Date(),
         color: highestColor || 0x337FD5,
       }
