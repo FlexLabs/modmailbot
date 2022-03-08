@@ -311,6 +311,23 @@ function discordURL(guildID, channelID, messageID) {
   return `https://discord.com/channels/${guildID}/${channelID}/${messageID}`;
 }
 
+function paginate(items, nPerPage) {
+  if (! items || ! items.length) throw new RangeError("Expected an array with elements");
+
+  const chunks = [[]];
+  let index = 0;
+
+  for (const i of items) {
+    if (chunks[index].length >= nPerPage) {
+      index++;
+      chunks.push([]);
+    }
+    chunks[index].push(i);
+  }
+  
+  return chunks;
+}
+
 module.exports = {
   BotError,
 
@@ -343,5 +360,6 @@ module.exports = {
   setDataModelProps,
 
   regEscape,
-  discordURL
+  discordURL,
+  paginate
 };

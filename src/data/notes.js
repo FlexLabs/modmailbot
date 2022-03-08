@@ -2,6 +2,7 @@ const moment = require("moment");
 const knex = require("../knex");
 const Note = require("./Note");
 const Eris = require("eris");
+const Thread = require("./Thread");
 
 /**
  * @param {String} user
@@ -19,16 +20,18 @@ async function getNotes(user) {
  * @param {String} user
  * @param {String} note
  * @param {Eris.User} author
+ * @param {Thread} thread
  * @returns {Promise<void>}
  */
-async function addNote(user, note, author) {
+async function addNote(user, note, author, thread) {
   return knex("notes")
     .insert({
       user_id: user,
       note: note,
       created_by_name: `${author.username}#${author.discriminator}`,
       created_by_id: author.id,
-      created_at: moment().utc().format("YYYY-MM-DD HH:mm:ss")
+      created_at: moment().utc().format("YYYY-MM-DD HH:mm:ss"),
+      thread: thread && thread.id
     });
 }
 
