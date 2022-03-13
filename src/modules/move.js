@@ -35,7 +35,12 @@ module.exports = bot => {
     /**
      * @type {Eris.CategoryChannel}
      */
-    const targetCategory = categories.find(c => c.name.toLowerCase() === searchStr.toLowerCase() || c.name.toLowerCase().startsWith(searchStr.toLowerCase()));
+    const targetCategory = categories.find(c =>
+      c.id == searchStr ||
+      c.name.toLowerCase() === searchStr.toLowerCase() ||
+      c.name.toLowerCase().startsWith(searchStr.toLowerCase())
+    );
+
     if (! targetCategory) {
       return thread.postSystemMessage("No matching category.");
     }
