@@ -1,7 +1,11 @@
+// @ts-check
 const Eris = require("eris");
 const threadUtils = require("../threadUtils");
 const notes = require("../data/notes");
 const utils = require("../utils");
+const { ComponentInteraction } = require("eris");
+
+const pagination = new Map;
 
 /**
  * @param {Eris.CommandClient} bot
@@ -38,7 +42,7 @@ module.exports = bot => {
     else if (userNotes.some(note => note.note === text))
       utils.postSystemMessageWithFallback(msg.channel, thread, "This note already exists, try something else.");
     else {
-      await notes.add(userId, text.replace(/\n/g, " "), msg.author);
+      await notes.add(userId, text.replace(/\n/g, " "), msg.author, thread);
       utils.postSystemMessageWithFallback(msg.channel, thread, `Added ${
         userNotes.length ? "another" : "a"
       } note for ${user ? `${user.username}#${user.discriminator}` : thread.user_name}!`);
@@ -54,26 +58,126 @@ module.exports = bot => {
     if (! userId || args.length > 0) {
       // User mention/id as argument
       userId = utils.getUserMention(args.shift());
-      if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
-
-      let user = bot.users.get(userId);
-
-      if (! user) {
-        user = await bot.getRESTUser(userId).catch(() => null);
-        if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");
-      }
 
       usage = `!note ${userId} <note>`;
+    }
+
+    if (! userId) return utils.postSystemMessageWithFallback(msg.channel, thread, "Please provide a user mention or ID!");
+
+    let user = bot.users.get(userId);
+
+    if (! user) {
+      user = await bot.getRESTUser(userId).catch(() => null);
+      if (! user) return utils.postSystemMessageWithFallback(msg.channel, thread, "User not found!");
     }
 
     const userNotes = await notes.get(userId);
     if (! userNotes || ! userNotes.length) return utils.postSystemMessageWithFallback(msg.channel, thread, `There are no notes for this user. Add one with \`${usage}\`.`);
 
-    const notesLine = await Promise.all(userNotes.map(async (note, i) => {
-      return `\`${i + 1}\` \`${note.created_by_name}\`: ${note.note}`;
+    const paginated = utils.paginate(userNotes.map((note, i) => {
+      note.i = i + 1;
+      return note;
     }));
 
-    utils.postSystemMessageWithFallback(msg.channel, thread, `**Notes for <@!${userId}>**:\n${notesLine.join("\n")}`);
+    // NOTE I know this is kinda messy, I will clean this up in a future release - Bsian
+
+    /** @type {import("eris").MessageContent} */
+    const content = {
+      embeds: [{
+        title: `Notes for ${user ? `${user.username}#${user.discriminator} (${user.id})` : `${userId}`}`,
+        fields: paginated[0].map((n) => {
+          return { name: `[${n.i}] ${n.created_by_name} | ${n.created_at}`, value: `${n.note}${n.thread ? ` | [Thread](${utils.getSelfUrl(`#thread/${n.thread}`)})` : ""}` };
+        }),
+        footer: { text: `${msg.author.username}#${msg.author.discriminator} | Page 1/${paginated.length}`}
+      }]
+    };
+
+    content.components = [{
+      type: 1,
+      components: [
+        {
+          type: 2,
+          custom_id: "prev",
+          disabled: true,
+          style: 1,
+          emoji: { id: "950081389020201050" }
+        },
+        {
+          type: 2,
+          custom_id: "f5",
+          style: 1,
+          emoji: { id: "950081388835655690" }
+        },
+        {
+          type: 2,
+          custom_id: "next",
+          disabled: paginated.length === 1,
+          style: 1,
+          emoji: { id: "950081388537843753" }
+        }
+      ]
+    }];
+
+    pagination.set(msg.id, {
+      pages: paginated,
+      index: 0,
+      authorID: msg.author.id,
+      targetID: userId,
+      expire: setTimeout(() => pagination.delete(msg.id), Date.now() + 3e5)
+    });
+
+    utils.postSystemMessageWithFallback(msg.channel, thread, content);
+  });
+
+  // NOTE I know this is kinda messy, I will clean this up in a future release - Bsian
+  bot.on("interactionCreate", async (interaction) => {
+    if (! (interaction instanceof ComponentInteraction)) return;
+    if (! pagination.has(interaction.message.id)) return;
+
+    const page = pagination.get(interaction.message.id);
+    if (! (interaction.user || interaction.member).id !== page.authorID) return interaction.createMessage({
+      content: "This interaction is not for you!",
+      flags: 64
+    });
+
+    switch (interaction.data.custom_id) {
+      case "f5": {
+        const userNotes = await notes.get(page.targetID);
+        page.pages = utils.paginate(userNotes.map((note, i) => {
+          note.i = i + 1;
+          return note;
+        }));
+        if (page.index + 1 > page.pages.length) page.index = 0;
+        break;
+      }
+      case "prev":
+      case "next": {
+        page.index = interaction.data.custom_id === "prev" ? --page.index : ++page.index;
+        break;
+      }
+      default: {
+        interaction.createMessage({ content: "Something weird happened...", flags: 64 });
+        throw new Error(`Unknown interaction custom_id "${interaction.data.custom_id}"`);
+      }
+    }
+
+    clearTimeout(page.expire);
+
+    const content = {
+      embeds: interaction.message.embeds,
+      components: interaction.message.components
+    };
+
+    if (page.index === 0) content.components[0].components[0].disabled = true;
+    if (page.index + 1 === page.pages.length) content.components[0].components[2].disabled = true;
+
+    content.embeds[0].fields = page.pages[page.index].map((n) => {
+      return { name: `[${n.i}] ${n.created_by_name} | ${n.created_at}`, value: `${n.note}${n.thread ? ` | [Thread](${utils.getSelfUrl(`#thread/${n.thread}`)})` : ""}` };
+    });
+    content.embeds[0].footer.text = `${(interaction.user || interaction.member).username}#${(interaction.user || interaction.member).discriminator} | Page ${page.index + 1}/${page.pages.length}`;
+
+    await interaction.editParent(content);
+    page.expire = setTimeout(() => pagination.delete(interaction.message.id), Date.now() + 3e5);
   });
 
   bot.registerCommandAlias("ns", "notes");
