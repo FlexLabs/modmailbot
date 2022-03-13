@@ -30,4 +30,5 @@ module.exports = bot => {
     }
   });
   bot.registerCommandAlias("setav", "setavatar");
+  bot.registerCommandAlias("av", "setavatar");
 };

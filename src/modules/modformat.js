@@ -13,17 +13,12 @@ module.exports = bot => {
       const messages = await thread.getThreadMessages();
       let idArray = [];
       for await (const message of messages) {
-        if (/(?:whois|modlogs|modinfo)\s\d{16,}/.test(message.body)) {
-          idArray.push(message.body.split(" ")[1]);
+        if (/(?:w|whois|modlogs|modinfo)\s<?@?!?\d{16,}>?/.test(message.body)) {
+          let lastItem = message.body.split(" ")[1].match(/\d{16,}/);
+          if(lastItem != thread.user_id) {
+            idArray.push(lastItem);} 
         }}
-      let lastItem = " ";
-      for (let i = 0; i < idArray.length; i++) {
-        if (idArray[i] != thread.user_id) {
-          lastItem = idArray[i];
-        }
-      }
-
-      bot.createMessage(msg.channel.id, `${lastItem} ${reason} | ${thread.id}`.trim());
+      bot.createMessage(msg.channel.id, `${idArray.pop() || ""} ${reason} | ${thread.id}`.trim());
     } else {
       const reason = args.join(" ").trim();
       bot.createMessage(msg.channel.id, `${reason} | ${thread.id}`);
