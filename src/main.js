@@ -180,7 +180,7 @@ bot.on("messageCreate", async msg => {
           // return if we don't want to auto respond
           if (! config.ignoredPrefixAutorespond) return;
           // respond and return if the message starts with an ignored prefix
-          return bot.createMessage(msg.channel.id, config.ignoredPrefixResponse);
+          return bot.createMessage(msg.channel.id, config.ignoredMessageResponse);
         }
       }
 
@@ -190,7 +190,7 @@ bot.on("messageCreate", async msg => {
           // return if we don't want to auto respond
           if (! config.ignoredWordAutorespond) return;
           // respond and return if the message starts with an ignored
-          return bot.createMessage(msg.channel.id, config.ignoredWordResponse);
+          return bot.createMessage(msg.channel.id, config.ignoredMessageResponse);
         }
       }
 
