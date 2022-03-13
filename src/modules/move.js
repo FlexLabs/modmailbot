@@ -1,5 +1,6 @@
 const Eris = require("eris");
 const config = require("../config");
+const threads = require("../data/threads");
 const threadUtils = require("../utils/threadUtils");
 const utils = require("../utils/utils");
 
@@ -7,42 +8,12 @@ const utils = require("../utils/utils");
  * @param {Eris.CommandClient} bot
  */
 module.exports = bot => {
-  /**
-   * @param {Eris.GuildTextableChannel} channel
-   */
-  async function clearThreadOverwrites(channel) {
-    const overwrites = channel.permissionOverwrites;
-    if (! overwrites) return;
-    let promises = [];
-    for (let o of overwrites.values()) {
-      if (o.id === channel.guild.id) continue;
-      promises.push(channel.deletePermission(o.id, "Moving modmail thread."));
-    }
-
-    return await Promise.all(promises);
-  }
-
-  /**
-   * @param {Eris.GuildTextableChannel} channel
-   * @param {Eris.CategoryChannel} category
-   */
-  function syncThreadChannel(channel, category) {
-    const overwrites = category.permissionOverwrites;
-    if (! overwrites) return;
-    for (let o of overwrites.values()) {
-      if (o.id === channel.guild.id) continue;
-      channel.editPermission(o.id, o.allow, o.deny, o.type, "Moving modmail thread.");
-    }
-  }
-
   threadUtils.addInboxServerCommand(bot, "move", async (msg, args, thread) => {
     if (! config.allowMove) return;
     if (! thread) return;
 
     const searchStr = args[0];
     if (! searchStr || searchStr.trim() === "") return;
-
-    // const normalizedSearchStr = transliterate.slugify(searchStr);
 
     /**
      * @type {Eris.CategoryChannel[]}
@@ -69,66 +40,12 @@ module.exports = bot => {
       return thread.postSystemMessage("No matching category.");
     }
 
-    // See if any category name contains a part of the search string
-    // const containsRankings = categories.map(cat => {
-    //   const normalizedCatName = transliterate.slugify(cat.name);
-
-    //   let i;
-    //   for (i = 1; i < normalizedSearchStr.length; i++) {
-    //     if (! normalizedCatName.includes(normalizedSearchStr.slice(0, i))) {
-    //       i--;
-    //       break;
-    //     }
-    //   }
-
-    //   return [cat, i];
-    // });
-
-    // // Sort by best match
-    // containsRankings.sort((a, b) => {
-    //   return a[1] > b[1] ? -1 : 1;
-    // });
-
-    // if (containsRankings[0][1] === 0) {
-    //   thread.postSystemMessage('No matching category');
-    //   return;
-    // }
-
-    // const targetCategory = containsRankings[0][0];
-    /**
-     * @type {Eris.GuildTextableChannel}
-     */
-    const threadChannel = bot.guilds.get(msg.guildID).channels.get(thread.channel_id);
-
-    await clearThreadOverwrites(threadChannel);
-
-    bot.editChannel(thread.channel_id, {
-      parentID: targetCategory.id
-    }).then(() => {
-      syncThreadChannel(threadChannel, targetCategory);
-
-      // Make thread private/unprivate
-
-      if (targetCategory.id !== config.newThreadCategoryId) {
-        thread.makePrivate();
-
-        // Ping Admins if necessary
-
-        if (config.adminMentionRole && ! utils.isAdmin(msg.member)) {
-          bot.createMessage(threadChannel.id, {
-            content: `<@&${config.adminMentionRole}>, a thread has been moved.`,
-            allowedMentions: {
-              roles: true
-            }
-          });
-        }
-      } else {
-        thread.makePublic();
-      }
-    }).catch((err) => {
+    try {
+      await threads.moveThread(thread, targetCategory, ! utils.isAdmin(msg.member));
+    } catch (err) {
       utils.handleError(err);
       return thread.postSystemMessage("Something went wrong while trying to move this thread.");
-    });
+    }
   });
 
   bot.registerCommandAlias("m", "move");

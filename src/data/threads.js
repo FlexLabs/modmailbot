@@ -93,6 +93,73 @@ async function createNewThreadForUser(user, topic, quiet = false) {
 }
 
 /**
+ * Clear the current permission overwrites of a thread channel
+ * @param {Eris.GuildTextableChannel} channel The channel object of the thread channel
+ */
+async function clearThreadOverwrites(channel) {
+  const overwrites = channel.permissionOverwrites;
+  if (! overwrites) return;
+  let promises = [];
+  for (let o of overwrites.values()) {
+    if (o.id === channel.guild.id) continue;
+    promises.push(channel.deletePermission(o.id, "Moving modmail thread."));
+  }
+
+  return await Promise.all(promises);
+}
+
+/**
+ * Sync the permissions of a thread channel to the parent category
+ * @param {Eris.GuildTextableChannel} channel The channel object of the thread channel
+ * @param {Eris.CategoryChannel} category The parent category to sync permissions with
+ */
+function syncThreadChannel(channel, category) {
+  const overwrites = category.permissionOverwrites;
+  if (! overwrites) return;
+  for (let o of overwrites.values()) {
+    if (o.id === channel.guild.id) continue;
+    channel.editPermission(o.id, o.allow, o.deny, o.type, "Moving modmail thread.");
+  }
+}
+
+/**
+ * Move a thread channel to a different category
+ * @param {Thread} thread The thread object
+ * @param {Eris.CategoryChannel} targetCategory The category to move the specified thread to
+ * @param {Boolean} mentionAdminRole Whether the bot should mention the adminMentionRole
+ */
+async function moveThread(thread, targetCategory, mentionAdminRole) {
+  const threadChannel = targetCategory.guild.channels.get(thread.channel_id);
+
+  await clearThreadOverwrites(threadChannel);
+
+  threadChannel.edit({
+    parentID: targetCategory.id
+  }).then(() => {
+    syncThreadChannel(threadChannel, targetCategory);
+
+    // Make thread private/unprivate
+
+    if (targetCategory.id !== config.newThreadCategoryId) {
+      thread.makePrivate();
+
+      // Ping Admins if necessary
+
+      if (config.adminMentionRole && mentionAdminRole) {
+        threadChannel.createMessage({
+          content: `<@&${config.adminMentionRole}>, a thread has been moved.`,
+          allowedMentions: {
+            roles: true
+          }
+        });
+      }
+    } else {
+      thread.makePublic();
+    }
+  });
+}
+
+/**
  * Creates a new thread row in the database
  * @param {Object} data
  * @returns {Promise<String>} The ID of the created thread
@@ -208,6 +275,9 @@ module.exports = {
   deleteClosedThreadsByUserId,
   findOrCreateThreadForUser,
   getThreadsThatShouldBeClosed,
+  clearThreadOverwrites,
+  syncThreadChannel,
+  moveThread,
   createThreadInDB,
   getClosedThreadCountByUserId,
 };
