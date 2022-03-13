@@ -5,9 +5,9 @@ const Eris = require("eris");
 
 const knex = require("../knex");
 const config = require("../config");
-const utils = require("../utils");
+const utils = require("../utils/utils");
 
-const { THREAD_STATUS } = require("./constants");
+const { THREAD_STATUS } = require("../utils/constants");
 
 /**
  * @param {String} id

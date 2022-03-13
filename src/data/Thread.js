@@ -5,14 +5,14 @@ const humanizeDuration = require("humanize-duration");
 
 const bot = require("../bot");
 const knex = require("../knex");
-const utils = require("../utils");
+const utils = require("../utils/utils");
 const config = require("../config");
 const attachments = require("./attachments");
 const threads = require("./threads");
 
 const ThreadMessage = require("./ThreadMessage");
 
-const {THREAD_MESSAGE_TYPE, THREAD_STATUS} = require("./constants");
+const {THREAD_MESSAGE_TYPE, THREAD_STATUS} = require("../utils/constants");
 const notes = require("./notes");
 const lastMsgs = new Map();
 

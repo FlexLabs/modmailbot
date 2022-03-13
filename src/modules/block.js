@@ -1,9 +1,9 @@
 const Eris = require("eris");
-const threadUtils = require("../threadUtils");
 const attachments = require("../data/attachments");
 const blocked = require("../data/blocked");
 const config = require("../config");
-const utils = require("../utils");
+const threadUtils = require("../utils/threadUtils");
+const utils = require("../utils/utils");
 
 /**
  * @param {Eris.CommandClient} bot

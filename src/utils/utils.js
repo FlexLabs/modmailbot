@@ -1,9 +1,9 @@
 const Eris = require("eris");
-const bot = require("./bot");
 const moment = require("moment");
 const publicIp = require("public-ip");
-const attachments = require("./data/attachments");
-const config = require("./config");
+const bot = require("../bot");
+const config = require("../config");
+const attachments = require("../data/attachments");
 
 class BotError extends Error {}
 
@@ -324,7 +324,7 @@ function paginate(items, nPerPage) {
     }
     chunks[index].push(i);
   }
-  
+
   return chunks;
 }
 

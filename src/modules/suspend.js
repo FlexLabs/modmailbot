@@ -1,6 +1,6 @@
 const Eris = require("eris");
-const threadUtils = require("../threadUtils");
 const threads = require("../data/threads");
+const threadUtils = require("../utils/threadUtils");
 
 /**
  * @param {Eris.CommandClient} bot

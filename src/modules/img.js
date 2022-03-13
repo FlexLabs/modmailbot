@@ -1,6 +1,6 @@
 const Eris = require("eris");
-const threadUtils = require("../threadUtils");
-const { getSelfUrl, regEscape } = require("../utils");
+const threadUtils = require("../utils/threadUtils");
+const { getSelfUrl, regEscape } = require("../utils/utils");
 
 const DISCORD_REGEX = /(https:\/\/(canary\.|beta\.)?discord(app)?\.com\/channels\/\d{17,19}\/\d{17,19}\/)?\d{17,19}/g;
 /**

@@ -1,5 +1,5 @@
 const Eris = require("eris");
-const utils = require("../utils");
+const utils = require("../utils/utils");
 
 /**
  * @param {Eris.CommandClient} bot

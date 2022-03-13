@@ -2,7 +2,7 @@ const Eris = require("eris");
 const path = require("path");
 const fs = require("fs");
 const {promisify} = require("util");
-const utils = require("../utils");
+const utils = require("../utils/utils");
 
 const access = promisify(fs.access);
 const readFile = promisify(fs.readFile);

@@ -2,7 +2,7 @@ const superagent = require("superagent");
 const jwt = require("jsonwebtoken");
 const config = require("./config");
 const bot = require("./bot");
-const utils = require("./utils");
+const utils = require("./utils/utils");
 
 function login (req, res) {
   utils.getSelfUrl(config.redirectPath.slice(1)).then(redirectUri => {

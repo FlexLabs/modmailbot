@@ -1,5 +1,5 @@
 const Eris = require("eris");
-const utils = require("../utils");
+const utils = require("../utils/utils");
 const randoms = [
   "You expect me to guess what you want me to say?",
   "Give me something to repeat...",

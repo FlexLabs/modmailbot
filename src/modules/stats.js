@@ -1,5 +1,5 @@
 const humanizeDuration = require("humanize-duration");
-const utils = require("../utils");
+const utils = require("../utils/utils");
 
 /** @param {import("eris").CommandClient} bot */
 module.exports = (bot) => {

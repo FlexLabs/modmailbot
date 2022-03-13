@@ -1,7 +1,7 @@
 const Eris = require("eris");
-const threadUtils = require("../threadUtils");
 const notes = require("../data/notes");
-const utils = require("../utils");
+const threadUtils = require("../utils/threadUtils");
+const utils = require("../utils/utils");
 const pagination = new Map;
 
 /**

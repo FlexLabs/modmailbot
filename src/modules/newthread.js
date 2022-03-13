@@ -1,8 +1,8 @@
 const Eris = require("eris");
 const SSE = require("express-sse");
-const utils = require("../utils");
-const threadUtils = require("../threadUtils");
 const threads = require("../data/threads");
+const threadUtils = require("../utils/threadUtils");
+const utils = require("../utils/utils");
 
 /**
  * @param {Eris.CommandClient} bot

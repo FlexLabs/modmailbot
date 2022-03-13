@@ -3,8 +3,8 @@ const SSE = require("express-sse");
 
 const config = require("./config");
 const bot = require("./bot");
-const Queue = require("./queue");
-const utils = require("./utils");
+const Queue = require("./utils/queue");
+const utils = require("./utils/utils");
 const blocked = require("./data/blocked");
 const threads = require("./data/threads");
 
@@ -38,7 +38,7 @@ const say = require("./modules/say");
 const modformat = require("./modules/modformat");
 
 const attachments = require("./data/attachments");
-const {ACCIDENTAL_THREAD_MESSAGES} = require("./data/constants");
+const {ACCIDENTAL_THREAD_MESSAGES} = require("./utils/constants");
 const { mainGuildId } = require("./config");
 
 const messageQueue = new Queue();

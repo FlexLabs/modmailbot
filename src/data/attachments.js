@@ -4,7 +4,7 @@ const config = require("../config");
 const {promisify} = require("util");
 const Eris = require("eris");
 
-const getUtils = () => require("../utils");
+const getUtils = () => require("../utils/utils");
 
 const access = promisify(fs.access);
 const readFile = promisify(fs.readFile);

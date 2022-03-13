@@ -6,12 +6,12 @@ const mime = require("mime");
 const fs = require("fs");
 const https = require("https");
 const path = require("path");
+const knex = require("../knex");
 const config = require("../config");
 const oauth2 = require("../oauth2");
 const threads = require("../data/threads");
 const attachments = require("../data/attachments");
-const constants = require("../data/constants");
-const knex = require("../knex");
+const constants = require("../utils/constants");
 
 const THREAD_ID = /^[0-9a-f-]+$/;
 const ID = /^\d+$/;

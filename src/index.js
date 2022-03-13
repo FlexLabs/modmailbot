@@ -30,9 +30,9 @@ try {
 }
 
 const config = require("./config");
-const utils = require("./utils");
 const main = require("./main");
 const knex = require("./knex");
+const utils = require("./utils/utils");
 const legacyMigrator = require("./legacy/legacyMigrator");
 
 // Send error on unhandled rejections

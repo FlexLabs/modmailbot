@@ -9,7 +9,7 @@ const config = require("../config");
 const jsonDb = require("./jsonDb");
 const threads = require("../data/threads");
 
-const {THREAD_STATUS, THREAD_MESSAGE_TYPE} = require("../data/constants");
+const {THREAD_STATUS, THREAD_MESSAGE_TYPE} = require("../utils/constants");
 
 const readDir = promisify(fs.readdir);
 const readFile = promisify(fs.readFile);

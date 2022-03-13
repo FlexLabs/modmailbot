@@ -3,9 +3,9 @@ const moment = require("moment");
 const Eris = require("eris");
 const SSE = require("express-sse");
 const config = require("../config");
-const threadUtils = require("../threadUtils");
-const utils = require("../utils");
 const threads = require("../data/threads");
+const threadUtils = require("../utils/threadUtils");
+const utils = require("../utils/utils");
 
 /**
  * @param {Eris.CommandClient} bot
