@@ -1,5 +1,6 @@
 const moment = require("moment");
 const knex = require("../knex");
+const utils = require("../utils/utils");
 
 /**
  * Checks whether userId is blocked
@@ -44,8 +45,25 @@ async function unblock(userId) {
     .delete();
 }
 
+/**
+ * Logs the block/unblock to the logging channel
+ * @param {import("eris").User} user
+ * @param {String} reason
+ * @param {Boolean} isUnblock
+ */
+function logBlock(user, reason, isUnblock = false) {
+  let logText = `**${isUnblock ? "Un" : "B"}locked:** ${user.username}#${user.discriminator} (${user.id}) was ${isUnblock ? "un" : ""}blocked`;
+
+  if (reason) {
+    logText += ` for ${reason}`;
+  }
+
+  return utils.postLog(logText);
+}
+
 module.exports = {
   isBlocked,
   block,
   unblock,
+  logBlock
 };

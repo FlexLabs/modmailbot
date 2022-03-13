@@ -30,15 +30,11 @@ module.exports = bot => {
       await thread.replyToUser(msg.member, text, msg.attachments, config.replyAnonDefault);
     }
 
-    let logText = `**Blocked:** ${user.username}#${user.discriminator} (${user.id}) was blocked`;
-
-    if (reason) {
-      logText += ` for ${reason}`;
-    }
-
-    utils.postLog(logText);
-    await blocked.block(user.id, `${user.username}#${user.discriminator}`, msg.author.id);
-    return utils.postSystemMessageWithFallback(msg.channel, thread, `Blocked <@${user.id}> (${user.id}) from modmail!`);
+    await blocked.block(user.id, `${user.username}#${user.discriminator}`, msg.author.id)
+      .then(() => {
+        blocked.logBlock(user, reason);
+        utils.postSystemMessageWithFallback(msg.channel, thread, `Blocked <@${user.id}> (${user.id}) from modmail!`);
+      });
   });
 
   threadUtils.addInboxServerCommand(bot, "unblock", async (msg, args, thread) => {
@@ -55,14 +51,11 @@ module.exports = bot => {
     if (! isBlocked) return utils.postSystemMessageWithFallback(msg.channel, thread, `${user.username}#${user.discriminator} isn't blocked!`);
 
     let reason = args.join(" ").trim();
-    let logText = `**Unblocked:** ${user.username}#${user.discriminator} (${userId}) was unblocked`;
 
-    if (reason) {
-      logText += ` for ${reason}`;
-    }
-
-    utils.postLog(logText);
-    await blocked.unblock(userId);
-    return utils.postSystemMessageWithFallback(msg.channel, thread, `Unblocked <@${userId}> (${userId}) from modmail!`);
+    await blocked.unblock(userId)
+      .then(() => {
+        blocked.logBlock(user, reason, true);
+        utils.postSystemMessageWithFallback(msg.channel, thread, `Unblocked <@${userId}> (${userId}) from modmail!`);
+      });
   });
 };
