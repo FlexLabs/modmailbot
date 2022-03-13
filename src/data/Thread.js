@@ -50,7 +50,7 @@ class Thread {
 
     if (isAnonymous) {
       modUsername = (mainRole ? mainRole.name : "Staff");
-      logModUsername = `(${moderator.user.username}) ${mainRole ? mainRole.name : "Staff"}`;
+      logModUsername = `(${moderator.user.username}) ${modUsername}`;
     } else {
       const name = (config.useNicknames ? moderator.nick || moderator.user.username : moderator.user.username);
       modUsername = (mainRole ? `(${name}) ${mainRole.name}` : name);
@@ -323,10 +323,6 @@ class Thread {
     const mainGuildNickname = member && member.nick && `(${member.nick})`;
     const accountAge = humanizeDuration(now - user.createdAt, {largest: 2});
     const memberFor = member ? humanizeDuration(now - member.joinedAt, {largest: 2}) : "Unavailable";
-    const roles = member && member.roles.map((r) => member.guild.roles.get(r)).sort((a, b) => b.position - a.position);
-    const roleList = roles ? roles.map((r) => r.name).join(", ") || "None" : "Unavailable";
-    const coloredRoles = roles && roles.filter((r) => r.color !== 0) || [];
-    const highestColor = coloredRoles[0] && coloredRoles[0].color;
     const fields = [
       {name: "User", value: `${user.username}#${user.discriminator} ${mainGuildNickname || ""}`, inline: true},
       {name: "Account age", value: accountAge, inline: true},
@@ -342,6 +338,10 @@ class Thread {
       });
     }
 
+    const roles = member && member.roles.map((r) => member.guild.roles.get(r)).sort((a, b) => b.position - a.position);
+    const coloredRoles = roles && roles.filter((r) => r.color !== 0) || [];
+    const highestColor = coloredRoles[0] && coloredRoles[0].color;
+
     fields.push(
       {
         name: `Last note (${userNotes.length})`,
@@ -349,7 +349,7 @@ class Thread {
       },
       {
         name: `Roles (${roles && roles.length || 0})`,
-        value: roleList
+        value: roles ? roles.map((r) => r.name).join(", ") || "None" : "Unavailable"
       }
     );
 
