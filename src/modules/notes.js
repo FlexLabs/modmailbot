@@ -1,10 +1,7 @@
-// @ts-check
 const Eris = require("eris");
 const threadUtils = require("../threadUtils");
 const notes = require("../data/notes");
 const utils = require("../utils");
-const { ComponentInteraction } = require("eris");
-
 const pagination = new Map;
 
 /**
@@ -131,7 +128,7 @@ module.exports = bot => {
 
   // NOTE I know this is kinda messy, I will clean this up in a future release - Bsian
   bot.on("interactionCreate", async (interaction) => {
-    if (! (interaction instanceof ComponentInteraction)) return;
+    if (! (interaction instanceof Eris.ComponentInteraction)) return;
     if (! pagination.has(interaction.message.id)) return;
 
     const page = pagination.get(interaction.message.id);

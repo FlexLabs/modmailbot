@@ -198,8 +198,8 @@ module.exports = (bot, sse) => {
       ca: fs.readFileSync(config.https.ca, "utf8")
     }, app);
 
-    httpsServer.listen(config.port, '0.0.0.0');
+    httpsServer.listen(config.port, "0.0.0.0");
   } else {
-    app.listen(config.port, '0.0.0.0');
+    app.listen(config.port, "0.0.0.0");
   }
 };
