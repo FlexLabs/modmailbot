@@ -278,7 +278,7 @@ class Thread {
       message_type: THREAD_MESSAGE_TYPE.SYSTEM,
       user_id: null,
       user_name: "",
-      body: typeof text === "string" ? text : (text.content + text.embed ? " <embed>" : "").trim(),
+      body: typeof text === "string" ? text : (text.content + (text.embed ? "\n\n<embed>" : "")).trim(),
       is_anonymous: 0,
       dm_message_id: msg.id,
       thread_message_id: msg.id
