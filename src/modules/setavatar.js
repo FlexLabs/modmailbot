@@ -29,6 +29,7 @@ module.exports = bot => {
       custom: (msg) => msg.member.roles.some((r) => ["203040224597508096", "523021576128692239"].includes(r))
     }
   });
+
   bot.registerCommandAlias("setav", "setavatar");
   bot.registerCommandAlias("av", "setavatar");
 };
