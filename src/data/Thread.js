@@ -13,6 +13,7 @@ const threads = require("./threads");
 const ThreadMessage = require("./ThreadMessage");
 
 const {THREAD_MESSAGE_TYPE, THREAD_STATUS} = require("../utils/constants");
+const {internalButtons} = require("../utils/components");
 const notes = require("./notes");
 const lastMsgs = new Map();
 
@@ -353,7 +354,7 @@ class Thread {
       }
     );
 
-    await this.postSystemMessage({
+    const data = {
       content: user.mention,
       embed: {
         fields,
@@ -361,7 +362,15 @@ class Thread {
         timestamp: new Date(),
         color: highestColor || 0x337FD5,
       }
-    });
+    };
+
+    // Only add the buttons if a topic is provided!
+
+    if (topic) {
+      data.components = internalButtons;
+    }
+
+    return await this.postSystemMessage(data);
   }
 
   /**
