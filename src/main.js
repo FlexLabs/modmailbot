@@ -389,6 +389,7 @@ async function deleteMessage(thread, msg) {
 bot.on("messageDelete", async msg => {
   if (! msg.member) return; // Eris 0.15.0
   if (! utils.isStaff(msg.member)) return; // Only to prevent unnecessary DB calls, see first messageCreate event
+
   const thread = await threads.findOpenThreadByChannelId(msg.channel.id);
   if (! thread) return;
 
@@ -397,8 +398,8 @@ bot.on("messageDelete", async msg => {
 
 bot.on("messageDeleteBulk", async messages => {
   const {channel, member} = messages[0];
-  if (! member) return;
 
+  if (! member) return;
   if (! utils.isStaff(member)) return; // Same as above
 
   const thread = await threads.findOpenThreadByChannelId(channel.id);
@@ -439,17 +440,17 @@ module.exports = {
     role(bot);
     purge(bot);
     close(bot, sse);
+    snippets(bot);
     logs(bot);
     hide(bot);
-    block(bot);
     move(bot);
-    snippets(bot);
+    block(bot);
     suspend(bot);
-    notes(bot);
     greeting(bot);
     typingProxy(bot);
     version(bot);
     newthread(bot, sse);
+    notes(bot);
     idcmd(bot);
     ping(bot);
     fixAttachment(bot);
