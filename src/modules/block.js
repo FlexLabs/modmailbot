@@ -32,7 +32,7 @@ module.exports = bot => {
 
     await blocked.block(user.id, `${user.username}#${user.discriminator}`, msg.author.id)
       .then(() => {
-        blocked.logBlock(user, reason);
+        blocked.logBlock(user, msg.member, reason);
         utils.postSystemMessageWithFallback(msg.channel, thread, `Blocked <@${user.id}> (${user.id}) from modmail!`);
       });
   });
@@ -54,7 +54,7 @@ module.exports = bot => {
 
     await blocked.unblock(userId)
       .then(() => {
-        blocked.logBlock(user, reason, true);
+        blocked.logBlock(user, msg.member, reason, true);
         utils.postSystemMessageWithFallback(msg.channel, thread, `Unblocked <@${userId}> (${userId}) from modmail!`);
       });
   });

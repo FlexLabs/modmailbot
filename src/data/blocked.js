@@ -1,3 +1,4 @@
+const Eris = require("eris");
 const moment = require("moment");
 const knex = require("../knex");
 const utils = require("../utils/utils");
@@ -47,12 +48,13 @@ async function unblock(userId) {
 
 /**
  * Logs the block/unblock to the logging channel
- * @param {import("eris").User} user
+ * @param {Eris.User} user
+ * @param {Eris.Member} moderator
  * @param {String} reason
  * @param {Boolean} isUnblock
  */
-function logBlock(user, reason, isUnblock = false) {
-  let logText = `**${isUnblock ? "Un" : "B"}locked:** ${user.username}#${user.discriminator} (${user.id}) was ${isUnblock ? "un" : ""}blocked`;
+function logBlock(user, moderator, reason, isUnblock = false) {
+  let logText = `**${isUnblock ? "Un" : "B"}locked:** ${user.username}#${user.discriminator} (${user.id}) was ${isUnblock ? "un" : ""}blocked by ${moderator.username}#${moderator.discriminator} (${moderator.id})`;
 
   if (reason) {
     logText += ` for ${reason}`;
