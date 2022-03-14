@@ -103,6 +103,17 @@ bot.on("messageCreate", async msg => {
   if (! (await utils.messageIsOnInboxServer(msg))) return;
   if (! utils.isStaff(msg.member)) return; // Only run if messages are sent by moderators to avoid a ridiculous number of DB calls
 
+  // Lance $ping command
+
+  if (msg.author.id === "155037590859284481" && msg.content === "$ping") {
+    let start = Date.now();
+    return bot.createMessage(msg.channel.id, "Pong!")
+      .then(m => {
+        let diff = (Date.now() - start);
+        return m.edit(`Pong! \`${diff}ms\``);
+      });
+  }
+
   const thread = await threads.findByChannelId(msg.channel.id);
   if (! thread) return;
 
@@ -395,17 +406,6 @@ bot.on("messageDeleteBulk", async messages => {
 
   for (let msg of messages) {
     deleteMessage(thread, msg);
-  }
-});
-
-bot.on("messageCreate", msg => {
-  if (msg.author.id === "155037590859284481" && msg.content === "$ping") {
-    let start = Date.now();
-    return bot.createMessage(msg.channel.id, "Pong! ")
-      .then(m => {
-        let diff = (Date.now() - start);
-        return m.edit(`Pong! \`${diff}ms\``);
-      });
   }
 });
 
