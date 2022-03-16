@@ -6,15 +6,6 @@
   "replyAnonDefault": true,
   "snippetAnonDefault": true,
 
-  "ignoredWords": ["help", "test"],
-  "ignoredPrefixes": ["?", "!"],
-
-  "ignoredWordAutorespond": true,
-  "ignoredPrefixAutorespond": true,
-  "ignoreNonAlphaMessages": true,
-
-  "minContentLength": 4,
-
   "newThreadCategoryId": "434883322284605442",
   "mentionRole": null,
   "adminMentionRole": "203040224597508096",
