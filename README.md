@@ -30,7 +30,6 @@ These go in `config.json`. See also `config.example.json`.
 |adminThreadCategoryId|None|ID of the category where modmail thread channels should be moved when the bot is instructed to move the thread to admins
 |mentionRole|"here"|Role that is mentioned when new threads are created or the bot is mentioned. Accepted values are "here", "everyone", or a role id as a string. Set to `null` to disable these pings entirely|
 |adminMentionRole|None|Role that is mentioned when a thread is moved to the `adminThreadCategoryId` category|
-|inboxServerPermission|None|Permission required to use bot commands on the inbox server|
 |inboxServerRoleIDs|None|IDs of required roles a user needs to use bot commands on the inbox server|
 |inboxAdminRoleIDs|None|IDs of required roles a user needs to use admin bot commands, or view private threads|
 |alwaysReply|false|If set to true, all messages in modmail threads will be relayed back to the user, even ones without `!r`|
