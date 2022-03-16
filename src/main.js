@@ -342,7 +342,6 @@ bot.on("interactionCreate", async (interaction) => {
 bot.on("messageUpdate", async (msg, oldMessage) => {
   if (! msg || ! msg.author || msg.author.bot) return;
   if (await blocked.isBlocked(msg.author.id)) return;
-  if (msg.content.length > 1900) return bot.createMessage(msg.channel.id, `Your edited message (<${utils.discordURL("@me", msg.channel.id, msg.id)}>) is too long to be recieved by Dave. (${msg.content.length}/1900)`);
 
   // Old message content doesn't persist between bot restarts
   const oldContent = oldMessage && oldMessage.content || "*Unavailable due to bot restart*";
@@ -354,6 +353,10 @@ bot.on("messageUpdate", async (msg, oldMessage) => {
   // 1) Edit in DMs
   if (! msg.guildID) {
     const thread = await threads.findOpenThreadByUserId(msg.author.id);
+
+    if (! thread) return;
+    if (msg.content.length > 1900) return bot.createMessage(msg.channel.id, `Your edited message (<${utils.discordURL("@me", msg.channel.id, msg.id)}>) is too long to be recieved by Dave. (${msg.content.length}/1900)`);
+
     const oldThreadMessage = await thread.getThreadMessageFromDM(msg);
     const editMessage = `**EDITED <${utils.discordURL(mainGuildId, thread.channel_id, oldThreadMessage.thread_message_id)}>:**\n${newContent}`;
 
