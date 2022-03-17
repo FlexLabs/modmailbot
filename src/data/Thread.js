@@ -47,7 +47,8 @@ class Thread {
   async replyToUser(moderator, text, replyAttachments = [], isAnonymous = false, sse) {
     // Username to reply with
     let modUsername, logModUsername;
-    let mainRole = this.getMainRole(moderator);
+    let channel = moderator.guild && moderator.guild.channels && moderator.guild.channels.get(this.channel_id);
+    let mainRole = this.getMainRole(moderator, channel?.parentID);
 
     if (isAnonymous) {
       modUsername = mainRole.name;
@@ -711,17 +712,33 @@ class Thread {
 
   /**
    * @param {Eris.Member} member
-   * @returns {String?}
+   * @param {String} categoryID
+   * @returns {Eris.Role}
    */
-  getMainRole(member) {
+  getMainRole(member, categoryID) {
     const role = this.getStaffRoleOverride(member.id);
+    const guild = member.guild;
 
     if (role) {
-      const guild = member.guild;
       const override = guild && guild.roles && guild.roles.get(role);
 
       if (override) {
         return override;
+      }
+    }
+
+    if (categoryID) {
+      const adminOverrides = { // These hard-coded IDs are temp
+        "429054322555355158": "203040224597508096",
+        "842139696313139309": "523021576128692239"
+      };
+  
+      if (adminOverrides[categoryID]) {
+        const role = guild && guild.roles && guild.roles.get(adminOverrides[categoryID]);
+  
+        if (role) {
+          return role;
+        }
       }
     }
 

@@ -9,7 +9,7 @@ module.exports = bot => {
   threadUtils.addInboxServerCommand(bot, "role", async (msg, args, thread) => {
     if (! thread) return;
     if (! args[0] || ! utils.isAdmin(msg.member)) {
-      const currentRole = thread.getMainRole(msg.member);
+      const currentRole = thread.getMainRole(msg.member, msg.channel.parentID);
       return utils.postSystemMessageWithFallback(msg.channel, thread, `Your current role for this thread is **${currentRole.name}**!`);
     }
 
