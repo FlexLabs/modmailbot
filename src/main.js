@@ -38,11 +38,13 @@ const say = require("./modules/say");
 const modformat = require("./modules/modformat");
 
 const attachments = require("./data/attachments");
+const components = require("./utils/components");
 const {ACCIDENTAL_THREAD_MESSAGES} = require("./utils/constants");
 const { mainGuildId } = require("./config");
 
 const messageQueue = new Queue();
 const awaitingOpen = new Map();
+const redirectCooldown = new Map();
 const sse = new SSE();
 let webInit = false;
 
@@ -255,54 +257,6 @@ bot.on("messageCreate", async msg => {
   });
 });
 
-bot.on("interactionCreate", async (interaction) => {
-  if (! interaction || ! interaction.data) return;
-
-  const { message } = interaction;
-  const opening = awaitingOpen.get(message.channel.id);
-
-  if (! opening || Date.now() - opening.timestamp > 300000) return;
-
-  bot.editMessage(message.channel.id, message.id, {
-    content: message.content,
-    components: [{
-      type: 1,
-      components: message.components[0].components.map((c) => {
-        c.disabled = true;
-        c.style = c.custom_id === interaction.data.custom_id ? 1 : 2;
-        return c;
-      })
-    }]
-  });
-
-  if (interaction.data.custom_id === "cancelThread") {
-    interaction.createMessage("Cancelled thread, your message won't be forwarded to staff members.");
-  } else if (interaction.data.custom_id === "dynoSupport") {
-    interaction.createMessage("We offer Dyno support in the server in the following channels:\n<#240777175802839040> | English support\n<#335003834445332481> | In-depth custom command support\n<#395821744696590338> | Soutien en français\n<#395821762669051904> | Internationale Unterstützung / Suporte internacional / Apoyo internacional / Uluslararası destek / الدعم الدولي");
-  } else {
-    let thread;
-    let clicked = message.components[0].components.find((c) => c.custom_id === interaction.data.custom_id);
-
-    try {
-      thread = await threads.createNewThreadForUser(opening.author, clicked.label);
-      await interaction.acknowledge();
-    } catch (error) {
-      awaitingOpen.delete(message.channel.id);
-      if (error.code === 50035 && error.message.includes("words not allowed")) {
-        utils.postLog(`Tried to open a thread with ${opening.author.username}#${opening.author.discriminator} (${opening.author.id}) but failed due to a restriction on channel names for servers in Server Discovery`);
-        return interaction.createMessage("Thread was unable to be opened - please change your username and try again!");
-      }
-      utils.postLog(`**Error:** \`\`\`js\nError creating modmail channel for ${opening.author.username}#${opening.author.discriminator}!\n${error.stack}\n\`\`\``);
-      return interaction.createMessage("Thread was unable to be opened due to an unknown error. If this persists, please contact a member of the staff team!");
-    }
-
-    sse.send({ thread }, "threadOpen");
-    await thread.receiveUserReply(opening, sse);
-  }
-
-  awaitingOpen.delete(message.channel.id);
-});
-
 /**
  * When a message is edited...
  * 1) If that message was in DMs, and we have a thread open with that user, post the edit as a system message in the thread
@@ -341,19 +295,6 @@ bot.on("messageUpdate", async (msg, oldMessage) => {
     thread.updateChatMessage(msg, msg);
   }
 });
-
-/**
- * @param {import('./data/Thread')} thread
- * @param {Eris.Message} msg
- */
-async function deleteMessage(thread, msg) {
-  if (! msg.author) return;
-  if (msg.author.bot) return;
-  if (! (await utils.messageIsOnInboxServer(msg))) return;
-  if (! utils.isStaff(msg.member)) return;
-
-  thread.deleteChatMessage(msg.id);
-}
 
 /**
  * When a staff message is deleted in a modmail thread, delete it from the database as well
@@ -398,6 +339,234 @@ bot.on("channelDelete", async (channel) => {
     );
   }
 });
+
+/**
+ * When a staff member uses an internal button...
+ * 1) Find an open thread where the interaction originated from
+ * 2) If found, check the custom ID and send any applicable events/messages
+ * NOTE: This event manages everything in regards to the internal staff buttons, including when they're pressed and when a staff member blocks the user with the buttons
+ */
+bot.on("interactionCreate", async (interaction) => {
+  if (! interaction || ! interaction.data || ! interaction.guildID) return;
+
+  const { message } = interaction;
+  const thread = await threads.findByChannelId(message.channel.id);
+
+  if (! thread) return;
+
+  const customID = interaction.data.custom_id;
+
+  // Thread redirection confirmation
+
+  if (components.moveToAdmins[0].components.map((c) => c.custom_id).includes(customID)) {
+    bot.editMessage(message.channel.id, message.id, {
+      content: message.content,
+      components: [{
+        type: 1,
+        components: message.components[0].components.map((c) => {
+          c.disabled = true;
+          c.style = c.custom_id === customID ? 1 : 2;
+          return c;
+        })
+      }]
+    });
+
+    if (message.channel.id === config.adminThreadCategoryId) return interaction.acknowledge();
+    if (customID.endsWith("Cancel")) {
+      return interaction.createMessage("Cancelled thread transfer.");
+    } else {
+      const targetCategory = message.channel.guild.channels.get(config.adminThreadCategoryId);
+
+      if (! targetCategory || ! config.allowedCategories.includes(targetCategory.id)) {
+        return interaction.createMessage("I can't move this thread to the admin category because it doesn't exist, or I'm not allowed to move threads there.");
+      }
+
+      return threads.moveThread(thread, targetCategory, customID.endsWith("-ping"))
+        .then(() => interaction.acknowledge())
+        .catch((err) => {
+          utils.handleError(err);
+          interaction.createMessage("Something went wrong while attempting to move that thread.");
+        });
+    }
+  }
+
+  // All other buttons
+
+  switch (customID) {
+    case "sendUserID": {
+      interaction.createMessage({
+        content: thread.user_id,
+        flags: 64
+      });
+      break;
+    }
+    case "sendThreadID": {
+      interaction.createMessage({
+        content: thread.id,
+        flags: 64
+      });
+      break;
+    }
+    case "redirectAdmins": {
+      const targetCategory = message.channel.guild.channels.get(config.adminThreadCategoryId);
+
+      if (! targetCategory || ! config.allowedCategories.includes(targetCategory.id)) {
+        return interaction.createMessage("I can't move this thread to the admin category because it doesn't exist, or I'm not allowed to move threads there.");
+      }
+
+      if (message.channel.parentID === targetCategory.id) {
+        return interaction.createMessage(`This thread is already inside of the ${targetCategory.name} category.`);
+      }
+
+      interaction.createMessage({
+        content: `Are you sure you want to move this thread to ${targetCategory.name}?`,
+        components: components.moveToAdmins
+      });
+      break;
+    }
+    case "redirectSupport": {
+      const cooldown = redirectCooldown.get(thread.id);
+
+      if (cooldown && Date.now () - cooldown.timestamp < 10000) {
+        interaction.createMessage({
+          content: (cooldown.member.id === interaction.member.id ? "You've" : `<@${cooldown.member.id}>`) + " only just redirected this user to the support channels.",
+          flags: 64
+        });
+      } else {
+        interaction.acknowledge();
+        thread.replyToUser(interaction.member, config.dynoSupportMessage, [], config.replyAnonDefault);
+        redirectCooldown.set(thread.id, {
+          member: interaction.member,
+          timestamp: Date.now()
+        });
+      }
+      break;
+    }
+    case "blockUser": {
+      const isBlocked = await blocked.isBlocked(thread.user_id);
+
+      if (isBlocked) {
+        interaction.createMessage({
+          content: `${thread.user_name} is already blocked!`,
+          flags: 64
+        });
+        break;
+      }
+
+      const modal = components.blockUserModal;
+
+      if (thread.user_name) {
+        modal.title = `Block ${thread.user_name}!`;
+      }
+
+      bot.createInteractionResponse(interaction.id, interaction.token, {
+        type: 9,
+        data: modal
+      });
+      break;
+    }
+    case components.blockUserModal.custom_id: {
+      const isBlocked = await blocked.isBlocked(thread.user_id);
+
+      if (isBlocked) {
+        interaction.createMessage({
+          content: `${thread.user_name} is already blocked!`,
+          flags: 64
+        });
+        break;
+      }
+
+      const reason = interaction.data.components[0].components[0].value;
+      const moderator = interaction.member;
+
+      await thread.replyToUser(moderator, `You have been blocked for ${reason}`, [], config.replyAnonDefault);
+      await blocked.block(thread.user_id, thread.user_name, moderator.id)
+        .then(() => {
+          blocked.logBlock({
+            id: thread.user_id,
+            username: thread.user_name.split("#")[0],
+            discriminator: thread.user_name.split("#")[1]
+          }, moderator, reason);
+          interaction.createMessage({
+            content: `Blocked <@${thread.user_id}> (${thread.user_id}) from modmail!`,
+            flags: 64
+          });
+        });
+      break;
+    }
+    default: interaction.createMessage({
+      content: "Something's wrong. Please mention a Dave contributor!",
+      flags: 64
+    });
+  }
+});
+
+/**
+ * When a private button gets pressed...
+ * 1) Edit the button to disable all the buttons
+ * 2) Respond to their message or simply open a thread, depending on which button got pressed
+ */
+bot.on("interactionCreate", async (interaction) => {
+  if (! interaction || ! interaction.data || interaction.guildID) return;
+
+  const { message } = interaction;
+  const customID = interaction.data.custom_id;
+  const opening = awaitingOpen.get(message.channel.id);
+
+  if (! opening || Date.now() - opening.timestamp > 300000) return;
+
+  bot.editMessage(message.channel.id, message.id, {
+    content: message.content,
+    components: [{
+      type: 1,
+      components: message.components[0].components.map((c) => {
+        c.disabled = true;
+        c.style = c.custom_id === customID ? 1 : 2;
+        return c;
+      })
+    }]
+  });
+
+  if (customID === "cancelThread") {
+    interaction.createMessage("Cancelled thread, your message won't be forwarded to staff members.");
+  } else if (customID === "dynoSupport") {
+    interaction.createMessage(config.dynoSupportMessage);
+  } else {
+    let thread;
+    let clicked = message.components[0].components.find((c) => c.custom_id === customID);
+
+    try {
+      thread = await threads.createNewThreadForUser(opening.author, clicked.label);
+      await interaction.acknowledge();
+    } catch (error) {
+      awaitingOpen.delete(message.channel.id);
+      if (error.code === 50035 && error.message.includes("words not allowed")) {
+        utils.postLog(`Tried to open a thread with ${opening.author.username}#${opening.author.discriminator} (${opening.author.id}) but failed due to a restriction on channel names for servers in Server Discovery`);
+        return interaction.createMessage("Thread was unable to be opened - please change your username and try again!");
+      }
+      utils.postLog(`**Error:** \`\`\`js\nError creating modmail channel for ${opening.author.username}#${opening.author.discriminator}!\n${error.stack}\n\`\`\``);
+      return interaction.createMessage("Thread was unable to be opened due to an unknown error. If this persists, please contact a member of the staff team!");
+    }
+
+    sse.send({ thread }, "threadOpen");
+    await thread.receiveUserReply(opening, sse);
+  }
+
+  awaitingOpen.delete(message.channel.id);
+});
+
+/**
+ * @param {import('./data/Thread')} thread
+ * @param {Eris.Message} msg
+ */
+async function deleteMessage(thread, msg) {
+  if (! msg.author) return;
+  if (msg.author.bot) return;
+  if (! (await utils.messageIsOnInboxServer(msg))) return;
+  if (! utils.isStaff(msg.member)) return;
+
+  thread.deleteChatMessage(msg.id);
+}
 
 module.exports = {
   async start() {
