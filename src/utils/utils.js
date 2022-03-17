@@ -193,17 +193,6 @@ async function getSelfUrl(path = "") {
 }
 
 /**
- * Returns the highest hoisted role of the given member
- * @param {Eris.Member} member
- * @returns {Eris.Role}
- */
-function getMainRole(member) {
-  const roles = member.roles.map(id => member.guild.roles.get(id));
-  roles.sort((a, b) => a.position > b.position ? -1 : 1);
-  return roles.find(r => r.hoist);
-}
-
-/**
  * Splits array items into chunks of the specified size
  * @param {Array} items
  * @param {Number} chunkSize
@@ -349,7 +338,6 @@ module.exports = {
   getTimestamp,
   disableLinkPreviews,
   getSelfUrl,
-  getMainRole,
   convertDelayStringToMS,
   getInboxMention,
   postSystemMessageWithFallback,

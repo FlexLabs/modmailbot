@@ -47,14 +47,14 @@ class Thread {
   async replyToUser(moderator, text, replyAttachments = [], isAnonymous = false, sse) {
     // Username to reply with
     let modUsername, logModUsername;
-    const mainRole = this.getMainRole(moderator);
+    let mainRole = this.getMainRole(moderator);
 
     if (isAnonymous) {
-      modUsername = (mainRole ? mainRole.name : "Staff");
+      modUsername = mainRole.name;
       logModUsername = `(${moderator.user.username}) ${modUsername}`;
     } else {
       const name = (config.useNicknames ? moderator.nick || moderator.user.username : moderator.user.username);
-      modUsername = (mainRole ? `(${name}) ${mainRole.name}` : name);
+      modUsername = `(${name}) ${mainRole.name}`;
       logModUsername = modUsername;
     }
 
@@ -714,7 +714,7 @@ class Thread {
    * @returns {String?}
    */
   getMainRole(member) {
-    let role = this.getStaffRoleOverride(member.id);
+    const role = this.getStaffRoleOverride(member.id);
 
     if (role) {
       const guild = member.guild;
@@ -725,7 +725,7 @@ class Thread {
       }
     }
 
-    return utils.getMainRole(member);
+    return { name: "Staff" };
   }
 
   /**
