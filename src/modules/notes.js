@@ -120,7 +120,7 @@ module.exports = bot => {
       index: 0,
       authorID: msg.author.id,
       targetID: userId,
-      expire: setTimeout(() => pagination.delete(msg.id), Date.now() + 3e5)
+      expire: setTimeout(() => pagination.delete(msg.id), 3e5)
     });
 
     utils.postSystemMessageWithFallback(msg.channel, thread, content);
@@ -174,7 +174,7 @@ module.exports = bot => {
     content.embeds[0].footer.text = `${(interaction.user || interaction.member).username}#${(interaction.user || interaction.member).discriminator} | Page ${page.index + 1}/${page.pages.length}`;
 
     await interaction.editParent(content);
-    page.expire = setTimeout(() => pagination.delete(interaction.message.id), Date.now() + 3e5);
+    page.expire = setTimeout(() => pagination.delete(interaction.message.id), 3e5);
   });
 
   bot.registerCommandAlias("ns", "notes");
