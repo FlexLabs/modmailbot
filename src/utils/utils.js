@@ -256,17 +256,21 @@ function getInboxMention() {
   else return `<@&${config.mentionRole}> `;
 }
 
+function awaitPostSystemMessageWithFallback(channel, thread, text) {
+  if (thread) {
+    return thread.postSystemMessage(text);
+  } else {
+    return bot.createMessage(channel.id, text);
+  }
+}
+
 /**
  * @param {Eris.GuildTextableChannel} channel
  * @param {import('./data/Thread')} thread
  * @param {Eris.MessageContent} text
  */
 function postSystemMessageWithFallback(channel, thread, text) {
-  if (thread) {
-    thread.postSystemMessage(text);
-  } else {
-    bot.createMessage(channel.id, text);
-  }
+  awaitPostSystemMessageWithFallback(channel, thread, text);
 }
 
 /**
@@ -341,6 +345,7 @@ module.exports = {
   convertDelayStringToMS,
   getInboxMention,
   postSystemMessageWithFallback,
+  awaitPostSystemMessageWithFallback,
 
   chunk,
   trimAll,

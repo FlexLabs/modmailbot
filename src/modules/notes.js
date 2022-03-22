@@ -78,12 +78,14 @@ module.exports = bot => {
 
     // NOTE I know this is kinda messy, I will clean this up in a future release - Bsian
 
+    const selfURL = await utils.getSelfUrl("#thread/");
+
     /** @type {import("eris").MessageContent} */
     const content = {
       embeds: [{
         title: `Notes for ${user ? `${user.username}#${user.discriminator} (${user.id})` : `${userId}`}`,
         fields: paginated[0].map((n) => {
-          return { name: `[${n.i}] ${n.created_by_name} | ${n.created_at}`, value: `${n.note}${n.thread ? ` | [Thread](${utils.getSelfUrl(`#thread/${n.thread}`)})` : ""}` };
+          return { name: `[${n.i}] ${n.created_by_name} | ${n.created_at}`, value: `${n.note}${n.thread ? ` | [Thread](${selfURL + n.thread})` : ""}` };
         }),
         footer: { text: `${msg.author.username}#${msg.author.discriminator} | Page 1/${paginated.length}`}
       }]
@@ -115,20 +117,20 @@ module.exports = bot => {
       ]
     }];
 
-    pagination.set(msg.id, {
+    const page = await utils.awaitPostSystemMessageWithFallback(msg.channel, thread, content);
+
+    pagination.set(page.id, {
       pages: paginated,
       index: 0,
       authorID: msg.author.id,
       targetID: userId,
       expire: setTimeout(() => pagination.delete(msg.id), 3e5)
     });
-
-    utils.postSystemMessageWithFallback(msg.channel, thread, content);
   });
 
   // NOTE I know this is kinda messy, I will clean this up in a future release - Bsian
   bot.on("interactionCreate", async (interaction) => {
-    if (! (interaction instanceof Eris.ComponentInteraction)) return;
+    if (interaction.type !== 3) return;
     if (! pagination.has(interaction.message.id)) return;
 
     const page = pagination.get(interaction.message.id);
@@ -168,8 +170,9 @@ module.exports = bot => {
     if (page.index === 0) content.components[0].components[0].disabled = true;
     if (page.index + 1 === page.pages.length) content.components[0].components[2].disabled = true;
 
+    const selfURL = await utils.getSelfUrl("#thread/");
     content.embeds[0].fields = page.pages[page.index].map((n) => {
-      return { name: `[${n.i}] ${n.created_by_name} | ${n.created_at}`, value: `${n.note}${n.thread ? ` | [Thread](${utils.getSelfUrl(`#thread/${n.thread}`)})` : ""}` };
+      return { name: `[${n.i}] ${n.created_by_name} | ${n.created_at}`, value: `${n.note}${n.thread ? ` | [Thread](${selfURL + n.thread})` : ""}` };
     });
     content.embeds[0].footer.text = `${(interaction.user || interaction.member).username}#${(interaction.user || interaction.member).discriminator} | Page ${page.index + 1}/${page.pages.length}`;
 
