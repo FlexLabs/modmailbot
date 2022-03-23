@@ -37,6 +37,8 @@ const stats = require("./modules/stats");
 const say = require("./modules/say");
 const modformat = require("./modules/modformat");
 
+const exampleInteraction = require("./interactions/example");
+
 const attachments = require("./data/attachments");
 const components = require("./utils/components");
 const {ACCIDENTAL_THREAD_MESSAGES} = require("./utils/constants");
@@ -45,6 +47,7 @@ const { mainGuildId } = require("./config");
 const messageQueue = new Queue();
 const awaitingOpen = new Map();
 const redirectCooldown = new Map();
+const interactionList = new Map();
 const sse = new SSE();
 let webInit = false;
 
@@ -340,6 +343,70 @@ bot.on("channelDelete", async (channel) => {
   }
 });
 
+// NOTE New interaction handling. May or may not break
+function loadInteraction(i) {
+  if (interactionList.has(i.name)) {
+    throw new Error(`Interaction ${i.name} already registered!`);
+  }
+  interactionList.set(i.name, i);
+}
+
+bot.on(
+  "interactionCreate",
+  /**
+   * 
+   * @param {Eris.ComponentInteraction} interaction 
+   */
+  async (interaction) => {
+    return; // TODO Migrate interactions to new system
+    if (interaction.type !== 3 && interaction.type !== 5) {
+      interaction.createMessage({
+        content: "I don't recognise this type of interaction - please speak to a Dave contributor!",
+        flags: 64
+      });
+      throw new Error("Unknown/unhandled interaction type: " + interaction.type);
+    }
+
+    const [interactionName, customID] = interaction.data.custom_id.split(":");
+
+    if (! interactionName || ! customID) {
+      interaction.createMessage({
+        content: "Something weird happened... please speak to a Dave contributor!",
+        flags: 64
+      });
+      throw new Error("Invalid custom_id value: " + interaction.data.custom_id);
+    }
+
+    if (! interactionList.has(interactionName)) {
+      interaction.createMessage({
+        content: "I'm not sure what this interaction is for - please speak to a Dave contributor!",
+        flags: 64
+      });
+      throw new Error("Unknown interaction name: " + interactionName);
+    }
+
+    const interact = interactionList.get(interactionName);
+    if (interact.type !== interaction.type) {
+      interaction.createMessage({
+        content: "I wasn't expecting this interaction type for the interaction - please speak to a Dave contributor!",
+        flags: 64
+      });
+      throw new Error(`Mismatched interaction type for ${interactionName}. Expected: ${interact.type}. Received ${interaction.type}`);
+    }
+
+    try {
+      await interact.handler(interaction, customID);
+    } catch (error) {
+      if (! interaction.acknowledged) {
+        interaction.createMessage({
+          content: "Something weird happened... please speak to a Dave contributor!",
+          flags: 64
+        });
+      }
+      throw error;
+    }
+  });
+
 /**
  * When a staff member uses an internal button...
  * 1) Find an open thread where the interaction originated from
@@ -603,5 +670,9 @@ module.exports = {
     stats(bot);
     say(bot);
     modformat(bot);
+
+    // Load interactions
+    console.log("Loading interactions...");
+    loadInteraction(exampleInteraction);
   }
 };
