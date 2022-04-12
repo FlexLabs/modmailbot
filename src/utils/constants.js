@@ -52,4 +52,7 @@ module.exports = {
     "okey np",
     "cheers"
   ],
+
+  INLINE_SNIPPET_REGEX: /(?<!\\){([a-z0-9_-]+?)}/gi,
+  REMOVE_INLINE_BRACKETS: /(?:{)|(?:})/g
 };

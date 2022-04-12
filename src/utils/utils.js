@@ -4,6 +4,7 @@ const publicIp = require("public-ip");
 const bot = require("../bot");
 const config = require("../config");
 const attachments = require("../data/attachments");
+const constants = require("./constants");
 
 class BotError extends Error {}
 
@@ -321,6 +322,43 @@ function paginate(items, nPerPage) {
   return chunks;
 }
 
+/**
+ * @param {String} text
+ */
+async function parseText(text) { // TODO Prevent circular references. Current setup is fine for now as nested inline snippets is not currently possible
+  const matches = text.match(constants.INLINE_SNIPPET_REGEX); // Get text that should be converted
+  if (! matches) return text;
+
+  const fetched = await Promise.all(
+    matches
+      .filter((v, i, a) => a.indexOf(v) === i) // Remove duplicates
+      .map(async (m) => {
+        const ret =  {
+          word: m.replace(constants.REMOVE_INLINE_BRACKETS, ""),
+          full: m
+        };
+
+        let snippet = await snippets.get(ret.word);
+        snippet = snippet && snippet.body;
+        ret.content = snippet;
+        return ret;
+      })
+  );
+
+  const noMatch = fetched.filter((s) => ! s.content);
+  if (noMatch.length) {
+    const error = new Error("UNKNOWN_SNIPPETS");
+    error.matches = noMatch.map((m) => m.word);
+    throw error;
+  }
+
+  let toReturn = text;
+  for (const s of fetched) {
+    toReturn = toReturn.replace(RegExp("(?<!\\\\)" + s.full, "g"), s.content);
+  }
+  return toReturn;
+}
+
 module.exports = {
   BotError,
 
@@ -354,5 +392,8 @@ module.exports = {
 
   regEscape,
   discordURL,
-  paginate
+  paginate,
+  parseText
 };
+
+const snippets = require("../data/snippets");
