@@ -106,7 +106,7 @@ bot.on("error", (e) => process.emit("unhandledRejection", e, Promise.resolve()))
 bot.on("messageCreate", async msg => {
   if (! msg.guildID || msg.author.bot) return;
   if (! (await utils.messageIsOnInboxServer(msg))) return;
-  if (! utils.isStaff(msg.member)) return; // Only run if messages are sent by moderators to avoid a ridiculous number of DB calls
+  if (! utils.isStaff(msg.member) && ! utils.isCommunityTeam) return; // Only run if messages are sent by moderators (and now ct too) to avoid a ridiculous number of DB calls
 
   // Lance $ping command
 
@@ -291,7 +291,7 @@ bot.on("messageUpdate", async (msg, oldMessage) => {
   }
 
   // 2) Edit in the thread
-  else if ((await utils.messageIsOnInboxServer(msg)) && utils.isStaff(msg.member)) {
+  else if ((await utils.messageIsOnInboxServer(msg)) && (utils.isStaff(msg.member) || utils.isCommunityTeam(msg.member))) {
     const thread = await threads.findOpenThreadByChannelId(msg.channel.id);
     if (! thread) return;
 
@@ -304,7 +304,7 @@ bot.on("messageUpdate", async (msg, oldMessage) => {
  */
 bot.on("messageDelete", async msg => {
   if (! msg.member) return; // Eris 0.15.0
-  if (! utils.isStaff(msg.member)) return; // Only to prevent unnecessary DB calls, see first messageCreate event
+  if (! utils.isStaff(msg.member) && ! utils.isCommunityTeam(msg.member)) return; // Only to prevent unnecessary DB calls, see first messageCreate event
 
   const thread = await threads.findOpenThreadByChannelId(msg.channel.id);
   if (! thread) return;
@@ -316,7 +316,7 @@ bot.on("messageDeleteBulk", async messages => {
   const {channel, member} = messages[0];
 
   if (! member) return;
-  if (! utils.isStaff(member)) return; // Same as above
+  if (! utils.isStaff(member) && ! utils.isCommunityTeam(member)) return; // Same as above
 
   const thread = await threads.findOpenThreadByChannelId(channel.id);
   if (! thread) return;
@@ -630,7 +630,7 @@ async function deleteMessage(thread, msg) {
   if (! msg.author) return;
   if (msg.author.bot) return;
   if (! (await utils.messageIsOnInboxServer(msg))) return;
-  if (! utils.isStaff(msg.member)) return;
+  if (! utils.isStaff(msg.member) && ! utils.isCommunityTeam(msg.member)) return;
 
   thread.deleteChatMessage(msg.id);
 }

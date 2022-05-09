@@ -15,7 +15,7 @@ function addInboxServerCommand(bot, cmd, commandHandler, opts) {
   try {
     bot.registerCommand(cmd, async (msg, args) => {
       if (! (await utils.messageIsOnInboxServer(msg))) return;
-      if (! utils.isStaff(msg.member)) return;
+      if (! utils.isStaff(msg.member) && ! utils.isCommunityTeam(msg.member)) return;
 
       const thread = await threads.findOpenThreadByChannelId(msg.channel.id);
       await commandHandler(msg, args, thread);

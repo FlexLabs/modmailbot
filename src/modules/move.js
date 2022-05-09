@@ -46,7 +46,16 @@ module.exports = bot => {
     }
 
     try {
-      await threads.moveThread(thread, targetCategory, ! utils.isAdmin(msg.member));
+      if(targetCategory.id == config.communityThreadCategoryId) {
+        //checks if user is admin to be able move to CT branch
+        if(utils.isAdmin(msg.member)){
+          return threads.moveThread(thread, targetCategory, false);
+        } else {
+          thread.postSystemMessage("Only admins are allowed to move threads to this category");
+        }
+      } else {
+        threads.moveThread(thread, targetCategory, ! utils.isAdmin(msg.member));
+      }
     } catch (err) {
       utils.handleError(err);
       return thread.postSystemMessage("Something went wrong while trying to move this thread.");

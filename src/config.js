@@ -30,11 +30,13 @@ const defaultConfig = {
   "dynoSupportMessage": "We offer Dyno support in the server in the following channels:\n<#240777175802839040> | English support\n<#335003834445332481> | In-depth custom command support\n<#395821744696590338> | Soutien en français\n<#395821762669051904> | Internationale Unterstützung / Suporte internacional / Apoyo internacional / Uluslararası destek / الدعم الدولي",
 
   "newThreadCategoryId": null,
+  "communityThreadCategoryId": null,
   "adminThreadCategoryId": null,
   "mentionRole": "here",
   "adminMentionRole": null,
 
   "inboxServerRoleIDs": [],
+  "inboxCTRoleIDs": [],
   "inboxAdminRoleIDs": [],
   "alwaysReply": false,
   "alwaysReplyAnon": false,

@@ -107,6 +107,16 @@ function isStaff(member) {
 }
 
 /**
+ * Returns whether the given member has permission to use some specific modmail commands
+ * @param {Eris.Member} member
+ * @returns {boolean}
+ */
+function isCommunityTeam(member) {
+  if (! config.inboxCTRoleIDs.length) return true;
+  if (! member) return false;
+  return member.roles.some((r) => config.inboxCTRoleIDs.includes(r));
+}
+/**
  * Returns whether the given message is on the inbox server
  * @param {Eris.Message} msg
  * @returns {Promise<boolean>}
@@ -371,6 +381,7 @@ module.exports = {
 
   isAdmin,
   isStaff,
+  isCommunityTeam,
   messageIsOnInboxServer,
   messageIsOnMainServer,
 

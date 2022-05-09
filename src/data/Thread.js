@@ -566,9 +566,12 @@ class Thread {
      */
     const channel = bot.getChannel(this.channel_id);
     if (channel) {
-      if (this.isPrivate && channel.parentID == config.newThreadCategoryId) {
+      if(! this.isCT && channel.parentID == config.communityThreadCategoryId) {
+        this.addCommunityAccess();
+      }
+      if (this.isPrivate && (channel.parentID == config.newThreadCategoryId || channel.parentID == config.communityThreadCategoryId)) {
         this.makePublic();
-      } else if (! this.isPrivate && channel.parentID != config.newThreadCategoryId) {
+      } else if (! this.isPrivate && (channel.parentID != config.newThreadCategoryId && channel.parentID != config.communityThreadCategoryId)) {
         this.makePrivate();
       }
 
@@ -700,6 +703,16 @@ class Thread {
       });
   }
 
+  /**
+   * @returns {Promise<void>}
+   */
+  async addCommunityAccess() {
+    return await knex("threads")
+      .where("id", this.id)
+      .update({
+        isCT: true
+      });
+  }
   /**
    * @param {String} userId
    * @returns {String?}
