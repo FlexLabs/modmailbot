@@ -83,7 +83,7 @@ const finalConfig = Object.assign({}, defaultConfig);
 
 for (const [prop, value] of Object.entries(localConfig)) {
   if (! defaultConfig.hasOwnProperty(prop)) {
-    //throw new Error(`Invalid option: ${prop}`);
+    continue;
   }
 
   finalConfig[prop] = value;
