@@ -139,7 +139,7 @@ async function moveThread(thread, targetCategory, mentionAdminRole) {
     syncThreadChannel(threadChannel, targetCategory);
 
     // Make thread private/unprivate
-    if (targetCategory.id !== (config.newThreadCategoryId || config.communityThreadCategoryId)) {
+    if (targetCategory.id !== config.newThreadCategoryId && targetCategory.id !== config.communityThreadCategoryId) {
       thread.makePrivate();
 
       // Ping Admins if necessary

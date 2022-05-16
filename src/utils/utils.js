@@ -116,6 +116,7 @@ function isCommunityTeam(member) {
   if (! member) return false;
   return member.roles.some((r) => config.inboxCTRoleIDs.includes(r));
 }
+
 /**
  * Returns whether the given message is on the inbox server
  * @param {Eris.Message} msg

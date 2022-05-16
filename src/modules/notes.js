@@ -55,7 +55,6 @@ module.exports = bot => {
     if (! userId || args.length > 0) {
       // User mention/id as argument
       userId = utils.getUserMention(args.shift());
-
       usage = `!note ${userId} <note>`;
     }
 

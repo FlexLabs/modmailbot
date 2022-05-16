@@ -14,7 +14,7 @@ module.exports = bot => {
      */
     async function getLogs(userId) {
       let userThreads = await threads.getClosedThreadsByUserId(userId);
-      if(utils.isCommunityTeam(msg.member) && ! utils.isStaff(msg.member)){
+      if (utils.isCommunityTeam(msg.member) && ! utils.isStaff(msg.member)){
         userThreads = userThreads.filter((t) => t.isCT );
       }
       if (! utils.isAdmin(msg.member)) {

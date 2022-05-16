@@ -745,10 +745,10 @@ class Thread {
         "429054322555355158": "203040224597508096",
         "842139696313139309": "523021576128692239"
       };
-  
+
       if (adminOverrides[categoryID]) {
         const role = guild && guild.roles && guild.roles.get(adminOverrides[categoryID]);
-  
+
         if (role) {
           return role;
         }

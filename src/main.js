@@ -106,7 +106,7 @@ bot.on("error", (e) => process.emit("unhandledRejection", e, Promise.resolve()))
 bot.on("messageCreate", async msg => {
   if (! msg.guildID || msg.author.bot) return;
   if (! (await utils.messageIsOnInboxServer(msg))) return;
-  if (! utils.isStaff(msg.member) && ! utils.isCommunityTeam) return; // Only run if messages are sent by moderators (and now ct too) to avoid a ridiculous number of DB calls
+  if (! utils.isStaff(msg.member) && ! utils.isCommunityTeam(msg.member)) return; // Only run if messages are sent by moderators (and now ct too) to avoid a ridiculous number of DB calls
 
   // Lance $ping command
 
