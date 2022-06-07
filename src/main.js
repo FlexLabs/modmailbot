@@ -144,7 +144,7 @@ bot.on("messageCreate", async msg => {
  * 2) Post the message as a user reply in the thread
  */
 bot.on("messageCreate", async msg => {
-  if (msg.author.bot || msg.type !== 0) return; // Ignore bots & pins
+  if (msg.author.bot || ! (msg.type === 0 || msg.type === 19)) return; // Ignore bots & everything that isn't an actual message
   if (msg.guildID) return; // Ignore messages sent to a guild
 
   const isBlocked = await blocked.isBlocked(msg.author.id);
@@ -354,8 +354,8 @@ function loadInteraction(i) {
 bot.on(
   "interactionCreate",
   /**
-   * 
-   * @param {Eris.ComponentInteraction} interaction 
+   *
+   * @param {Eris.ComponentInteraction} interaction
    */
   async (interaction) => {
     return; // TODO Migrate interactions to new system
