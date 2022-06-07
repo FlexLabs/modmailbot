@@ -359,6 +359,7 @@ bot.on(
    */
   async (interaction) => {
     return; // TODO Migrate interactions to new system
+    // eslint-disable-next-line no-unreachable
     if (interaction.type !== 3 && interaction.type !== 5) {
       interaction.createMessage({
         content: "I don't recognise this type of interaction - please speak to a Dave contributor!",

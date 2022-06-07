@@ -1,4 +1,5 @@
-// This is an example of an interaction handler. 
+/* eslint-disable no-unused-vars */
+// This is an example of an interaction handler.
 
 const Eris = require("eris");
 
