@@ -12,7 +12,7 @@
   "author": "",
   "dependencies": {
     "cookie-parser": "^1.4.5",
-    "eris": "github:abalabahaha/eris",
+    "eris": "^0.17.0",
     "express": "^4.17.1",
     "express-sse": "^0.5.3",
     "humanize-duration": "^3.23.1",
@@ -21,7 +21,7 @@
     "mime": "^2.4.6",
     "moment": "^2.27.0",
     "public-ip": "^4.0.1",
-    "sqlite3": "^5.0.0",
+    "sqlite3": "^5.0.8",
     "superagent": "^5.3.1",
     "transliteration": "^2.1.11",
     "uuid": "^8.2.0"
