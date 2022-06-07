@@ -36,6 +36,7 @@
     "jsdoc/no-undefined-types": 1,
     "no-undef": "error",
     "no-const-assign": "error",
-    "no-trailing-spaces": "error"
+    "no-trailing-spaces": "error",
+    "eol-last": "error"
   }
 }
