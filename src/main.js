@@ -312,6 +312,9 @@ bot.on("messageDelete", async msg => {
   deleteMessage(thread, msg);
 });
 
+/**
+ * Bulk delete messages from the DB when a modmail thread is purged
+ */
 bot.on("messageDeleteBulk", async messages => {
   const {channel, member} = messages[0];
 
@@ -326,7 +329,9 @@ bot.on("messageDeleteBulk", async messages => {
   }
 });
 
-// If a modmail thread is manually deleted, close the thread automatically
+/**
+ * If a modmail thread is manually deleted, close the thread automatically
+ */
 bot.on("channelDelete", async (channel) => {
   if (! (channel instanceof Eris.TextChannel)) return;
   if (channel.guild.id !== config.mailGuildId) return;
@@ -351,15 +356,11 @@ function loadInteraction(i) {
   interactionList.set(i.name, i);
 }
 
-bot.on(
-  "interactionCreate",
+/**bot.on("interactionCreate", // TODO Migrate interactions to new system
   /**
-   *
    * @param {Eris.ComponentInteraction} interaction
-   */
+   *
   async (interaction) => {
-    return; // TODO Migrate interactions to new system
-    // eslint-disable-next-line no-unreachable
     if (interaction.type !== 3 && interaction.type !== 5) {
       interaction.createMessage({
         content: "I don't recognise this type of interaction - please speak to a Dave contributor!",
@@ -406,7 +407,7 @@ bot.on(
       }
       throw error;
     }
-  });
+  });*/
 
 /**
  * When a staff member uses an internal button...
