@@ -563,10 +563,6 @@ bot.on("interactionCreate", async (interaction) => {
         });
       break;
     }
-    default: interaction.createMessage({
-      content: "Something's wrong. Please mention a Dave contributor!",
-      flags: 64
-    });
   }
 });
 
