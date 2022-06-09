@@ -270,12 +270,17 @@ class Thread {
 
   /**
    * @param {Eris.MessageContent} text
-   * @param {Eris.MessageFile|Eris.MessageFile[]} [file]
+   * @param {String} [plainBody] Plain string of text to save to the DB, rather than an embed
    * @returns {Promise<Eris.Message<Eris.GuildTextableChannel>>}
    */
-  async postSystemMessage(text, file) {
-    const msg = await this.postToThreadChannel(text, file);
+  async postSystemMessage(text, plainBody) {
+    const msg = await this.postToThreadChannel(text);
     if (! msg) return; // This will be undefined if the channel is deleted
+
+    if (plainBody) {
+      text = plainBody;
+    }
+
     await this.addThreadMessageToDB({
       message_type: THREAD_MESSAGE_TYPE.SYSTEM,
       user_id: null,
