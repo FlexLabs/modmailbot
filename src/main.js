@@ -50,9 +50,13 @@ const interactionList = new Map();
 const sse = new SSE();
 let webInit = false;
 
-// Once the bot has connected, set the status/"playing" message
-bot.on("ready", () => { // TODO Eris `type` is optional
-  bot.editStatus(null, {name: config.status});
+// Once the bot has connected, set the bot status & activity
+bot.on("ready", () => {
+  bot.editStatus(null, {
+    name: config.status,
+    type: 3
+  });
+
   console.log("Connected! Now listening to DMs.");
   let guild = bot.guilds.get(config.mainGuildId);
   let roles = [];
