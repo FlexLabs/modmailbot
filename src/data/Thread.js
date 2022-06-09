@@ -376,7 +376,11 @@ class Thread {
       data.components = internalButtons;
     }
 
-    return await this.postSystemMessage(data);
+    // This is for the Dashboard, so it can parse notes and the users account age correctly!
+
+    const plainBody = fields.map((f) => `**${f.name}:** ${f.value}`).join("\n");
+
+    return await this.postSystemMessage(data, plainBody);
   }
 
   /**
