@@ -1,5 +1,6 @@
 const Eris = require("eris");
 const SSE = require("express-sse");
+const fs = require("fs");
 
 const config = require("./config");
 const bot = require("./bot");
@@ -36,8 +37,6 @@ const dmlink = require("./modules/dmlink");
 const stats = require("./modules/stats");
 const say = require("./modules/say");
 const modformat = require("./modules/modformat");
-
-const exampleInteraction = require("./interactions/example");
 
 const attachments = require("./data/attachments");
 const components = require("./utils/components");
@@ -349,12 +348,6 @@ bot.on("channelDelete", async (channel) => {
 });
 
 // NOTE New interaction handling. May or may not break
-function loadInteraction(i) {
-  if (interactionList.has(i.name)) {
-    throw new Error(`Interaction ${i.name} already registered!`);
-  }
-  interactionList.set(i.name, i);
-}
 
 /**bot.on("interactionCreate", // TODO Migrate interactions to new system
   /**
@@ -620,6 +613,33 @@ bot.on("interactionCreate", async (interaction) => {
   awaitingOpen.delete(message.channel.id);
 });
 
+function loadInteractions() {
+  console.log("Loading interactions...");
+
+  const dir = __dirname + "/./interactions";
+  const list = fs.readdirSync(dir);
+
+  for (let i of list) {
+    const file = dir + "/" + i;
+
+    if (! fs.statSync(file).isDirectory()) {
+      i = require(file);
+
+      if (! i.name || ! i.type || ! i.handler) {
+        console.error(`Interaction ${i.name} needs a name, interaction type, and handler!`);
+        continue;
+      }
+
+      if (interactionList.has(i.name)) {
+        console.warn(`Interaction ${i.name} already registered!`);
+        continue;
+      }
+
+      interactionList.set(i.name, i);
+    }
+  }
+}
+
 /**
  * @param {import('./data/Thread')} thread
  * @param {Eris.Message} msg
@@ -670,7 +690,7 @@ module.exports = {
     modformat(bot);
 
     // Load interactions
-    console.log("Loading interactions...");
-    loadInteraction(exampleInteraction);
+
+    loadInteractions();
   }
 };
