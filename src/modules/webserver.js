@@ -128,6 +128,7 @@ module.exports = (bot, sse) => {
 
     res.json({
       total: total,
+      includePrivate: viewAll,
       threads: await q.limit(limit).offset(offset)
     });
   });
