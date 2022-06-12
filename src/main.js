@@ -58,43 +58,33 @@ bot.on("ready", () => {
   });
 
   console.log("Connected! Now listening to DMs.");
-  let guild = bot.guilds.get(config.mainGuildId);
-  let roles = [];
-  let users = [];
-  let channels = [];
-  for (let role of guild.roles.values())
-    roles.push({ id: role.id, name: role.name, color: role.color });
-  for (let member of guild.members.values())
-    users.push({ id: member.id, name: member.username, discrim: member.discriminator });
-  for (let channel of guild.channels.values())
-    channels.push({ id: channel.id, name: channel.name });
+
+  const data = updateSSE();
+
   sse.updateInit({
-    roles: roles,
-    users: users,
-    channels: channels
+    users: data.users,
+    roles: data.roles,
+    channels: data.channels
   });
+
   webserver(bot, sse);
   webInit = true;
 });
 
 bot.on("guildAvailable", guild => {
-  if (guild.id !== config.mainGuildId) { return; }
-  if (webInit === true) { return; }
+  if (guild.id !== config.mainGuildId) return;
+  if (webInit === true) return;
+
   console.log("Registering main guild.");
-  let roles = [];
-  let users = [];
-  let channels = [];
-  for (let role of guild.roles.values())
-    roles.push({ id: role.id, name: role.name, color: role.color });
-  for (let member of guild.members.values())
-    users.push({ id: member.id, name: member.username, discrim: member.discriminator });
-  for (let channel of guild.channels.values())
-    channels.push({ id: channel.id, name: channel.name });
+
+  const data = updateSSE();
+
   sse.updateInit({
-    roles: roles,
-    users: users,
-    channels: channels
+    users: data.users,
+    roles: data.roles,
+    channels: data.channels
   });
+
   webserver(bot, sse);
   webInit = true;
 });
@@ -616,6 +606,24 @@ bot.on("interactionCreate", async (interaction) => {
 
   awaitingOpen.delete(message.channel.id);
 });
+
+function updateSSE() {
+  const data = { users: [], roles: [], channels: [] };
+  const guild = bot.guilds.get(config.mainGuildId);
+
+  if (guild) {
+    for (let member of guild.members.values())
+      data.users.push({ id: member.id, name: member.username, discrim: member.discriminator });
+
+    for (let role of guild.roles.values())
+      data.roles.push({ id: role.id, name: role.name, color: role.color });
+
+    for (let channel of guild.channels.values())
+      data.channels.push({ id: channel.id, name: channel.name });
+  }
+
+  return data;
+}
 
 function loadInteractions() {
   console.log("Loading interactions...");
