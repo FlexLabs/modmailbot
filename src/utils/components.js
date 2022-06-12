@@ -84,7 +84,7 @@ const moveToAdmins = [{
 }];
 
 const blockUserModal = {
-  title: "Block user!",
+  title: "Block User!",
   custom_id: "confirmBlockUser",
   components: [{
     type: 1,
@@ -96,14 +96,92 @@ const blockUserModal = {
         label: "Reason",
         min_length: 1,
         max_length: 1000,
-        required: true,
         placeholder: "Please enter a reason!"
       }
     ]
   }]
 };
 
-const reportUserSelectReason = [{
+const reportUserModal = {
+  title: "Report User!",
+  custom_id: "reportUser",
+  components: [
+    {
+      type: 1,
+      components: [{
+        type: 4,
+        custom_id: "userID",
+        style: 1,
+        label: "User ID/Name",
+        min_length: 1,
+        max_length: 32,
+        placeholder: "Please enter a user ID!"
+      }]
+    },
+    {
+      type: 1,
+      components: [{
+        type: 4,
+        custom_id: "reason",
+        style: 2,
+        label: "Reason",
+        min_length: 1,
+        max_length: 1000,
+        placeholder: "Please enter a reason!"
+      }]
+    },
+    {
+      type: 1,
+      components: [{
+        type: 4,
+        custom_id: "context",
+        style: 2,
+        label: "Additional Context/Links (Optional)",
+        max_length: 1000,
+        required: false,
+        placeholder: "Add any additional information here, and any message/screenshot links we can use for reference."
+      }]
+    }
+  ]
+};
+
+const moderationHelpReasons = [{
+  type: 1,
+  components: [
+    {
+      type: 3,
+      custom_id: "moderationHelpReasons",
+      options: [
+        {
+          "label": "Report a User",
+          "value": "reportUser"
+        },
+        {
+          "label": "Report Dyno Impersonation",
+          "value": "dynoImp"
+        },
+        {
+          "label": "Appeal a Ban",
+          "value": "banAppeal"
+        },
+        {
+          "label": "Appeal a Mute",
+          "value": "muteAppeal"
+        },
+        {
+          "label": "Other",
+          "value": "idfk",
+          "desription": "Your issue isn't listed here? Open a thread and explain further."
+        }
+      ],
+      min_values: 1,
+      max_values: 1,
+      placeholder: "What do you need help with?"
+    }
+  ]
+}];
+
+/*const reportUserSelectReason = [{
   type: 1,
   components: [
     {
@@ -111,24 +189,19 @@ const reportUserSelectReason = [{
       custom_id: "reportUserReason",
       options: [
         {
-          "label": "Sending DM advertisements",
-          "value": "dmADs",
-          "description": "Report a user for sending an unsolicited DM advertisement."
-        },
-        {
-          "label": "Sending NSFW/NSFL via DMs",
-          "value": "NSFW",
-          "description": "Report a user for sending innapropriate content via DMs."
-        },
-        {
-          "label": "Spamming DMs",
-          "value": "dmSpam",
-          "description": "Report a user for spamming you via DMs."
+          "label": "Inappropriate behavior in DMs",
+          "value": "badDMs",
+          "description": "DM ads, phishing, harassment, NSFW/NSFL, or spam."
         },
         {
           "label": "Breaking Dyno™ server rule",
           "value": "ruleBreaker",
-          "description": "Alert staff of a user currently breaking rules inside Dyno™."
+          "description": "Alert staff of a user currently violating rules inside #welcome."
+        },
+        {
+          "label": "Dyno impersonation",
+          "value": "impersonation",
+          "description": "Report a user, or bot, for using Dynos avatar or username."
         },
         {
           "label": "Report a staff member",
@@ -146,11 +219,12 @@ const reportUserSelectReason = [{
       placeholder: "What do you need to report?"
     }
   ]
-}];
+}];*/
 
 module.exports = {
   internalButtons,
   moveToAdmins,
   blockUserModal,
-  reportUserSelectReason
+  reportUserModal,
+  moderationHelpReasons
 };
