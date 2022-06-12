@@ -226,9 +226,9 @@ bot.on("messageCreate", async msg => {
             },
             {
               type: 2,
-              custom_id: "reportUser",
+              custom_id: "moderationHelp",
               style: 1,
-              label: "Report a User"
+              label: "Moderation Help"
             },
             {
               type: 2,
@@ -278,8 +278,8 @@ bot.on("messageUpdate", async (msg, oldMessage) => {
 
     const oldThreadMessage = await thread.getThreadMessageFromDM(msg);
     const editMessage = `**EDITED <${utils.discordURL(mainGuildId, thread.channel_id, oldThreadMessage.thread_message_id)}>:**\n${newContent}`;
-
     const newThreadMessage = await thread.postSystemMessage(editMessage);
+
     thread.updateChatMessage(msg, newThreadMessage);
   }
 
@@ -446,6 +446,15 @@ bot.on("interactionCreate", async (interaction) => {
     }
   }
 
+  // Button for report details (This will be rewritten in the future, it's a bandaid fix for mobile users)
+
+  if (customID.startsWith("reportedUser-")) {
+    return interaction.createMessage({
+      content: customID.split("-")[1],
+      flags: 64
+    });
+  }
+
   // All other buttons
 
   switch (customID) {
@@ -582,33 +591,132 @@ bot.on("interactionCreate", async (interaction) => {
     }]
   });
 
-  if (customID === "cancelThread") {
+  if (customID === "reportUser") { // Report User Modal
+    let [userID, reason, context] = interaction.data.components.map((c) => c.components[0].value);
+    let copyID = {
+      type: 2,
+      style: 1,
+      label: "Send Reported User ID",
+      custom_id: "reportedUser-" + userID
+    };
+
+    // Transform User ID to tag
+
+    if (! isNaN(userID) && userID.length > 16 && userID.length < 20) {
+      const mainGuild = bot.guilds.get(config.mainGuildId);
+      const search = mainGuild && mainGuild.members.get(userID);
+
+      if (search) {
+        userID = `**${search.username}#${search.discriminator}** (\`${userID}\`)`;
+      }
+    }
+
+    const fields = [
+      {
+        name: "User",
+        value: userID
+      },
+      {
+        name: "Reason",
+        value: reason
+      }
+    ];
+
+    if (context) {
+      fields.push({
+        name: "Additional Content/Links",
+        value: context
+      });
+    }
+
+    const member = await utils.getMainGuild()
+      .then((g) => g && g.members && g.members.find((m) => m.id === interaction.user.id))
+      .catch(() => null);
+
+    await createThreadFromInteraction(interaction, opening, {
+      embed: {
+        title: "**User Report**",
+        color: utils.getUserRoleColor(member),
+        fields
+      },
+      components: [{
+        type: 1,
+        components: [copyID]
+      }]
+    }, "Moderation Help");
+  } else if (customID === "moderationHelpReasons") { // Moderation Help Select Menu
+    const option = interaction.data.values[0];
+
+    switch (option) {
+      case "reportUser": {
+        // See if you can convert this to doing it the normal way yet
+        return bot.createInteractionResponse(interaction.id, interaction.token, {
+          type: 9,
+          data: components.reportUserModal
+        });
+      }
+      case "dynoImp": {
+        interaction.createMessage("To report a Dyno impersonator, please file a Discord Trust & Safety report using the below link, and they will be able to assist you better.\n\n<https://dis.gd/request>\n\nThanks so much for taking time to report Dyno impostors, we really appreciate it!");
+        break;
+      }
+      case "appealBan": {
+        interaction.createMessage("If you're looking to appeal a ban, you can fill out the form below. Our moderation team will review and resolve it as quickly as we can.\n\nYou can monitor the status of your appeal by going back to the form. If you opt-in when submitting, Dyno will attempt to DM you the outcome of your appeal. Please note he won't be able to DM you if you don't have your DMs open to everybody or if you're in no mutual servers with Dyno.\n\nhttps://dyno.gg/form/6312b9f5");
+        break;
+      }
+      default: {
+        await createThreadFromInteraction(interaction, opening, null, "Moderation Help");
+        break;
+      }
+    }
+  } else if (customID === "cancelThread") {
     interaction.createMessage("Cancelled thread, your message won't be forwarded to staff members.");
   } else if (customID === "dynoSupport") {
     interaction.createMessage(config.dynoSupportMessage);
+  } else if (customID === "moderationHelp") {
+    return interaction.createMessage({
+      content: "Please specify what you need help with, and I'll connect you with a member of our moderation team!",
+      components: components.moderationHelpReasons
+    });
   } else {
-    let thread;
-    let clicked = message.components[0].components.find((c) => c.custom_id === customID);
-
-    try {
-      thread = await threads.createNewThreadForUser(opening.author, clicked.label);
-      await interaction.acknowledge();
-    } catch (error) {
-      awaitingOpen.delete(message.channel.id);
-      if (error.code === 50035 && error.message.includes("words not allowed")) {
-        utils.postLog(`Tried to open a thread with ${opening.author.username}#${opening.author.discriminator} (${opening.author.id}) but failed due to a restriction on channel names for servers in Server Discovery`);
-        return interaction.createMessage("Thread was unable to be opened - please change your username and try again!");
-      }
-      utils.postLog(`**Error:** \`\`\`js\nError creating modmail channel for ${opening.author.username}#${opening.author.discriminator}!\n${error.stack}\n\`\`\``);
-      return interaction.createMessage("Thread was unable to be opened due to an unknown error. If this persists, please contact a member of the staff team!");
-    }
-
-    sse.send({ thread }, "threadOpen");
-    await thread.receiveUserReply(opening, sse);
+    const clicked = interaction.message.components[0].components.find((c) => c.custom_id === interaction.data.custom_id);
+    await createThreadFromInteraction(interaction, opening, null, clicked && clicked.label);
   }
 
   awaitingOpen.delete(message.channel.id);
 });
+
+/**
+ * Create a new thread
+ * @param {Eris.Interaction} interaction Response of the interaction
+ * @param {Eris.Message} originalMsg Original object of the message sent to trigger the interactions to appear
+ * @param {String} systemMsg The message which should first be sent when opening a new thread, before sending the users actual content
+ * @param {String} clicked The button the user clicked (This will be removed in a future update, when it won't be needed anymore. For now, it's helpful to understand what button the user pressed)
+ */
+async function createThreadFromInteraction(interaction, originalMsg, systemMsg, clicked) {
+  let thread;
+
+  try {
+    thread = await threads.createNewThreadForUser(originalMsg.author, clicked);
+    await interaction.acknowledge({
+      type: 6
+    });
+  } catch (error) {
+    if (error.code === 50035 && error.message.includes("words not allowed")) {
+      utils.postLog(`Tried to open a thread with ${originalMsg.author.username}#${originalMsg.author.discriminator} (${originalMsg.author.id}) but failed due to a restriction on channel names for servers in Server Discovery`);
+      return interaction.createMessage("Thread was unable to be opened - please change your username and try again!");
+    }
+    utils.postLog(`**Error:** \`\`\`js\nError creating modmail channel for ${originalMsg.author.username}#${originalMsg.author.discriminator}!\n${error.stack}\n\`\`\``);
+    return interaction.createMessage("Thread was unable to be opened due to an unknown error. If this persists, please contact a member of the staff team!");
+  }
+
+  sse.send({ thread }, "threadOpen");
+
+  if (systemMsg) {
+    await thread.postSystemMessage(systemMsg, true);
+  }
+
+  await thread.receiveUserReply(originalMsg, sse);
+}
 
 function updateSSE() {
   const data = { users: [], roles: [], channels: [] };
