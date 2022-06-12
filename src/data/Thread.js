@@ -123,7 +123,7 @@ class Thread {
     const extraContent = [];
     const stickers = msg.stickerItems && msg.stickerItems.map((s) => s.name);
 
-    if (msg.embeds.length) {
+    if (msg.embeds && msg.embeds.length) {
       extraContent.push(`${msg.embeds.length} embed${msg.embeds.length == 1 ? "" : "s"}`);
     }
 
@@ -346,8 +346,7 @@ class Thread {
     }
 
     const roles = member && member.roles.map((r) => member.guild.roles.get(r)).sort((a, b) => b.position - a.position);
-    const coloredRoles = roles && roles.filter((r) => r.color !== 0) || [];
-    const highestColor = coloredRoles[0] && coloredRoles[0].color;
+    const highestColor = utils.getUserRoleColor(member);
 
     fields.push(
       {

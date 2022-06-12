@@ -173,6 +173,19 @@ function getUserMention(str) {
 }
 
 /**
+ * Returns the color of the members' highest role which has a color
+ * @param {Eris.Member} member
+ */
+function getUserRoleColor(member) {
+  if (! member || ! member.roles) return 0;
+
+  const roles = member.roles.map((r) => member.guild.roles.get(r)).sort((a, b) => b.position - a.position) || [];
+  const colored = roles.filter((r) => r.color !== 0) || [];
+
+  return colored[0] && colored[0].color;
+}
+
+/**
  * Returns the current timestamp in an easily readable form
  * @returns {String}
  */
@@ -389,6 +402,7 @@ module.exports = {
   formatAttachment,
 
   getUserMention,
+  getUserRoleColor,
   getTimestamp,
   disableLinkPreviews,
   getSelfUrl,
