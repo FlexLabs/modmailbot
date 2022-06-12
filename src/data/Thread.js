@@ -270,15 +270,37 @@ class Thread {
 
   /**
    * @param {Eris.MessageContent} text
-   * @param {String} [plainBody] Plain string of text to save to the DB, rather than an embed
+   * @param {Boolean} [plainBody] Whether the bot should save a plain text version of an embed (if provided) to the DB
    * @returns {Promise<Eris.Message<Eris.GuildTextableChannel>>}
    */
   async postSystemMessage(text, plainBody) {
     const msg = await this.postToThreadChannel(text);
     if (! msg) return; // This will be undefined if the channel is deleted
 
-    if (plainBody) {
-      text = plainBody;
+    if (plainBody === true && text.embed) {
+      const strings = [];
+      const embed = text.embed;
+
+      if (text.content)
+        strings.push(text.content);
+
+      if (embed.author && embed.author.name)
+        strings.push(embed.author.name);
+
+      if (embed.title)
+        strings.push(embed.title);
+
+      if (embed.description)
+        strings.push(embed.description);
+
+      if (embed.fields)
+        strings.push(embed.fields.map((f) => `**${f.name}:** ${f.value}`).join("\n"));
+
+      if (embed.footer && embed.footer.text)
+        strings.push(embed.footer.text);
+
+      if (strings.length)
+        text = strings.join("\n");
     }
 
     await this.addThreadMessageToDB({
@@ -375,11 +397,7 @@ class Thread {
       data.components = internalButtons;
     }
 
-    // This is for the Dashboard, so it can parse notes and the users account age correctly!
-
-    const plainBody = fields.map((f) => `**${f.name}:** ${f.value}`).join("\n");
-
-    return await this.postSystemMessage(data, plainBody);
+    return await this.postSystemMessage(data, true);
   }
 
   /**
