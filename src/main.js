@@ -572,8 +572,11 @@ bot.on("interactionCreate", async (interaction) => {
     components: [{
       type: 1,
       components: message.components[0].components.map((c) => {
-        c.disabled = true;
-        c.style = c.custom_id === customID ? 1 : 2;
+        if (c.type === Eris.Constants.ComponentTypes.BUTTON) {
+          c.style = c.custom_id === customID ? 1 : 2;
+          c.disabled = true;
+        }
+
         return c;
       })
     }]
