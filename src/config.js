@@ -27,7 +27,7 @@ const defaultConfig = {
   "status": "Message me for help!",
   "openingMessage": "Hi there, thanks for reaching out to the Dyno modmail bot. This is the best way to get in contact with the Dyno staff team. Please select what you'd like assistance with from the options below so I can route your request to the correct team.\n\n*Note: We can only offer assistance in English.*",
   "responseMessage": "Your message has been forwarded to our staff team. A staff member will reply to you here as soon as possible.",
-  "dynoSupportMessage": "We offer Dyno support in the server in the following channels:\n<#240777175802839040> | English support\n<#335003834445332481> | In-depth custom command support\n<#395821744696590338> | Soutien en français\n<#395821762669051904> | Internationale Unterstützung / Suporte internacional / Apoyo internacional / Uluslararası destek / الدعم الدولي",
+  "dynoSupportMessage": "We offer Dyno support in the server in the following channels:\n<#991748447046729858> | FAQ and help from Support Team members\n<#240777175802839040> | Support from community members\n<#335003834445332481> | In-depth custom command support\n<#395821744696590338> | Soutien en français\n<#395821762669051904> | Internationale Unterstützung / Suporte internacional / Apoyo internacional / Uluslararası destek / الدعم الدولي",
 
   "newThreadCategoryId": null,
   "communityThreadCategoryId": null,
