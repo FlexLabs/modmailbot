@@ -7,17 +7,19 @@
   "snippetAnonDefault": true,
 
   "newThreadCategoryId": "434883322284605442",
+  "communityThreadCategoryId": "862160976535224370",
   "adminThreadCategoryId": "429054322555355158",
   "mentionRole": null,
   "adminMentionRole": "203040224597508096",
 
   "inboxServerRoleIDs": ["203040224597508096", "523021576128692239", "231095149508296704"],
+  "inboxCTRoleIDs": ["855930038556950558"],
   "inboxAdminRoleIDs": ["203040224597508096", "523021576128692239"],
   "ignoreAccidentalThreads": true,
   "allowMove": true,
   "typingProxy": true,
 
-  "allowedCategories": ["434883322284605442", "429054322555355158"],
+  "allowedCategories": ["434883322284605442", "429054322555355158", "862160976535224370"],
 
   "autoResponses": [
     {
