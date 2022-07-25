@@ -21,17 +21,7 @@
 
   "allowedCategories": ["434883322284605442", "429054322555355158", "862160976535224370"],
 
-  "autoResponses": [
-    {
-      "match": ["hi", "hello", "hi!", "hello!", "hi?", "hello?", "hi.", "hello.", "hey", "hey!"],
-      "response": "Hi, this is used for reporting issues to staff members on the Dyno server, if you have something to report or ask, just let us know."
-    },
-    {
-      "match": ["invite", "join"],
-      "matchStart": true,
-      "response": "Hi, I can't be invited. This is used for reporting issues to staff members on the Dyno server, if you have something to report or ask, just let us know."
-    }
-  ],
+  "autoResponses": [],
 
   "dataFactory": true,
 
