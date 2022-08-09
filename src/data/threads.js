@@ -126,9 +126,9 @@ function syncThreadChannel(channel, category) {
  * Move a thread channel to a different category
  * @param {Thread} thread The thread object
  * @param {Eris.CategoryChannel} targetCategory The category to move the specified thread to
- * @param {Boolean} mentionAdminRole Whether the bot should mention the adminMentionRole
+ * @param {Boolean | Array<String>} mentionRole Whether the bot should mention the adminMentionRole, or an array of role IDs to be pinged if supplied
  */
-async function moveThread(thread, targetCategory, mentionAdminRole) {
+async function moveThread(thread, targetCategory, mentionRole) {
   const threadChannel = targetCategory.guild.channels.get(thread.channel_id);
 
   await clearThreadOverwrites(threadChannel);
@@ -143,8 +143,16 @@ async function moveThread(thread, targetCategory, mentionAdminRole) {
       thread.makePrivate();
 
       // Ping Admins if necessary
-
-      if (config.adminMentionRole && mentionAdminRole) {
+      if (Array.isArray(mentionRole)) {
+        if (mentionRole.length !== 0) {
+          threadChannel.createMessage({
+            content: `${mentionRole.map((r) => `<@&${r}>`).join(" ")}, a thread has been moved.`,
+            allowedMentions: {
+              roles: true
+            }
+          });
+        }
+      } else if (config.adminMentionRole && mentionRole) {
         threadChannel.createMessage({
           content: `<@&${config.adminMentionRole}>, a thread has been moved.`,
           allowedMentions: {

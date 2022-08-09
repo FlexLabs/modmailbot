@@ -28,6 +28,7 @@ const defaultConfig = {
   "openingMessage": "Hi there, thanks for reaching out to the Dyno modmail bot. This is the best way to get in contact with the Dyno staff team. Please select what you'd like assistance with from the options below so I can route your request to the correct team.\n\n*Note: We can only offer assistance in English.*",
   "responseMessage": "Your message has been forwarded to our staff team. A staff member will reply to you here as soon as possible.",
   "dynoSupportMessage": "We offer Dyno support in the server in the following channels:\n<#991748447046729858> | FAQ and help from Support Team members\n<#240777175802839040> | Support from community members\n<#395821744696590338> | Soutien en français\n<#395821762669051904> | Internationale Unterstützung / Suporte internacional / Apoyo internacional / Uluslararası destek / الدعم الدولي",
+  "dynoPremiumSupport": "\n\n<:DynoBravo:556614157777109023> As you have the Premium role, you may also use <#231089658971291648> for Dyno support <:DynoBravo:556614157777109023>",
 
   "newThreadCategoryId": null,
   "communityThreadCategoryId": null,
@@ -48,6 +49,7 @@ const defaultConfig = {
   "typingProxyReverse": false,
 
   "allowedCategories": [],
+  "modmailCategories": {},
 
   "autoResponses": [],
 

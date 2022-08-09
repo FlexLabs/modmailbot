@@ -39,13 +39,12 @@ const say = require("./modules/say");
 const modformat = require("./modules/modformat");
 
 const attachments = require("./data/attachments");
-const components = require("./utils/components");
 const {ACCIDENTAL_THREAD_MESSAGES} = require("./utils/constants");
 const { mainGuildId } = require("./config");
 
 const messageQueue = new Queue();
 const awaitingOpen = new Map();
-const redirectCooldown = new Map();
+// const redirectCooldown = new Map();
 const interactionList = new Map();
 const sse = new SSE();
 let webInit = false;
@@ -214,31 +213,31 @@ bot.on("messageCreate", async msg => {
           components: [
             {
               type: 2,
-              custom_id: "dynoSupport",
+              custom_id: "threadopen:support",
               style: 1,
               label: "Dyno Support"
             },
             {
               type: 2,
-              custom_id: "premiumSupport",
+              custom_id: "threadopen:premiumPayment",
               style: 1,
               label: "Premium/Payment Issues"
             },
             {
               type: 2,
-              custom_id: "moderationHelp",
+              custom_id: "threadopen:moderation",
               style: 1,
               label: "Moderation Help"
             },
             {
               type: 2,
-              custom_id: "noFuckingClue",
+              custom_id: "threadopen:noFuckingClue",
               style: 1,
               label: "Other"
             },
             {
               type: 2,
-              custom_id: "cancelThread",
+              custom_id: "threadopen:cancel",
               style: 4,
               label: "Cancel Thread"
             }
@@ -343,346 +342,53 @@ bot.on("channelDelete", async (channel) => {
 
 // NOTE New interaction handling. May or may not break
 
-/**bot.on("interactionCreate", // TODO Migrate interactions to new system
-  /**
-   * @param {Eris.ComponentInteraction} interaction
-   *
-  async (interaction) => {
-    if (interaction.type !== 3 && interaction.type !== 5) {
-      interaction.createMessage({
-        content: "I don't recognise this type of interaction - please speak to a Dave contributor!",
-        flags: 64
-      });
-      throw new Error("Unknown/unhandled interaction type: " + interaction.type);
-    }
+bot.on("interactionCreate", async (interaction) => {
+  if (interaction.type !== 3 && interaction.type !== 5) {
+    interaction.createMessage({
+      content: "I don't recognise this type of interaction - please speak to a Dave contributor!",
+      flags: 64
+    });
+    throw new Error("Unknown/unhandled interaction type: " + interaction.type);
+  }
 
-    const [interactionName, customID] = interaction.data.custom_id.split(":");
+  const [interactionName, customID] = interaction.data.custom_id.split(":");
 
-    if (! interactionName || ! customID) {
+  if (! interactionName || ! customID) {
+    interaction.createMessage({
+      content: "Something weird happened... please speak to a Dave contributor!",
+      flags: 64
+    });
+    throw new Error("Invalid custom_id value: " + interaction.data.custom_id);
+  }
+
+  if (! interactionList.has(interactionName)) {
+    interaction.createMessage({
+      content: "I'm not sure what this interaction is for - please speak to a Dave contributor!",
+      flags: 64
+    });
+    throw new Error("Unknown interaction name: " + interactionName);
+  }
+
+  const interact = interactionList.get(interactionName);
+  if (interact.type !== interaction.type) {
+    interaction.createMessage({
+      content: "I wasn't expecting this interaction type for the interaction - please speak to a Dave contributor!",
+      flags: 64
+    });
+    throw new Error(`Mismatched interaction type for ${interactionName}. Expected: ${interact.type}. Received ${interaction.type}`);
+  }
+
+  try {
+    await interact.handler(interaction, customID);
+  } catch (error) {
+    if (! interaction.acknowledged) {
       interaction.createMessage({
         content: "Something weird happened... please speak to a Dave contributor!",
         flags: 64
       });
-      throw new Error("Invalid custom_id value: " + interaction.data.custom_id);
     }
-
-    if (! interactionList.has(interactionName)) {
-      interaction.createMessage({
-        content: "I'm not sure what this interaction is for - please speak to a Dave contributor!",
-        flags: 64
-      });
-      throw new Error("Unknown interaction name: " + interactionName);
-    }
-
-    const interact = interactionList.get(interactionName);
-    if (interact.type !== interaction.type) {
-      interaction.createMessage({
-        content: "I wasn't expecting this interaction type for the interaction - please speak to a Dave contributor!",
-        flags: 64
-      });
-      throw new Error(`Mismatched interaction type for ${interactionName}. Expected: ${interact.type}. Received ${interaction.type}`);
-    }
-
-    try {
-      await interact.handler(interaction, customID);
-    } catch (error) {
-      if (! interaction.acknowledged) {
-        interaction.createMessage({
-          content: "Something weird happened... please speak to a Dave contributor!",
-          flags: 64
-        });
-      }
-      throw error;
-    }
-  });*/
-
-/**
- * When a staff member uses an internal button...
- * 1) Find an open thread where the interaction originated from
- * 2) If found, check the custom ID and send any applicable events/messages
- * NOTE: This event manages everything in regards to the internal staff buttons, including when they're pressed and when a staff member blocks the user with the buttons
- */
-bot.on("interactionCreate", async (interaction) => {
-  if (! interaction || ! interaction.data || ! interaction.guildID) return;
-
-  const { message } = interaction;
-  const thread = await threads.findByChannelId(message.channel.id);
-
-  if (! thread) return;
-
-  const customID = interaction.data.custom_id;
-
-  // Thread redirection confirmation
-
-  if (components.moveToAdmins[0].components.map((c) => c.custom_id).includes(customID)) {
-    bot.editMessage(message.channel.id, message.id, {
-      content: message.content,
-      components: [{
-        type: 1,
-        components: message.components[0].components.map((c) => {
-          c.disabled = true;
-          c.style = c.custom_id === customID ? 1 : 2;
-          return c;
-        })
-      }]
-    });
-
-    if (message.channel.id === config.adminThreadCategoryId) return interaction.acknowledge();
-    if (customID.endsWith("Cancel")) {
-      return interaction.createMessage("Cancelled thread transfer.");
-    } else {
-      const targetCategory = message.channel.guild.channels.get(config.adminThreadCategoryId);
-
-      if (! targetCategory || ! config.allowedCategories.includes(targetCategory.id)) {
-        return interaction.createMessage("I can't move this thread to the admin category because it doesn't exist, or I'm not allowed to move threads there.");
-      }
-
-      return threads.moveThread(thread, targetCategory, customID.endsWith("-ping"))
-        .then(() => interaction.acknowledge())
-        .catch((err) => {
-          utils.handleError(err);
-          interaction.createMessage("Something went wrong while attempting to move that thread.");
-        });
-    }
+    throw error;
   }
-
-  // Button for report details (This will be rewritten in the future, it's a bandaid fix for mobile users)
-
-  if (customID.startsWith("reportedUser-")) {
-    return interaction.createMessage({
-      content: customID.split("-")[1],
-      flags: 64
-    });
-  }
-
-  // All other buttons
-
-  switch (customID) {
-    case "sendUserID": {
-      interaction.createMessage({
-        content: thread.user_id,
-        flags: 64
-      });
-      break;
-    }
-    case "sendThreadID": {
-      interaction.createMessage({
-        content: thread.id,
-        flags: 64
-      });
-      break;
-    }
-    case "redirectAdmins": {
-      const targetCategory = message.channel.guild.channels.get(config.adminThreadCategoryId);
-
-      if (! targetCategory || ! config.allowedCategories.includes(targetCategory.id)) {
-        return interaction.createMessage("I can't move this thread to the admin category because it doesn't exist, or I'm not allowed to move threads there.");
-      }
-
-      if (message.channel.parentID === targetCategory.id) {
-        return interaction.createMessage(`This thread is already inside of the ${targetCategory.name} category.`);
-      }
-
-      interaction.createMessage({
-        content: `Are you sure you want to move this thread to ${targetCategory.name}?`,
-        components: components.moveToAdmins
-      });
-      break;
-    }
-    case "redirectSupport": {
-      const cooldown = redirectCooldown.get(thread.id);
-
-      if (cooldown && Date.now () - cooldown.timestamp < 10000) {
-        interaction.createMessage({
-          content: (cooldown.member.id === interaction.member.id ? "You've" : `<@${cooldown.member.id}>`) + " only just redirected this user to the support channels.",
-          flags: 64
-        });
-      } else {
-        interaction.acknowledge();
-        thread.replyToUser(interaction.member, config.dynoSupportMessage, [], config.replyAnonDefault);
-        redirectCooldown.set(thread.id, {
-          member: interaction.member,
-          timestamp: Date.now()
-        });
-      }
-      break;
-    }
-    case "blockUser": {
-      const isBlocked = await blocked.isBlocked(thread.user_id);
-
-      if (isBlocked) {
-        interaction.createMessage({
-          content: `${thread.user_name} is already blocked!`,
-          flags: 64
-        });
-        break;
-      }
-
-      const modal = components.blockUserModal;
-
-      if (thread.user_name) {
-        modal.title = `Block ${thread.user_name}!`;
-      }
-
-      bot.createInteractionResponse(interaction.id, interaction.token, {
-        type: 9,
-        data: modal
-      });
-      break;
-    }
-    case components.blockUserModal.custom_id: {
-      const isBlocked = await blocked.isBlocked(thread.user_id);
-
-      if (isBlocked) {
-        interaction.createMessage({
-          content: `${thread.user_name} is already blocked!`,
-          flags: 64
-        });
-        break;
-      }
-
-      const reason = interaction.data.components[0].components[0].value;
-      const moderator = interaction.member;
-
-      await thread.replyToUser(moderator, `You have been blocked for ${reason}`, [], config.replyAnonDefault);
-      await blocked.block(thread.user_id, thread.user_name, moderator.id)
-        .then(() => {
-          blocked.logBlock({
-            id: thread.user_id,
-            username: thread.user_name.split("#")[0],
-            discriminator: thread.user_name.split("#")[1]
-          }, moderator, reason);
-          interaction.createMessage({
-            content: `Blocked <@${thread.user_id}> (${thread.user_id}) from modmail!`,
-            flags: 64
-          });
-        });
-      break;
-    }
-  }
-});
-
-/**
- * When a private button gets pressed...
- * 1) Edit the button to disable all the buttons
- * 2) Respond to their message or simply open a thread, depending on which button got pressed
- */
-bot.on("interactionCreate", async (interaction) => {
-  if (! interaction || ! interaction.data || interaction.guildID) return;
-
-  const { message } = interaction;
-  const customID = interaction.data.custom_id;
-  const opening = awaitingOpen.get(message.channel.id);
-
-  if (! opening || Date.now() - opening.timestamp > 300000) return;
-
-  bot.editMessage(message.channel.id, message.id, {
-    content: message.content,
-    components: [{
-      type: 1,
-      components: message.components[0].components.map((c) => {
-        if (c.type === Eris.Constants.ComponentTypes.BUTTON) {
-          c.style = c.custom_id === customID ? 1 : 2;
-          c.disabled = true;
-        }
-
-        return c;
-      })
-    }]
-  });
-
-  if (customID === "reportUser") { // Report User Modal
-    let [userID, reason, context] = interaction.data.components.map((c) => c.components[0].value);
-    let copyID = {
-      type: 2,
-      style: 1,
-      label: "Send Reported User ID",
-      custom_id: "reportedUser-" + userID
-    };
-
-    // Transform User ID to tag
-
-    if (! isNaN(userID) && userID.length > 16 && userID.length < 20) {
-      const mainGuild = bot.guilds.get(config.mainGuildId);
-      const search = mainGuild && mainGuild.members.get(userID);
-
-      if (search) {
-        userID = `**${search.username}#${search.discriminator}** (\`${userID}\`)`;
-      }
-    }
-
-    const fields = [
-      {
-        name: "User",
-        value: userID
-      },
-      {
-        name: "Reason",
-        value: reason
-      }
-    ];
-
-    if (context) {
-      fields.push({
-        name: "Additional Content/Links",
-        value: context
-      });
-    }
-
-    const member = await utils.getMainGuild()
-      .then((g) => g && g.members && g.members.find((m) => m.id === interaction.user.id))
-      .catch(() => null);
-
-    await createThreadFromInteraction(interaction, opening, {
-      embed: {
-        title: "**User Report**",
-        color: utils.getUserRoleColor(member),
-        fields
-      },
-      components: [{
-        type: 1,
-        components: [copyID]
-      }]
-    }, "Moderation Help");
-  } else if (customID === "moderationHelpReasons") { // Moderation Help Select Menu
-    const option = interaction.data.values[0];
-
-    switch (option) {
-      case "reportUser": {
-        // See if you can convert this to doing it the normal way yet
-        return bot.createInteractionResponse(interaction.id, interaction.token, {
-          type: 9,
-          data: components.reportUserModal
-        });
-      }
-      case "dynoImp": {
-        interaction.createMessage("To report a Dyno impersonator, please file a Discord Trust & Safety report using the below link, and they will be able to assist you better.\n\n<https://dis.gd/request>\n\nThanks so much for taking time to report Dyno impostors, we really appreciate it!");
-        break;
-      }
-      case "appealBan": {
-        interaction.createMessage("If you're looking to appeal a ban, you can fill out the form below. Our moderation team will review and resolve it as quickly as we can.\n\nYou can monitor the status of your appeal by going back to the form. If you opt-in when submitting, Dyno will attempt to DM you the outcome of your appeal. Please note he won't be able to DM you if you don't have your DMs open to everybody or if you're in no mutual servers with Dyno.\n\nhttps://dyno.gg/form/6312b9f5");
-        break;
-      }
-      default: {
-        await createThreadFromInteraction(interaction, opening, null, "Moderation Help");
-        break;
-      }
-    }
-  } else if (customID === "cancelThread") {
-    interaction.createMessage("Cancelled thread, your message won't be forwarded to staff members.");
-  } else if (customID === "dynoSupport") {
-    interaction.createMessage(config.dynoSupportMessage);
-  } else if (customID === "moderationHelp") {
-    return interaction.createMessage({
-      content: "Please specify what you need help with, and I'll connect you with a member of our moderation team!",
-      components: components.moderationHelpReasons
-    });
-  } else {
-    const clicked = interaction.message.components[0].components.find((c) => c.custom_id === interaction.data.custom_id);
-    await createThreadFromInteraction(interaction, opening, null, clicked && clicked.label);
-  }
-
-  awaitingOpen.delete(message.channel.id);
 });
 
 /**
@@ -777,6 +483,8 @@ async function deleteMessage(thread, msg) {
 }
 
 module.exports = {
+  createThreadFromInteraction,
+  awaitingOpen,
   async start() {
     // Connect to Discord
     console.log("Connecting to Discord...");

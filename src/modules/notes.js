@@ -3,6 +3,7 @@ const notes = require("../data/notes");
 const threadUtils = require("../utils/threadUtils");
 const utils = require("../utils/utils");
 const pagination = new Map;
+const { createPagination, paginate } = require("../utils/pagination");
 
 /**
  * @param {Eris.CommandClient} bot
@@ -70,7 +71,7 @@ module.exports = bot => {
     const userNotes = await notes.get(userId);
     if (! userNotes || ! userNotes.length) return utils.postSystemMessageWithFallback(msg.channel, thread, `There are no notes for this user. Add one with \`${usage}\`.`);
 
-    const paginated = utils.paginate(userNotes.map((note, i) => {
+    const paginated = paginate(userNotes.map((note, i) => {
       note.i = i + 1;
       return note;
     }));
@@ -95,20 +96,20 @@ module.exports = bot => {
       components: [
         {
           type: 2,
-          custom_id: "prev",
+          custom_id: "pagination:prev",
           disabled: true,
           style: 1,
           emoji: { id: "950081389020201050" }
         },
         {
           type: 2,
-          custom_id: "f5",
+          custom_id: "pagination:f5",
           style: 1,
           emoji: { id: "950081388835655690" }
         },
         {
           type: 2,
-          custom_id: "next",
+          custom_id: "pagination:next",
           disabled: paginated.length === 1,
           style: 1,
           emoji: { id: "950081388537843753" }
@@ -116,67 +117,39 @@ module.exports = bot => {
       ]
     }];
 
-    const page = await utils.awaitPostSystemMessageWithFallback(msg.channel, thread, content);
+    const pageMsg = await utils.awaitPostSystemMessageWithFallback(msg.channel, thread, content);
 
-    pagination.set(page.id, {
+    createPagination(pageMsg.id, paginated, msg.author.id, { targetID: userId },
+      async (interaction, page, currPage) => {
+        const content = {
+          components: interaction.message.components,
+          embeds: interaction.message.embeds,
+        };
+        content.embeds[0].fields = currPage.map((n) => {
+          return { name: `[${n.i}] ${n.created_by_name} | ${n.created_at}`, value: `${n.note}${n.thread ? ` | [Thread](${selfURL + n.thread})` : ""}` };
+        });
+        content.embeds[0].footer.text = `${(interaction.user || interaction.member).username}#${(interaction.user || interaction.member).discriminator} | Page ${page.index + 1}/${page.pages.length}`;
+
+        await interaction.editParent(content);
+      },
+      {
+        f5: async (interaction, page) => {
+          const userNotes = await notes.get(page.info.targetID);
+          page.pages = utils.paginate(userNotes.map((note, i) => {
+            note.i = i + 1;
+            return note;
+          }));
+          if (page.index + 1 > page.pages.length) page.index = 0;
+        }
+      });
+
+    pagination.set(pageMsg.id, {
       pages: paginated,
       index: 0,
       authorID: msg.author.id,
       targetID: userId,
       expire: setTimeout(() => pagination.delete(msg.id), 3e5)
     });
-  });
-
-  // NOTE I know this is kinda messy, I will clean this up in a future release - Bsian
-  bot.on("interactionCreate", async (interaction) => {
-    if (interaction.type !== 3) return;
-    if (! pagination.has(interaction.message.id)) return;
-
-    const page = pagination.get(interaction.message.id);
-    if (! (interaction.user || interaction.member).id !== page.authorID) return interaction.createMessage({
-      content: "This interaction is not for you!",
-      flags: 64
-    });
-
-    switch (interaction.data.custom_id) {
-      case "f5": {
-        const userNotes = await notes.get(page.targetID);
-        page.pages = utils.paginate(userNotes.map((note, i) => {
-          note.i = i + 1;
-          return note;
-        }));
-        if (page.index + 1 > page.pages.length) page.index = 0;
-        break;
-      }
-      case "prev":
-      case "next": {
-        page.index = interaction.data.custom_id === "prev" ? --page.index : ++page.index;
-        break;
-      }
-      default: {
-        interaction.createMessage({ content: "Something weird happened...", flags: 64 });
-        throw new Error(`Unknown interaction custom_id "${interaction.data.custom_id}"`);
-      }
-    }
-
-    clearTimeout(page.expire);
-
-    const content = {
-      embeds: interaction.message.embeds,
-      components: interaction.message.components
-    };
-
-    if (page.index === 0) content.components[0].components[0].disabled = true;
-    if (page.index + 1 === page.pages.length) content.components[0].components[2].disabled = true;
-
-    const selfURL = await utils.getSelfUrl("#thread/");
-    content.embeds[0].fields = page.pages[page.index].map((n) => {
-      return { name: `[${n.i}] ${n.created_by_name} | ${n.created_at}`, value: `${n.note}${n.thread ? ` | [Thread](${selfURL + n.thread})` : ""}` };
-    });
-    content.embeds[0].footer.text = `${(interaction.user || interaction.member).username}#${(interaction.user || interaction.member).discriminator} | Page ${page.index + 1}/${page.pages.length}`;
-
-    await interaction.editParent(content);
-    page.expire = setTimeout(() => pagination.delete(interaction.message.id), 3e5);
   });
 
   bot.registerCommandAlias("ns", "notes");

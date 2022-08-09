@@ -54,7 +54,7 @@ async function unblock(userId) {
  * @param {Boolean} isUnblock
  */
 function logBlock(user, moderator, reason, isUnblock = false) {
-  let logText = `**${isUnblock ? "Un" : "B"}locked:** ${user.username}#${user.discriminator} (${user.id}) was ${isUnblock ? "un" : ""}blocked by ${moderator.username}#${moderator.discriminator} (${moderator.id})`;
+  let logText = `**${isUnblock ? "Unb" : "B"}locked:** ${user.username}#${user.discriminator} (${user.id}) was ${isUnblock ? "un" : ""}blocked by ${moderator.username}#${moderator.discriminator} (${moderator.id})`;
 
   if (reason) {
     logText += ` for ${reason}`;

@@ -14,7 +14,7 @@ const internalButtons = [{
         name: "DaveRing",
         id: "815827221549154355"
       },
-      custom_id: "sendUserID"
+      custom_id: "thread:sendUserID"
     },
     {
       type: 2,
@@ -24,7 +24,7 @@ const internalButtons = [{
         name: "DaveRingRight",
         id: "815830334163255326"
       },
-      custom_id: "sendThreadID"
+      custom_id: "thread:sendThreadID"
     },
     {
       type: 2,
@@ -34,7 +34,7 @@ const internalButtons = [{
         name: "DaveBanana",
         id: "752731353266520084"
       },
-      custom_id: "redirectAdmins"
+      custom_id: "thread:redirectAdmins"
     },
     {
       type: 2,
@@ -44,7 +44,7 @@ const internalButtons = [{
         name: "DaveDerp",
         id: "687013677681213484"
       },
-      custom_id: "redirectSupport"
+      custom_id: "thread:redirectSupport"
     },
     {
       type: 2,
@@ -54,7 +54,7 @@ const internalButtons = [{
         name: "DaveCult",
         id: "827253899403722803"
       },
-      custom_id: "blockUser"
+      custom_id: "thread:blockUser"
     }
   ]
 }];
@@ -65,27 +65,27 @@ const moveToAdmins = [{
     {
       type: 2,
       style: 1,
-      label: "Move Thread & Ping",
-      custom_id: "redirectAdminsConfirm-ping"
+      label: "Move Council & Ping",
+      custom_id: "movethread:council-ping"
     },
     {
       type: 2,
       style: 1,
-      label: "Move Thread",
-      custom_id: "redirectAdminsConfirm"
+      label: "Move Council",
+      custom_id: "movethread:council"
     },
     {
       type: 2,
       style: 4,
       label: "Cancel",
-      custom_id: "redirectAdminsCancel"
+      custom_id: "movethread:cancel"
     }
   ]
 }];
 
 const blockUserModal = {
   title: "Block User!",
-  custom_id: "confirmBlockUser",
+  custom_id: "blockuser:block",
   components: [{
     type: 1,
     components: [
@@ -104,7 +104,7 @@ const blockUserModal = {
 
 const reportUserModal = {
   title: "Report User!",
-  custom_id: "reportUser",
+  custom_id: "threadopen:userReport",
   components: [
     {
       type: 1,
@@ -154,24 +154,29 @@ const moderationHelpReasons = [{
       options: [
         {
           "label": "Report a User",
-          "value": "reportUser"
+          "value": "threadopenmoderation:reportUser"
         },
         {
           "label": "Report Dyno Impersonation",
-          "value": "dynoImp"
+          "value": "threadopenmoderation:dynoImp"
         },
         {
           "label": "Appeal a Ban",
-          "value": "banAppeal"
+          "value": "threadopenmoderation:banAppeal"
         },
         {
           "label": "Appeal a Mute",
-          "value": "muteAppeal"
+          "value": "threadopenmoderation:muteAppeal"
         },
         {
           "label": "Other",
-          "value": "idfk",
+          "value": "threadopenmoderation:idfk",
           "desription": "Your issue isn't listed here? Open a thread and explain further."
+        },
+        {
+          "label": "Cancel",
+          "value": "threadopenmoderation:cancel",
+          "description": "Cancel opening a modmail thread"
         }
       ],
       min_values: 1,
@@ -180,46 +185,6 @@ const moderationHelpReasons = [{
     }
   ]
 }];
-
-/*const reportUserSelectReason = [{
-  type: 1,
-  components: [
-    {
-      type: 3,
-      custom_id: "reportUserReason",
-      options: [
-        {
-          "label": "Inappropriate behavior in DMs",
-          "value": "badDMs",
-          "description": "DM ads, phishing, harassment, NSFW/NSFL, or spam."
-        },
-        {
-          "label": "Breaking Dyno™ server rule",
-          "value": "ruleBreaker",
-          "description": "Alert staff of a user currently violating rules inside #welcome."
-        },
-        {
-          "label": "Dyno impersonation",
-          "value": "impersonation",
-          "description": "Report a user, or bot, for using Dynos avatar or username."
-        },
-        {
-          "label": "Report a staff member",
-          "value": "reportStaff",
-          "description": "Make a complaint about one of our staff members."
-        },
-        {
-          "label": "Other",
-          "value": "noFuckingClue",
-          "description": "Report something not listed here."
-        }
-      ],
-      min_values: 1,
-      max_values: 1,
-      placeholder: "What do you need to report?"
-    }
-  ]
-}];*/
 
 module.exports = {
   internalButtons,
