@@ -104,11 +104,11 @@ module.exports = {
         break;
       }
       case "close": {
-        await thread.close(message.author, false, sse);
+        await thread.close(interaction.member, false, sse);
         
         const logUrl = await thread.getLogUrl();
         utils.postLog(
-          utils.trimAll(`Modmail thread with ${thread.user_name} (${thread.user_id}) was closed by ${msg.author.username}#${msg.author.discriminator}
+          utils.trimAll(`Modmail thread with ${thread.user_name} (${thread.user_id}) was closed by ${interaction.member.username}#${interaction.member.discriminator}
           Logs: <${logUrl}>`)
         );
         break;
@@ -116,7 +116,7 @@ module.exports = {
       case "closeIn10": {
         const closeAt = moment.utc().add(600000, "ms");
 
-        await thread.scheduleClose(closeAt.format("YYYY-MM-DD HH:mm:ss"), msg.author);
+        await thread.scheduleClose(closeAt.format("YYYY-MM-DD HH:mm:ss"), interaction.member);
         thread.postSystemMessage(`Thread will close in 10 minutes. Use \`${config.prefix}close cancel\` to cancel.`);
         break;
       }

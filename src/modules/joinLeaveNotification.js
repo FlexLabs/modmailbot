@@ -41,13 +41,8 @@ module.exports = bot => {
         let thread = await threads.findOpenThreadByUserId(member.id);
         if (thread !== null) {
             const leaveNotice = {
-                content: `**The user has left the server.**`,
+                content: `**The user has left the server.**\nUserID: ${member.id}`,
                 components: internalClose,
-                embed: {
-                  footer: {text: `ID: ${member.id}`},
-                  timestamp: new Date(),
-                  color: 0x337FD5,
-                }
             };
           
             return await thread.postSystemMessage(leaveNotice, true);
