@@ -80,8 +80,11 @@ async function createNewThreadForUser(user, topic, quiet = false) {
       });
     }
 
+    let contextMessage = "If you have screenshots or attachments to send, please do so now.";
     // Send auto-reply to the user
-    if (config.responseMessage) {
+    if (topic === "Moderation Help" && config.responseMessage) {
+      newThread.postToUser(config.responseMessage + "\n" + contextMessage);
+    } else if (config.responseMessage) {
       newThread.postToUser(config.responseMessage);
     }
   }

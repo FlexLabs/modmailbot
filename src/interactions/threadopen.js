@@ -51,6 +51,12 @@ module.exports = {
         await interaction.createFollowup(snip);
         break;
       }
+      case "iWantStaff": {
+        let snip = await snippets.get("staffapp");
+        if (!snip) throw new Error("Staff application snippet does not exist");
+        await interaction.createFollowup(snip);
+        break;
+      }
       case "moderation": {
         await interaction.createFollowup({
           content: "Please specify what you need help with, and I'll connect you with a member of our moderation team!",

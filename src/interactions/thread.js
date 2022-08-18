@@ -1,10 +1,12 @@
 const Eris = require("eris");
+const moment = require("moment");
 const blocked = require("../data/blocked");
 const bot = require("../bot");
 const components = require("../utils/components");
 const config = require("../config");
 const snippets = require("../data/snippets");
 const threads = require("../data/threads");
+const utils = require("../utils/utils");
 
 const redirectCooldown = new Map;
 
@@ -99,6 +101,23 @@ module.exports = {
           type: 9,
           data: modal
         });
+        break;
+      }
+      case "close": {
+        await thread.close(message.author, false, sse);
+        
+        const logUrl = await thread.getLogUrl();
+        utils.postLog(
+          utils.trimAll(`Modmail thread with ${thread.user_name} (${thread.user_id}) was closed by ${msg.author.username}#${msg.author.discriminator}
+          Logs: <${logUrl}>`)
+        );
+        break;
+      }
+      case "closeIn10": {
+        const closeAt = moment.utc().add(600000, "ms");
+
+        await thread.scheduleClose(closeAt.format("YYYY-MM-DD HH:mm:ss"), msg.author);
+        thread.postSystemMessage(`Thread will close in 10 minutes. Use \`${config.prefix}close cancel\` to cancel.`);
         break;
       }
       default: {

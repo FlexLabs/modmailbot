@@ -231,10 +231,20 @@ bot.on("messageCreate", async msg => {
             },
             {
               type: 2,
+              custom_id: "threadopen:iWantStaff",
+              style: 1,
+              label: "Apply for Staff"
+            },
+            {
+              type: 2,
               custom_id: "threadopen:noFuckingClue",
               style: 1,
               label: "Other"
-            },
+            }
+          ]
+        }, {
+          type: 1,
+          components: [
             {
               type: 2,
               custom_id: "threadopen:cancel",

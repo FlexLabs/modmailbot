@@ -2,6 +2,31 @@
  * These component objects are used during the process of reporting a user, and
  * requesting help with premium/payments!
  */
+ const internalClose = [{
+  type: 1,
+  components: [
+    {
+      type: 2,
+      style: 4,
+      label: "Close Thread",
+      emoji: {
+        name: "DaveHangUp",
+        id: "815830349816659968"
+      },
+      custom_id: "thread:close"
+    },
+    {
+      type: 2,
+      style: 4,
+      label: "Close Thread in 10m",
+      emoji: {
+        name: "DaveHangUp",
+        id: "815830349816659968"
+      },
+      custom_id: "thread:closeIn10"
+    }
+  ]
+}];
 
 const internalButtons = [{
   type: 1,
@@ -139,7 +164,7 @@ const reportUserModal = {
         label: "Additional Context/Links (Optional)",
         max_length: 1000,
         required: false,
-        placeholder: "Add any additional information here, and any message/screenshot links we can use for reference."
+        placeholder: "Add any additional information here, and any message links we can use for reference."
       }]
     }
   ]
@@ -150,7 +175,7 @@ const moderationHelpReasons = [{
   components: [
     {
       type: 3,
-      custom_id: "moderationHelpReasons",
+      custom_id: "threadopenmoderation:moderationHelpReasons",
       options: [
         {
           "label": "Report a User",
@@ -187,6 +212,7 @@ const moderationHelpReasons = [{
 }];
 
 module.exports = {
+  internalClose,
   internalButtons,
   moveToAdmins,
   blockUserModal,
