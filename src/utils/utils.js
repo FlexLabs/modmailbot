@@ -5,6 +5,8 @@ const bot = require("../bot");
 const config = require("../config");
 const attachments = require("../data/attachments");
 const constants = require("./constants");
+const snippets = require("../data/snippets");
+const Thread = require("../data/Thread");
 
 class BotError extends Error {}
 
@@ -56,8 +58,31 @@ async function getLogChannel() {
   return logChannel;
 }
 
-function postLog(...args) {
-  getLogChannel().then(c => c.createMessage(...args));
+/**
+ * Posts a thread log in log channel
+ * @param {Thread} thread the thread the log is referencing
+ * @param {Eris.Member} moderator the moderator that executed the log
+ * @param {String} logLink the url of the thread
+ * @param {String} reason reason the thread was closed, if automatic
+ */
+function postLog(thread, moderator, logLink, reason) {
+  const logData = {
+    embed: {
+      author: {name: `Thread Closed | ${thread.user_name}`},
+      color: 0x337FD5,
+      timestamp: new Date(),
+      footer: {text: `UserID: ${thread.user_id}`},
+      fields: [
+        {name: 'User', value: `<@!${thread.user_id}>`, inline: true},
+        {name: 'Moderator', value: `${moderator.mention}`, inline: true},
+        {name: 'Thread', value: `[Log Link](${logLink})`, inline: true}
+      ]
+    }
+  }
+  if (reason) {
+    logData.embed.fields.push({name: 'Reason', value: `${reason}`, inline: true});
+  }
+  getLogChannel().then(c => c.createMessage(logData));
 }
 
 function postError(str) {
@@ -421,5 +446,3 @@ module.exports = {
   paginate,
   parseText
 };
-
-const snippets = require("../data/snippets");

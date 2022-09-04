@@ -30,6 +30,7 @@ const lastMsgs = new Map();
  * @property {String?} alert_users
  * @property {Object?} staff_role_overrides
  * @property {String} created_at
+ * @param {String} topic the button the user clicked if any
  */
 class Thread {
   constructor(props) {
@@ -48,7 +49,7 @@ class Thread {
     // Username to reply with
     let modUsername, logModUsername;
     let channel = moderator.guild && moderator.guild.channels && moderator.guild.channels.get(this.channel_id);
-    let mainRole = this.getMainRole(moderator, channel ? channel.parentID : undefined);
+    let mainRole = this.getMainRole(moderator, channel ? channel.parentID : undefined, topic);
 
     if (isAnonymous) {
       modUsername = mainRole.name;
@@ -752,9 +753,10 @@ class Thread {
   /**
    * @param {Eris.Member} member
    * @param {String} categoryID
+   * @param {String} topic If the user opened the thread, this will be the label of which ever button they pressed
    * @returns {Eris.Role}
    */
-  getMainRole(member, categoryID) {
+  getMainRole(member, categoryID, topic) {
     const role = this.getStaffRoleOverride(member.id);
     const guild = member.guild;
 
@@ -781,7 +783,9 @@ class Thread {
       }
     }
 
-    return { name: "Staff" };
+    if (topic === "Moderation Help") {
+      return { name: "Moderator" };
+    } else return { name: "Staff" };
   }
 
   /**

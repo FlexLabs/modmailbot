@@ -107,10 +107,7 @@ module.exports = {
         await thread.close(interaction.member, false, sse);
         
         const logUrl = await thread.getLogUrl();
-        utils.postLog(
-          utils.trimAll(`Modmail thread with ${thread.user_name} (${thread.user_id}) was closed by ${interaction.member.username}#${interaction.member.discriminator}
-          Logs: <${logUrl}>`)
-        );
+        utils.postLog(thread, interaction.member, logUrl);
         break;
       }
       case "closeIn10": {

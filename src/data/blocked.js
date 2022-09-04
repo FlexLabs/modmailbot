@@ -54,13 +54,21 @@ async function unblock(userId) {
  * @param {Boolean} isUnblock
  */
 function logBlock(user, moderator, reason, isUnblock = false) {
-  let logText = `**${isUnblock ? "Unb" : "B"}locked:** ${user.username}#${user.discriminator} (${user.id}) was ${isUnblock ? "un" : ""}blocked by ${moderator.username}#${moderator.discriminator} (${moderator.id})`;
-
-  if (reason) {
-    logText += ` for ${reason}`;
+  const logData = {
+    embed: {
+      author: {name: `${isUnblock ? "Unblock" : "Block"} | ${user.username}#${user.discriminator}`},
+      color: 0x337FD5,
+      timestamp: new Date(),
+      footer: {text: `UserID: ${user.id}`},
+      fields: [
+        {name: 'User', value: `${user.mention}`, inline: true},
+        {name: 'Moderator', value: `${moderator.mention}`, inline: true},
+        {name: 'Reason', value: `${reason ?? "No Reason Given"}`, inline: true}
+      ]
+    }
   }
 
-  return utils.postLog(logText);
+  utils.getLogChannel().then(c => c.createMessage(logData));
 }
 
 module.exports = {

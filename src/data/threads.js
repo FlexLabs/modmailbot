@@ -67,7 +67,8 @@ async function createNewThreadForUser(user, topic, quiet = false) {
     user_id: user.id,
     user_name: `${user.username}#${user.discriminator}`,
     channel_id: createdChannel.id,
-    created_at: moment.utc().format("YYYY-MM-DD HH:mm:ss")
+    created_at: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+    topic: topic
   });
 
   const newThread = await findById(newThreadId);

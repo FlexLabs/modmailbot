@@ -343,10 +343,7 @@ bot.on("channelDelete", async (channel) => {
     await thread.close(bot.user, false, sse);
 
     const logUrl = await thread.getLogUrl();
-    utils.postLog(
-      utils.trimAll(`Modmail thread with ${thread.user_name} (${thread.user_id}) was closed due to channel deletion
-      Logs: <${logUrl}>`)
-    );
+    utils.postLog(thread, bot.user, logUrl, 'Thread channel deleted.');
   }
 });
 
@@ -418,10 +415,10 @@ async function createThreadFromInteraction(interaction, originalMsg, systemMsg, 
     });
   } catch (error) {
     if (error.code === 50035 && error.message.includes("words not allowed")) {
-      utils.postLog(`Tried to open a thread with ${originalMsg.author.username}#${originalMsg.author.discriminator} (${originalMsg.author.id}) but failed due to a restriction on channel names for servers in Server Discovery`);
+      utils.postError(`Tried to open a thread with ${originalMsg.author.username}#${originalMsg.author.discriminator} (${originalMsg.author.id}) but failed due to a restriction on channel names for servers in Server Discovery`);
       return interaction.createMessage("Thread was unable to be opened - please change your username and try again!");
     }
-    utils.postLog(`**Error:** \`\`\`js\nError creating modmail channel for ${originalMsg.author.username}#${originalMsg.author.discriminator}!\n${error.stack}\n\`\`\``);
+    utils.postError(`\`\`\`js\nError creating modmail channel for ${originalMsg.author.username}#${originalMsg.author.discriminator}!\n${error.stack}\n\`\`\``);
     return interaction.createMessage("Thread was unable to be opened due to an unknown error. If this persists, please contact a member of the staff team!");
   }
 

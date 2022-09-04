@@ -25,10 +25,7 @@ module.exports = (bot, sse) => {
       await thread.close(null, false, sse);
 
       const logUrl = await thread.getLogUrl();
-      utils.postLog(
-        utils.trimAll(`Modmail thread with ${thread.user_name} (${thread.user_id}) was closed as scheduled by ${thread.scheduled_close_name}
-        Logs: <${logUrl}>`)
-      );
+      utils.postLog(thread, (await utils.getMainGuild()).members.get(thread.scheduled_close_id), logUrl, 'Scheduled close.');
     }
   }
 
@@ -104,10 +101,7 @@ module.exports = (bot, sse) => {
     await thread.close(msg.author, false, sse);
 
     const logUrl = await thread.getLogUrl();
-    utils.postLog(
-      utils.trimAll(`Modmail thread with ${thread.user_name} (${thread.user_id}) was closed by ${msg.author.username}#${msg.author.discriminator}
-      Logs: <${logUrl}>`)
-    );
+    utils.postLog(thread, msg.author, logUrl);
   });
 
   // Auto-close threads if their channel is deleted
@@ -123,9 +117,6 @@ module.exports = (bot, sse) => {
     await thread.close(entry ? entry.user : null, true, sse);
 
     const logUrl = await thread.getLogUrl();
-    utils.postLog(
-      utils.trimAll(`Modmail thread with ${thread.user_name} (${thread.user_id}) was closed automatically because the channel was deleted
-      Logs: ${logUrl}`)
-    );
+    utils.postLog(thread, bot.user, logUrl, 'Thread channel deleted.');
   });
 };
