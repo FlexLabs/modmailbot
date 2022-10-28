@@ -1,5 +1,5 @@
 const Eris = require("eris");
-const config = require("../config");
+const config = require("../../config2.json");
 const threads = require("../data/threads");
 const utils = require("../utils/utils");
 const {internalClose} = require("../utils/components");
@@ -17,7 +17,6 @@ module.exports = bot => {
         /**
         * @type {Eris.CategoryChannel}
         */
-        const config = require("../../config2.json");
         const cat = await guild.channels.get(config.modmailCategories.modmail.id);
         if (cat.channels.size <= 2) return;
 
