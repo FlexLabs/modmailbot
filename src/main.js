@@ -352,7 +352,7 @@ bot.on("channelDelete", async (channel) => {
 bot.on("interactionCreate", async (interaction) => {
   if (interaction.type !== 3 && interaction.type !== 5) {
     interaction.createMessage({
-      content: "I don't recognise this type of interaction - please speak to a Dave contributor!",
+      content: "Unknown Interaction...please let a staff member know you recieved this error!",
       flags: 64
     });
     throw new Error("Unknown/unhandled interaction type: " + interaction.type);
@@ -362,7 +362,7 @@ bot.on("interactionCreate", async (interaction) => {
 
   if (! interactionName || ! customID) {
     interaction.createMessage({
-      content: "Something weird happened... please speak to a Dave contributor!",
+      content: "Something went wrong...please try again or let a staff member know you recieved this error!",
       flags: 64
     });
     throw new Error("Invalid custom_id value: " + interaction.data.custom_id);
@@ -370,16 +370,16 @@ bot.on("interactionCreate", async (interaction) => {
 
   if (! interactionList.has(interactionName)) {
     interaction.createMessage({
-      content: "I'm not sure what this interaction is for - please speak to a Dave contributor!",
+      content: "Unknown Interaction Name...please try again or let a staff member know you recieved this error!",
       flags: 64
     });
-    throw new Error("Unknown interaction name: " + interactionName);
+    throw new Error("Unknown Interaction Name: " + interactionName);
   }
 
   const interact = interactionList.get(interactionName);
   if (interact.type.includes?.(interaction.type) === false || interact.type !== interaction.type) {
     interaction.createMessage({
-      content: "I wasn't expecting this interaction type for the interaction - please speak to a Dave contributor!",
+      content: "Something went wrong...please try again or let a staff member know you recieved this error!",
       flags: 64
     });
     throw new Error(`Mismatched interaction type for ${interactionName}. Expected: ${interact.type}. Received ${interaction.type}`);
@@ -391,12 +391,12 @@ bot.on("interactionCreate", async (interaction) => {
     awaitingOpen.delete(interaction.message.channel.id); // In case an error occurs in DM, allows user to immediately send another message
     if (! interaction.acknowledged) {
       interaction.createMessage({
-        content: "Something weird happened... please speak to a Dave contributor!",
+        content: "Something went wrong...please try again or let a staff member know you recieved this error!",
         flags: 64
       });
     } else {
       interaction.createFollowup({
-        content: "Something weird happened... please speak to a Dave contributor!",
+        content: "Something went wrong...please try again or let a staff member know you recieved this error!",
         flags: 64
       });
     }
