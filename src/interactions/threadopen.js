@@ -28,7 +28,7 @@ module.exports = {
       }]
     });
 
-    if (message.channel.type !== Eris.Constants.ChannelTypes.DM) {
+    if (! ("user" in interaction)) {
       throw new Error(`Unexpected channel type ${message.channel.type} from ${message.jumpLink}`);
     }
     const opening = awaitingOpen.get(message.channel.id);
@@ -53,7 +53,7 @@ module.exports = {
       }
       case "iWantStaff": {
         let snip = await snippets.get("staffapp");
-        if (!snip) throw new Error("Staff application snippet does not exist");
+        if (! snip) throw new Error("Staff application snippet does not exist");
         await interaction.createFollowup(snip);
         break;
       }

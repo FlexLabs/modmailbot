@@ -343,7 +343,7 @@ bot.on("channelDelete", async (channel) => {
     await thread.close(bot.user, false, sse);
 
     const logUrl = await thread.getLogUrl();
-    utils.postLog(thread, bot.user, logUrl, 'Thread channel deleted.');
+    utils.postLog(thread, bot.user, logUrl, "Thread channel deleted.");
   }
 });
 
@@ -390,6 +390,11 @@ bot.on("interactionCreate", async (interaction) => {
   } catch (error) {
     if (! interaction.acknowledged) {
       interaction.createMessage({
+        content: "Something weird happened... please speak to a Dave contributor!",
+        flags: 64
+      });
+    } else {
+      interaction.createFollowup({
         content: "Something weird happened... please speak to a Dave contributor!",
         flags: 64
       });
