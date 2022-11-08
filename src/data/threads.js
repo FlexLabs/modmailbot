@@ -31,6 +31,7 @@ async function findOpenThreadByUserId(userId) {
     .where("status", THREAD_STATUS.OPEN)
     .first();
 
+
   return (thread ? new Thread(thread) : null);
 }
 

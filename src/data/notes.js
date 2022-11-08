@@ -2,7 +2,6 @@ const moment = require("moment");
 const knex = require("../knex");
 const Note = require("./Note");
 const Eris = require("eris");
-const Thread = require("./Thread");
 
 /**
  * @param {String} user
@@ -75,3 +74,4 @@ module.exports = {
   edit: editNote,
   del: deleteNote,
 };
+const Thread = require("./Thread");

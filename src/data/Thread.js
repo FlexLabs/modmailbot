@@ -5,16 +5,13 @@ const humanizeDuration = require("humanize-duration");
 
 const bot = require("../bot");
 const knex = require("../knex");
-const utils = require("../utils/utils");
 const config = require("../config");
 const attachments = require("./attachments");
-const threads = require("./threads");
 
 const ThreadMessage = require("./ThreadMessage");
 
 const {THREAD_MESSAGE_TYPE, THREAD_STATUS} = require("../utils/constants");
 const {internalButtons} = require("../utils/components");
-const notes = require("./notes");
 const lastMsgs = new Map();
 
 /**
@@ -49,7 +46,7 @@ class Thread {
     // Username to reply with
     let modUsername, logModUsername;
     let channel = moderator.guild && moderator.guild.channels && moderator.guild.channels.get(this.channel_id);
-    let mainRole = this.getMainRole(moderator, channel ? channel.parentID : undefined, topic);
+    let mainRole = this.getMainRole(moderator, channel ? channel.parentID : undefined, this.topic);
 
     if (isAnonymous) {
       modUsername = mainRole.name;
@@ -797,3 +794,6 @@ class Thread {
 }
 
 module.exports = Thread;
+const threads = require("./threads");
+const notes = require("./notes");
+const utils = require("../utils/utils");

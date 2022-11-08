@@ -358,7 +358,7 @@ bot.on("interactionCreate", async (interaction) => {
     throw new Error("Unknown/unhandled interaction type: " + interaction.type);
   }
 
-  const [interactionName, customID] = interaction.data.custom_id.split(":");
+  const [interactionName, customID] = (interaction.data.values?.[0] || interaction.data.custom_id).split(":");
 
   if (! interactionName || ! customID) {
     interaction.createMessage({
@@ -377,7 +377,7 @@ bot.on("interactionCreate", async (interaction) => {
   }
 
   const interact = interactionList.get(interactionName);
-  if (interact.type !== interaction.type) {
+  if (interact.type.includes?.(interaction.type) === false && interact.type !== interaction.type) {
     interaction.createMessage({
       content: "I wasn't expecting this interaction type for the interaction - please speak to a Dave contributor!",
       flags: 64
@@ -386,8 +386,9 @@ bot.on("interactionCreate", async (interaction) => {
   }
 
   try {
-    await interact.handler(interaction, customID);
+    await interact.handler(interaction, customID, sse);
   } catch (error) {
+    awaitingOpen.delete(interaction.message.channel.id); // In case an error occurs in DM, allows user to immediately send another message
     if (! interaction.acknowledged) {
       interaction.createMessage({
         content: "Something weird happened... please speak to a Dave contributor!",

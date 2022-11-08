@@ -2,7 +2,7 @@
  * These component objects are used during the process of reporting a user, and
  * requesting help with premium/payments!
  */
- const internalClose = [{
+const internalClose = [{
   type: 1,
   components: [
     {

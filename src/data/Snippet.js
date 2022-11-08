@@ -1,5 +1,3 @@
-const utils = require("../utils/utils");
-
 /**
  * @property {String} trigger
  * @property {String} body
@@ -14,3 +12,4 @@ class Snippet {
 }
 
 module.exports = Snippet;
+const utils = require("../utils/utils");

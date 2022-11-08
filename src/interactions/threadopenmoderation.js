@@ -2,6 +2,7 @@ const Eris = require("eris");
 const { createThreadFromInteraction, awaitingOpen } = require("../main");
 const components = require("../utils/components");
 const bot = require("../bot");
+const main = require("../main");
 
 module.exports = {
   name: "threadopenmoderation",
@@ -13,7 +14,7 @@ module.exports = {
   handler: async (interaction, customID) => {
     const { message } = interaction;
 
-    if (message.channel.type !== Eris.Constants.ChannelTypes.DM) {
+    if (! ("user" in interaction)) {
       throw new Error(`Unexpected channel type ${message.channel.type} from ${message.jumpLink}`);
     }
     const opening = awaitingOpen.get(message.channel.id);
@@ -47,12 +48,13 @@ module.exports = {
         break;
       }
       default: {
+        main.awaitingOpen.delete(message.channel.id);
         return interaction.createMessage({
           content: "Unknown selection. Please send another message and try again.",
           flags: 64
         });
       }
     }
-    awaitingOpen.delete(message.channel.id);
+    if (customID !== "reportUser") awaitingOpen.delete(message.channel.id);
   }
 };

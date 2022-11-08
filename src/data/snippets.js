@@ -1,6 +1,5 @@
 const moment = require("moment");
 const knex = require("../knex");
-const Snippet = require("./Snippet");
 
 /**
  * @param {String} trigger
@@ -58,3 +57,4 @@ module.exports = {
   del: deleteSnippet,
   all: getAllSnippets,
 };
+const Snippet = require("./Snippet");

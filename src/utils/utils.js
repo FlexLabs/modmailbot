@@ -5,8 +5,6 @@ const bot = require("../bot");
 const config = require("../config");
 const attachments = require("../data/attachments");
 const constants = require("./constants");
-const snippets = require("../data/snippets");
-const Thread = require("../data/Thread");
 
 class BotError extends Error {}
 
@@ -73,14 +71,14 @@ function postLog(thread, moderator, logLink, reason) {
       timestamp: new Date(),
       footer: {text: `UserID: ${thread.user_id}`},
       fields: [
-        {name: 'User', value: `<@!${thread.user_id}>`, inline: true},
-        {name: 'Moderator', value: `${moderator.mention}`, inline: true},
-        {name: 'Thread', value: `[Log Link](${logLink})`, inline: true}
+        {name: "User", value: `<@!${thread.user_id}>`, inline: true},
+        {name: "Moderator", value: `${moderator.mention}`, inline: true},
+        {name: "Thread", value: `[Log Link](${logLink})`, inline: true}
       ]
     }
-  }
+  };
   if (reason) {
-    logData.embed.fields.push({name: 'Reason', value: `${reason}`, inline: true});
+    logData.embed.fields.push({name: "Reason", value: `${reason}`, inline: true});
   }
   getLogChannel().then(c => c.createMessage(logData));
 }
@@ -446,3 +444,5 @@ module.exports = {
   paginate,
   parseText
 };
+const Thread = require("../data/Thread");
+const snippets = require("../data/snippets");

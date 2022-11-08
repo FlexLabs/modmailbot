@@ -61,12 +61,12 @@ function logBlock(user, moderator, reason, isUnblock = false) {
       timestamp: new Date(),
       footer: {text: `UserID: ${user.id}`},
       fields: [
-        {name: 'User', value: `${user.mention}`, inline: true},
-        {name: 'Moderator', value: `${moderator.mention}`, inline: true},
-        {name: 'Reason', value: `${reason ?? "No Reason Given"}`, inline: true}
+        {name: "User", value: `${user.mention}`, inline: true},
+        {name: "Moderator", value: `${moderator.mention}`, inline: true},
+        {name: "Reason", value: `${reason ?? "No Reason Given"}`, inline: true}
       ]
     }
-  }
+  };
 
   utils.getLogChannel().then(c => c.createMessage(logData));
 }

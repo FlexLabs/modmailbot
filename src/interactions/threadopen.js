@@ -8,7 +8,7 @@ const utils = require("../utils/utils");
 
 module.exports = {
   name: "threadopen",
-  type: Eris.Constants.InteractionTypes.MESSAGE_COMPONENT,
+  type: [Eris.Constants.InteractionTypes.MESSAGE_COMPONENT, 5],
   /**
    * @param {Eris.ComponentInteraction} interaction
    * @param {String} customID
@@ -48,13 +48,13 @@ module.exports = {
         if (member && member.roles.includes("265342465483997184")) {
           snip += config.dynoPremiumSupport;
         }
-        await interaction.createFollowup(snip);
+        await interaction.createFollowup(snip.body);
         break;
       }
       case "iWantStaff": {
         let snip = await snippets.get("staffapp");
         if (! snip) throw new Error("Staff application snippet does not exist");
-        await interaction.createFollowup(snip);
+        await interaction.createFollowup(snip.body);
         break;
       }
       case "moderation": {
@@ -101,7 +101,7 @@ module.exports = {
           });
         }
 
-        const member = mainGuild.get(interaction.user.id);
+        const member = mainGuild.members.get(interaction.user.id);
         await createThreadFromInteraction(interaction, opening, {
           embed: {
             title: "**User Report**",
@@ -117,7 +117,7 @@ module.exports = {
       }
       case "premiumPayment":
       case "noFuckingClue": {
-        const label = message.components[0].find((c) => c.custom_id === interaction.data.custom_id);
+        const label = message.components[0].components.find((c) => c.custom_id === interaction.data.custom_id);
         await createThreadFromInteraction(interaction, opening, null, label);
       }
     }

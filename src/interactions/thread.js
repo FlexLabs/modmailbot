@@ -17,7 +17,7 @@ module.exports = {
    * @param {Eris.ComponentInteraction} interaction
    * @param {String} customID
    */
-  handler: async (interaction, customID) => {
+  handler: async (interaction, customID, sse) => {
     const { message } = interaction;
     const thread = await threads.findByChannelId(message.channel.id);
 
@@ -66,6 +66,7 @@ module.exports = {
         } else {
           let snip = await snippets.get("sup");
           if (! snip) throw new Error("Support redirect snippet does not exist");
+          snip = snip.body;
           const member = message.channel.guild.members.get(thread.user_id);
           if (member && member.roles.includes("265342465483997184")) {
             snip += config.dynoPremiumSupport;
@@ -105,7 +106,7 @@ module.exports = {
       }
       case "close": {
         await thread.close(interaction.member, false, sse);
-        
+
         const logUrl = await thread.getLogUrl();
         utils.postLog(thread, interaction.member, logUrl);
         break;

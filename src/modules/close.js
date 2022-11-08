@@ -25,7 +25,7 @@ module.exports = (bot, sse) => {
       await thread.close(null, false, sse);
 
       const logUrl = await thread.getLogUrl();
-      utils.postLog(thread, (await utils.getMainGuild()).members.get(thread.scheduled_close_id), logUrl, 'Scheduled close.');
+      utils.postLog(thread, (await utils.getMainGuild()).members.get(thread.scheduled_close_id), logUrl, "Scheduled close.");
     }
   }
 
@@ -117,6 +117,6 @@ module.exports = (bot, sse) => {
     await thread.close(entry ? entry.user : null, true, sse);
 
     const logUrl = await thread.getLogUrl();
-    utils.postLog(thread, bot.user, logUrl, 'Thread channel deleted.');
+    utils.postLog(thread, bot.user, logUrl, "Thread channel deleted.");
   });
 };
