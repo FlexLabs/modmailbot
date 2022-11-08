@@ -377,7 +377,7 @@ bot.on("interactionCreate", async (interaction) => {
   }
 
   const interact = interactionList.get(interactionName);
-  if (interact.type.includes?.(interaction.type) === false || interact.type !== interaction.type) {
+  if (Array.isArray(interact.type) ? ! interact.type.includes(interaction.type) : interact.type !== interaction.type) {
     interaction.createMessage({
       content: "Something went wrong...please try again or let a staff member know you recieved this error!",
       flags: 64
