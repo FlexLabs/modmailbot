@@ -377,7 +377,7 @@ bot.on("interactionCreate", async (interaction) => {
   }
 
   const interact = interactionList.get(interactionName);
-  if (interact.type.includes?.(interaction.type) === false || interact.type !== interaction.type) {
+  if (Array.isArray(interact.type) ? ! interact.type.includes(interaction.type) : interact.type !== interaction.type) {
     interaction.createMessage({
       content: "I wasn't expecting this interaction type for the interaction - please speak to a Dave contributor!",
       flags: 64
