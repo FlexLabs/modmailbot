@@ -31,7 +31,7 @@ module.exports = {
     }
 
     const reason = interaction.data.components[0].components[0].value;
-    const moderator = interaction.moderator;
+    const moderator = interaction.member;
 
     await blocked[customID](thread.user_id, thread.user_name, moderator.id)
       .then(() => {

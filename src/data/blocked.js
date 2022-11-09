@@ -57,7 +57,7 @@ function logBlock(user, moderator, reason, isUnblock = false) {
   const logData = {
     embed: {
       author: {name: `${isUnblock ? "Unblock" : "Block"} | ${user.username}#${user.discriminator}`},
-      color: isUnblock ? 0x337FD5 : 0xF04947,
+      color: isUnblock ? 0x43B582 : 0xF04947,
       timestamp: new Date(),
       footer: {text: `UserID: ${user.id}`},
       fields: [
