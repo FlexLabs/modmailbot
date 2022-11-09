@@ -324,10 +324,7 @@ class Thread {
     await this.postToThreadChannel(content, file);
   }
 
-  /**
-   * @param {String} topic If the user opened the thread, this will be the label of which ever button they pressed
-   */
-  async sendThreadInfo(topic) {
+  async sendThreadInfo() {
     const now = Date.now();
     const user = bot.users.get(this.user_id);
     const [
@@ -357,10 +354,10 @@ class Thread {
       {name: `Thread ID (${userLogCount} Logs)`, value: this.id, inline: true}
     ];
 
-    if (topic) {
+    if (this.topic) {
       fields.push({
         name: "Topic",
-        value: topic,
+        value: this.topic,
         inline: true
       });
     }
@@ -391,7 +388,7 @@ class Thread {
 
     // Only add the buttons if a topic is provided!
 
-    if (topic) {
+    if (this.topic) {
       data.components = internalButtons;
     }
 
@@ -753,7 +750,7 @@ class Thread {
    * @param {String} topic If the user opened the thread, this will be the label of which ever button they pressed
    * @returns {Eris.Role}
    */
-  getMainRole(member, categoryID, topic) {
+  getMainRole(member, categoryID) {
     const role = this.getStaffRoleOverride(member.id);
     const guild = member.guild;
 
@@ -780,7 +777,7 @@ class Thread {
       }
     }
 
-    if (topic === "Moderation Help") {
+    if (this.topic === "Moderation Help") {
       return { name: "Moderator" };
     } else return { name: "Staff" };
   }

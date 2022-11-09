@@ -115,7 +115,7 @@ module.exports = {
         const closeAt = moment.utc().add(600000, "ms");
 
         await thread.scheduleClose(closeAt.format("YYYY-MM-DD HH:mm:ss"), interaction.member);
-        thread.postSystemMessage(`Thread will close in 10 minutes. Use \`${config.prefix}close cancel\` to cancel.`);
+        interaction.createMessage(`Thread will close in 10 minutes. Use \`${config.prefix}close cancel\` to cancel.`);
         break;
       }
       default: {

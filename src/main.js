@@ -37,6 +37,7 @@ const dmlink = require("./modules/dmlink");
 const stats = require("./modules/stats");
 const say = require("./modules/say");
 const modformat = require("./modules/modformat");
+const joinLeave = require("./modules/joinLeaveNotification");
 
 const attachments = require("./data/attachments");
 const {ACCIDENTAL_THREAD_MESSAGES} = require("./utils/constants");
@@ -416,7 +417,7 @@ async function createThreadFromInteraction(interaction, originalMsg, systemMsg, 
 
   try {
     thread = await threads.createNewThreadForUser(originalMsg.author, clicked);
-    await interaction.acknowledge({
+    if (! interaction.acknowledged) await interaction.acknowledge({
       type: 6
     });
   } catch (error) {
@@ -532,6 +533,7 @@ module.exports = {
     stats(bot);
     say(bot);
     modformat(bot);
+    joinLeave(bot);
 
     // Load interactions
 
