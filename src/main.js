@@ -54,7 +54,7 @@ let webInit = false;
 bot.on("ready", () => {
   bot.editStatus(null, {
     name: config.status,
-    type: 3
+    type: 0
   });
 
   console.log("Connected! Now listening to DMs.");
