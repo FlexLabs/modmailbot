@@ -72,7 +72,7 @@ module.exports = (bot, sse) => {
         utils.postInfo(thread, message);
         return;
       } else if (args[0] === "force") {
-        if (! utils.isAdmin(msg.member) || ! msg.member.roles.includes("987377218927861760")) return;
+        //if (! utils.isAdmin(msg.member) || ! msg.member.roles.includes("987377218927861760")) return;
         await thread.close(msg.author, false, sse);
         const logUrl = await thread.getLogUrl();
         utils.postLog(thread, msg.author, logUrl, 'Force closed.');

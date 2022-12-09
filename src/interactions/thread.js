@@ -158,15 +158,6 @@ module.exports = {
         }
         break;
       }
-      case "forceClose": {
-        if (! utils.isAdmin(interaction.member) || ! interaction.member.roles.includes("987377218927861760")) {
-          return utils.postInteractionError(interaction, "Only Council and Senior Moderators can force close threads!", null, true);
-        }
-        await thread.close(interaction.member, false, sse);
-        const logUrl = await thread.getLogUrl();
-        utils.postLog(thread, interaction.member, logUrl, 'Force closed.');
-        break;
-      }
       case "suspend": {
         if (! thread) return;
         await thread.suspend();

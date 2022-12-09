@@ -56,15 +56,7 @@ const confirmClose = [{
               name: "DaveHangUp",
               id: "815830349816659968",
             }
-        },
-        {
-          label: "Force close",
-          value: "thread:forceClose",
-          emoji: {
-            name: "DaveHangUp",
-            id: "815830349816659968",
-          }
-      }
+        }
     ]
 }]
 }];
