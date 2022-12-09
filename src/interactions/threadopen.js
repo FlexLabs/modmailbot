@@ -43,12 +43,15 @@ module.exports = {
       }
       case "support": {
         let snip = await snippets.get("sup");
-        if (! snip) throw new Error("Support redirect snippet does not exist");
+        let premSnip = await snippets.get("premsup");
+        let supMsg = snip ? snip.body : config.dynoSupportMessage;
+        let premMsg = premSnip ? premSnip.body : config.dynoPremiumSupport;
+        if (! supMsg) throw new Error("Support redirect snippet does not exist");
         const member = bot.guilds.get("203039963636301824").members.get(interaction.user.id);
-        if (member && member.roles.includes("265342465483997184")) {
-          snip.body += config.dynoPremiumSupport;
+        if (member && member.roles.includes("265342465483997184") && premMsg) {
+          supMsg += premMsg;
         }
-        await interaction.createFollowup(snip.body);
+        await interaction.createFollowup(supMsg);
         break;
       }
       case "iWantStaff": {

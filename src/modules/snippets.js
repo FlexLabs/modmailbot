@@ -59,7 +59,7 @@ module.exports = bot => {
     } else {
       if (text) {
         // If the snippet doesn't exist and the user wants to create it, create it
-        await snippets.add(trigger, text, isAnonymous);
+        await snippets.add(trigger, text, isAnonymous, msg.author.id);
         utils.postSuccess(thread, `Snippet \`${trigger}\` created!`, null, msg);
       } else {
         // If the snippet doesn't exist and the user isn't trying to create it, inform them how to create it
@@ -102,12 +102,33 @@ module.exports = bot => {
     let isAnonymous = true;
 
     await snippets.del(trigger);
-    await snippets.add(trigger, text, isAnonymous);
+    await snippets.add(trigger, text, isAnonymous, msg.author.id);
 
     utils.postSuccess(thread, `Snippet \`${trigger}\` edited!`, null, msg);
   });
 
   bot.registerCommandAlias("es", "edit_snippet");
+
+  threadUtils.addInboxServerCommand(bot, "snippet_info", async (msg, args, thread) => {
+    const trigger = args[0];
+    if (! trigger) return;
+
+    const snippet = await snippets.get(trigger);
+    if (! snippet) {
+      utils.postError(thread, `Snippet \`${trigger}\` doesn't exist!`, null, msg);
+      return;
+    }
+
+    utils.postInfo(thread, `**Snippet Info - ${trigger}**\n\n**Trigger:** ${config.snippetPrefix}${snippet.trigger}\n`
+    + `**Body:** Use \`${config.prefix}s ${snippet.trigger}\` to see the snippet body!\n`
+    + `**Replies Anonymously:** ${snippet.is_anonymous ? "Yes" : "No"}\n`
+    + `**Created By:** ${snippet.created_by}`,
+    null,
+    msg
+    );
+  });
+
+  bot.registerCommandAlias("is", "snippet_info");
 
   threadUtils.addInboxServerCommand(bot, "snippets", async (msg, args, thread) => {
     const allSnippets = await snippets.all();

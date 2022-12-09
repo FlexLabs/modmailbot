@@ -66,15 +66,17 @@ module.exports = {
           );
         } else {
           let snip = await snippets.get("sup");
-          if (! snip) throw new Error("Support redirect snippet does not exist");
-          snip = snip.body;
+          let premSnip = await snippets.get("premsup");
+          let supMsg = snip ? snip.body : config.dynoSupportMessage;
+          let premMsg = premSnip ? premSnip.body : config.dynoPremiumSupport;
+          if (! supMsg) throw new Error("Support redirect snippet does not exist");
           const member = message.channel.guild.members.get(thread.user_id);
-          if (member && member.roles.includes("265342465483997184")) {
-            snip += config.dynoPremiumSupport;
+          if (member && member.roles.includes("265342465483997184") && premMsg) {
+            supMsg += premMsg;
           }
 
           interaction.acknowledge();
-          await thread.replyToUser(interaction.member, snip, [], config.replyAnonDefault);
+          await thread.replyToUser(interaction.member, supMsg, [], config.replyAnonDefault);
           redirectCooldown.set(thread.id, {
             member: interaction.member,
             timestamp: Date.now()
@@ -154,6 +156,15 @@ module.exports = {
         } else {
           utils.postInteractionInfo(interaction, "This thread is not scheduled to close");
         }
+        break;
+      }
+      case "forceClose": {
+        if (! utils.isAdmin(interaction.member) || ! interaction.member.roles.includes("987377218927861760")) {
+          return utils.postInteractionError(interaction, "Only Council and Senior Moderators can force close threads!", null, true);
+        }
+        await thread.close(interaction.member, false, sse);
+        const logUrl = await thread.getLogUrl();
+        utils.postLog(thread, interaction.member, logUrl, 'Force closed.');
         break;
       }
       case "suspend": {

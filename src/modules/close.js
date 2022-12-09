@@ -65,25 +65,31 @@ module.exports = (bot, sse) => {
       } else if (args[0] === "status") {
         let message;
         if (thread.scheduled_close_at) {
-          message = `Closing at <t:${moment(thread.scheduled_close_at).unix()}:F>\nClosing by ${thread.scheduled_close_name} (${thread.scheduled_close_id})`;
+          message = `Closing <t:${moment(thread.scheduled_close_at).unix()}:R>\nScheduled by ${thread.scheduled_close_name} (${thread.scheduled_close_id})`;
         } else {
           message = "This thread is not scheduled to close!";
         }
         utils.postInfo(thread, message);
         return;
+      } else if (args[0] === "force") {
+        if (! utils.isAdmin(msg.member) || ! msg.member.roles.includes("987377218927861760")) return;
+        await thread.close(msg.author, false, sse);
+        const logUrl = await thread.getLogUrl();
+        utils.postLog(thread, msg.author, logUrl, 'Force closed.');
+        return;
       }
 
       // Set a timed close
       const delay = utils.convertDelayStringToMS(args.join(" "));
-      if (delay === 0 || delay === null) {
+      if (delay === null) {
         utils.postError(thread, "Invalid delay specified. Format: \"1h30m\"");
         return;
       }
 
       let closeMsg = "Thread will now close in ";
       
-      if (delay <= 300000) {
-        utils.postError(thread, "You must set a time above 5 minutes.");
+      if (delay <= 299000) {
+        utils.postInfo(thread, "An interval of at least `5m` is required.");
         return;
       }
 

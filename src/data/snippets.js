@@ -17,9 +17,10 @@ async function getSnippet(trigger) {
  * @param {String} trigger
  * @param {String} body
  * @param {Boolean} isAnonymous
+ * @param {String} createdBy
  * @returns {Promise<void>}
  */
-async function addSnippet(trigger, body, isAnonymous = true, createdBy = 0) {
+async function addSnippet(trigger, body, isAnonymous = true, createdBy) {
   if (await getSnippet(trigger)) return;
 
   return knex("snippets").insert({
