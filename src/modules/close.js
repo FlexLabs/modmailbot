@@ -81,12 +81,11 @@ module.exports = (bot, sse) => {
 
       // Set a timed close
       const delay = utils.convertDelayStringToMS(args.join(" "));
+      const closeAt = moment.utc().add(delay, "ms");
       if (delay === null) {
         utils.postError(thread, "Invalid delay specified. Format: \"1h30m\"");
         return;
       }
-
-      let closeMsg = "Thread will now close in ";
       
       if (delay <= 299000) {
         utils.postInfo(thread, "An interval of at least `5m` is required.");
@@ -95,19 +94,16 @@ module.exports = (bot, sse) => {
 
       if (delay === 314000) { // Pi easter egg
         if (msg.author.id !== "334093318818627586") {
-          utils.postError(thread, "Invalid delay specified. Only Pi can set a thread to close for 314 seconds!");
+          utils.postError(thread, "Only Pi can set a thread to close for 314 seconds!");
           return;
         }
 
-        closeMsg += "π * 100 seconds.";
+        await thread.scheduleClose(closeAt.format("YYYY-MM-DD HH:mm:ss"), msg.author);
+        return utils.postSuccess(thread, `**Thread will now close in π \* 100 seconds**`, cancelClose);
       } else {
-        closeMsg += humanizeDelay(delay);
+        await thread.scheduleClose(closeAt.format("YYYY-MM-DD HH:mm:ss"), msg.author);
+        return utils.postSuccess(thread, `***Thread will now close in ${humanizeDelay(delay)}***`, cancelClose);
       }
-
-      const closeAt = moment.utc().add(delay, "ms");
-
-      await thread.scheduleClose(closeAt.format("YYYY-MM-DD HH:mm:ss"), msg.author);
-      return utils.postSuccess(thread, `***${closeMsg}***`, cancelClose);
     }
 
     // Regular close
