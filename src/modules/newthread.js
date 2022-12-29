@@ -41,6 +41,7 @@ module.exports = (bot, sse) => {
 
     const createdThread = await threads.createNewThreadForUser(user, null, true);
     utils.postInfo(createdThread, `Thread was opened by ${msg.author.username}#${msg.author.discriminator}`, null, msg);
+    msg.addReaction(":dynoSuccess:696561641227288639");
 
     sse.send({ thread: createdThread }, "threadOpen", null);
 
