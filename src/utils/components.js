@@ -1,6 +1,6 @@
 /**
  * These component objects are used during the process of reporting a user, and
- * requesting help with premium/payments!
+ * requesting help with subscriptions/payments!
  */
 const confirmClose = [{
   type: 1,
@@ -108,7 +108,7 @@ const internalLeave = [{
     },
     {
       type: 2,
-      style: 4,
+      style: 2,
       label: "Suspend",
       emoji: {
         name: "DaveHangUp",
