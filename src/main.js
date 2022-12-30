@@ -220,9 +220,9 @@ bot.on("messageCreate", async msg => {
             },
             {
               type: 2,
-              custom_id: "threadopen:premiumPayment",
+              custom_id: "threadopen:premium",
               style: 1,
-              label: "Premium/Payment Issues"
+              label: "Subscription/Payment Issues"
             },
             {
               type: 2,
