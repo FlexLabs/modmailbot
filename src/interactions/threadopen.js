@@ -118,7 +118,7 @@ module.exports = {
         }, "Moderation Help");
         break;
       }
-      case "premiumPayment":
+      case "premium":
       case "noFuckingClue": {
         const label = message.components[0].components.find((c) => c.custom_id === interaction.data.custom_id).label;
         await createThreadFromInteraction(interaction, opening, null, label);
