@@ -542,7 +542,7 @@ class Thread {
   }
 
   /**
-   * @param {Eris.User} author
+   * @param {Eris.User|{ id: string; username: string; }} author
    * @param {Boolean} [silent=false]
    * @param {SSE} [sse]
    * @returns {Promise<void>}
