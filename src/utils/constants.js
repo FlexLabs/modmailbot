@@ -16,7 +16,10 @@ module.exports = {
 
   ACCIDENTAL_THREAD_MESSAGES: [
     "ok",
+    "oki",
+    "oke",
     "okay",
+    "okey",
     "thanks",
     "ty",
     "k",

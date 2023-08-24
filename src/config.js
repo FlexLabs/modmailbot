@@ -35,9 +35,9 @@ const defaultConfig = {
   "mentionRole": "here",
   "adminMentionRole": null,
 
+  "inboxAdminRoleIDs": [],
   "inboxServerRoleIDs": [],
   "inboxCTRoleIDs": [],
-  "inboxAdminRoleIDs": [],
   "alwaysReply": false,
   "alwaysReplyAnon": false,
   "useNicknames": false,

@@ -27,7 +27,7 @@ async function addNote(user, note, author, thread) {
     .insert({
       user_id: user,
       note: note,
-      created_by_name: `${author.username}#${author.discriminator}`,
+      created_by_name: `${author.username}`,
       created_by_id: author.id,
       created_at: moment().utc().format("YYYY-MM-DD HH:mm:ss"),
       thread: thread && thread.id
@@ -62,7 +62,7 @@ async function editNote(user, id, note, author) {
     .where("note", notes[id - 1].note)
     .update({
       note: note,
-      created_by_name: `${author.username}#${author.discriminator}`,
+      created_by_name: `${author.username}`,
       created_by_id: author.id,
       created_at: moment().utc().format("YYYY-MM-DD HH:mm:ss")
     });

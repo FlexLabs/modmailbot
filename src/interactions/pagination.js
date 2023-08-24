@@ -1,5 +1,6 @@
 const Eris = require("eris");
 const pagination = require("../utils/pagination");
+const utils = require("../utils/utils");
 
 module.exports = {
   name: "pagination",
@@ -14,10 +15,11 @@ module.exports = {
     if (! page) {
       throw new Error("Unknown pagination: " + message.id);
     }
-    if (! (interaction.user || interaction.member).id !== page.authorID) return interaction.createMessage({
-      content: "This interaction is not for you!",
-      flags: 64
-    });
+    if (! (interaction.user || interaction.member).id !== page.authorID) return utils.postInteractionError(interaction,
+      "Not Authorized",
+      null,
+      true
+    );
 
     switch(customID) {
       case "next":

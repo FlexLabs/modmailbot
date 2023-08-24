@@ -1,7 +1,7 @@
 const Eris = require("eris");
 const config = require("../config");
 const threads = require("../data/threads");
-const { handleError } = require("../utils/utils");
+const utils = require("../utils/utils");
 
 module.exports = {
   name: "movethread",
@@ -29,27 +29,60 @@ module.exports = {
     if (! thread) throw new Error("Unknown thread: " + message.channel.id);
 
     if (customID === "cancel") {
-      return interaction.createFollowup("Cancelled thread transfer.");
+      return utils.postInteractionError(interaction, "**Thread Transfer Cancelled.**", null, true);
     }
 
-    const shouldPing = customID.endsWith("-ping");
-    if (shouldPing) {
-      customID = customID.replace("-ping", "");
+    if (customID === "modmail") {
+      const targetCategory = message.channel.guild.channels.get(config.newThreadCategoryId);
+      if (! targetCategory) {
+        return utils.postInteractionError(interaction, `I can't move this thread to ${customID.toLowerCase()} because it doesn't exist.`);
+      }
+      if (message.channel.parentID === targetCategory.id) {
+        return utils.postInteractionError(interaction, `This thread is already in ${targetCategory.name}.`, null, true);
+      }
+      return threads.moveThread(thread, targetCategory, false)
+        .catch((e) => {
+          utils.handleError(e);
+          utils.postInteractionError(interaction, "Something went wrong while attempting to move this thread.", null, true);
+        });
+    } else if (customID === "community") {
+      const targetCategory = message.channel.guild.channels.get(config.communityThreadCategoryId);
+      if (! targetCategory) {
+        return utils.postInteractionError(interaction, `I can't move this thread to ${customID.toLowerCase()} because it doesn't exist.`);
+      }
+      if (message.channel.parentID === targetCategory.id) {
+        return utils.postInteractionError(interaction, `This thread is already in ${targetCategory.name}.`, null, true);
+      }
+      return threads.moveThread(thread, targetCategory, false)
+        .catch((e) => {
+          utils.handleError(e);
+          utils.postInteractionError(interaction, "Something went wrong while attempting to move this thread.", null, true);
+        });
     }
+    else {
+      const shouldPing = customID.endsWith("-ping");
+      if (shouldPing) {
+        customID = customID.replace("-ping", "");
+      }
 
-    const category = config.modmailCategories[customID.toLowerCase()];
-    if (! category) {
-      return interaction.createFollowup("I was unable to find a valid category with that name.");
-    }
-    const targetCategory = message.channel.guild.channels.get(category.id);
-    if (! targetCategory) {
-      return interaction.createFollowup(`I can't move this thread to the ${customID.toLowerCase()} because it doesn't exist.`);
-    }
+      const category = config.modmailCategories[customID.toLowerCase()];
+      if (! category) {
+        return utils.postInteractionError(interaction, "I can't find a category with that name.");
+      }
+      const targetCategory = message.channel.guild.channels.get(category.id);
+      if (! targetCategory) {
+        return utils.postInteractionError(interaction, `I can't move this thread to ${customID.toLowerCase()} because it doesn't exist.`);
+      }
 
-    return threads.moveThread(thread, targetCategory, shouldPing ? category.role : [])
-      .catch((e) => {
-        handleError(e);
-        interaction.createMessage("Something went wrong while attempting to move this thread.");
-      });
+      if (message.channel.parentID === targetCategory.id) {
+        return utils.postInteractionError(interaction, `This thread is already in ${targetCategory.name}.`, null, true);
+      }
+
+      return threads.moveThread(thread, targetCategory, shouldPing ? category.role : [])
+        .catch((e) => {
+          utils.handleError(e);
+          utils.postInteractionError(interaction, "Something went wrong while attempting to move this thread.", null, true);
+        });
+    }
   }
 };

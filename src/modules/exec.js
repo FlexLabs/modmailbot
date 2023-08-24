@@ -1,8 +1,9 @@
 const Eris = require("eris");
 const childProcess = require("child_process");
 const GIT_VALIDATOR = /^git[\w\d\s\-"'/.]+$/;
+// eslint-disable-next-line no-unused-vars
 const NPM_VALIDATOR = /^npm[\w\d\s\-"'/.]+$/;
-const adminRoleIDs = ["203040224597508096", "523021576128692239"];
+const adminRoleIDs = ["523021576128692239"];
 
 /**
  * @param {String} command

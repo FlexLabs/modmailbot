@@ -33,8 +33,7 @@ module.exports = {
         if (customID === "block") thread.replyToUser(moderator, `You have been blocked from modmail for: ${reason}`, []);
         blocked.logBlock({
           id: thread.user_id,
-          username: thread.user_name.split("#")[0],
-          discriminator: thread.user_name.split("#")[1],
+          username: thread.user_name,
           mention: `<@${thread.user_id}>`
         }, moderator, reason, customID === "unblock");
         utils.postInteractionSuccess(interaction, `***${thread.user_name} has been blocked from modmail!***`);

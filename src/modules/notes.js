@@ -43,7 +43,7 @@ module.exports = bot => {
       await notes.add(userId, text.replace(/\n/g, " "), msg.author, thread);
       utils.postSuccess(thread, `Added ${
         userNotes.length ? "another" : "a"
-      } note for ${user ? `${user.username}#${user.discriminator}` : thread.user_name}!`, null, msg);
+      } note for ${user ? `${user.username}` : thread.user_name}!`, null, msg);
     }
   });
 
@@ -83,11 +83,11 @@ module.exports = bot => {
     /** @type {import("eris").MessageContent} */
     const content = {
       embeds: [{
-        title: `Notes for ${user ? `${user.username}#${user.discriminator} (${user.id})` : `${userId}`}`,
+        title: `Notes for ${user ? `${user.username} (${user.id})` : `${userId}`}`,
         fields: paginated[0].map((n) => {
           return { name: `[${n.i}] ${n.created_by_name} | ${n.created_at}`, value: `${n.note}${n.thread ? ` | [Thread](${selfURL + n.thread})` : ""}` };
         }),
-        footer: { text: `${msg.author.username}#${msg.author.discriminator} | Page 1/${paginated.length}`}
+        footer: { text: `${msg.author.username} | Page 1/${paginated.length}`}
       }]
     };
 
@@ -128,7 +128,7 @@ module.exports = bot => {
         content.embeds[0].fields = currPage.map((n) => {
           return { name: `[${n.i}] ${n.created_by_name} | ${n.created_at}`, value: `${n.note}${n.thread ? ` | [Thread](${selfURL + n.thread})` : ""}` };
         });
-        content.embeds[0].footer.text = `${(interaction.user || interaction.member).username}#${(interaction.user || interaction.member).discriminator} | Page ${page.index + 1}/${page.pages.length}`;
+        content.embeds[0].footer.text = `${(interaction.user || interaction.member).username} | Page ${page.index + 1}/${page.pages.length}`;
 
         await interaction.editParent(content);
       },
@@ -191,7 +191,7 @@ module.exports = bot => {
         utils.postError(thread, "That note doesn't exist.", null, msg);
       } else {
         await notes.edit(userId, id, text.replace(/\n/g, " "), msg.author);
-        utils.postSuccess(thread, `Edited note for ${user ? `${user.username}#${user.discriminator}` : thread.user_name}`, null, msg);
+        utils.postSuccess(thread, `Edited note for ${user ? `${user.username}` : thread.user_name}`, null, msg);
       }
     }
   });
@@ -222,7 +222,7 @@ module.exports = bot => {
 
     const userNotes = await notes.get(userId);
     if (! userNotes || ! userNotes.length) {
-      utils.postError(thread, `${user ? `${user.username}#${user.discriminator}` : thread.user_name} doesn't have any notes to delete, add one with \`${usage}\`.`, null, msg);
+      utils.postError(thread, `${user ? `${user.username}` : thread.user_name} doesn't have any notes to delete, add one with \`${usage}\`.`, null, msg);
     } else {
       let id = parseInt(args[0]);
       if (args.length && args[0].toLowerCase() === "all")
@@ -235,7 +235,7 @@ module.exports = bot => {
         await notes.del(userId, id);
         utils.postSuccess(thread, `Deleted ${
           id <= 0 ? "all notes" : "note"
-        } for ${user ? `${user.username}#${user.discriminator}` : thread.user_name}!`, null, msg);
+        } for ${user ? `${user.username}` : thread.user_name}!`, null, msg);
       }
     }
   });

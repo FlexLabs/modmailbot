@@ -55,7 +55,7 @@ module.exports = bot => {
      */
     async function deleteLogs(userId) {
       await threads.deleteClosedThreadsByUserId(userId);
-      utils.postSuccess(thread, `Deleted log files for <@!${userId}>`, null, msg);
+      utils.postSuccess(thread, `Deleted log files for <@${userId}>`, null, msg);
     }
 
     let userId = thread && thread.user_id;

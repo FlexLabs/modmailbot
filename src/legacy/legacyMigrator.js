@@ -87,7 +87,7 @@ async function migrateOpenThreads() {
         const threadMessages = await oldChannel.getMessages(1000);
         const log = threadMessages.reverse().map(msg => {
           const date = moment.utc(msg.timestamp, "x").format("YYYY-MM-DD HH:mm:ss");
-          return `[${date}] ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`;
+          return `[${date}] ${msg.author.username}: ${msg.content}`;
         }).join("\n") + "\n";
 
         const newThread = {

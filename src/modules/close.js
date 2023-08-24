@@ -2,7 +2,6 @@ const humanizeDuration = require("humanize-duration");
 const moment = require("moment");
 const Eris = require("eris");
 const SSE = require("express-sse");
-const config = require("../config");
 const threads = require("../data/threads");
 const threadUtils = require("../utils/threadUtils");
 const utils = require("../utils/utils");
@@ -75,7 +74,7 @@ module.exports = (bot, sse) => {
         //if (! utils.isAdmin(msg.member) || ! msg.member.roles.includes("987377218927861760")) return;
         await thread.close(msg.author, false, sse);
         const logUrl = await thread.getLogUrl();
-        utils.postLog(thread, msg.author, logUrl, 'Force closed.');
+        utils.postLog(thread, msg.author, logUrl, "Force closed.");
         return;
       }
 
@@ -86,7 +85,7 @@ module.exports = (bot, sse) => {
         utils.postError(thread, "Invalid delay specified. Format: \"1h30m\"");
         return;
       }
-      
+
       if (delay <= 299000) {
         utils.postInfo(thread, "An interval of at least `5m` is required.");
         return;
@@ -99,7 +98,8 @@ module.exports = (bot, sse) => {
         }
 
         await thread.scheduleClose(closeAt.format("YYYY-MM-DD HH:mm:ss"), msg.author);
-        return utils.postSuccess(thread, `**Thread will now close in π \* 100 seconds**`, cancelClose);
+        // eslint-disable-next-line no-useless-escape
+        return utils.postSuccess(thread, "**Thread will now close in π \* 100 seconds**", cancelClose);
       } else {
         await thread.scheduleClose(closeAt.format("YYYY-MM-DD HH:mm:ss"), msg.author);
         return utils.postSuccess(thread, `***Thread will now close in ${humanizeDelay(delay)}***`, cancelClose);

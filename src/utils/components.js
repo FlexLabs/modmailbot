@@ -9,56 +9,56 @@ const confirmClose = [{
     custom_id: "thread:confirmClose",
     placeholder: "Select a time to schedule close",
     options: [
-        {
-            label: "Close in 10mins",
-            value: "thread:closeIn10m",
-            emoji: {
-              name: "DaveHangUp",
-              id: "815830349816659968",
-            }
-        },
-        {
-            label: "Close in 15mins",
-            value: "thread:closeIn15m",
-            emoji: {
-              name: "DaveHangUp",
-              id: "815830349816659968",
-            }
-        },
-        {
-            label: "Close in 30mins",
-            value: "thread:closeIn30m",
-            emoji: {
-              name: "DaveHangUp",
-              id: "815830349816659968",
-            }
-        }, 
-        {
-            label: "Close in 1hr",
-            value: "thread:closeIn1h",
-            emoji: {
-              name: "DaveHangUp",
-              id: "815830349816659968",
-            }
-        },
-        {
-            label: "Close in 24hrs",
-            value: "thread:closeIn24h",
-            emoji: {
-              name: "DaveHangUp",
-              id: "815830349816659968",
-            }
-        },
-        {
-            label: "Close in π",
-            value: "thread:close314",
-            emoji: {
-              name: "DaveHangUp",
-              id: "815830349816659968",
-            }
+      {
+        label: "Close in 10mins",
+        value: "thread:closeIn10m",
+        emoji: {
+          name: "DaveHangUp",
+          id: "815830349816659968",
         }
+      },
+      {
+        label: "Close in 15mins",
+        value: "thread:closeIn15m",
+        emoji: {
+          name: "DaveHangUp",
+          id: "815830349816659968",
+        }
+      },
+      {
+        label: "Close in 30mins",
+        value: "thread:closeIn30m",
+        emoji: {
+          name: "DaveHangUp",
+          id: "815830349816659968",
+        }
+      },
+      {
+        label: "Close in 1hr",
+        value: "thread:closeIn1h",
+        emoji: {
+          name: "DaveHangUp",
+          id: "815830349816659968",
+        }
+      },
+      {
+        label: "Close in 24hrs",
+        value: "thread:closeIn24h",
+        emoji: {
+          name: "DaveHangUp",
+          id: "815830349816659968",
+        }
+      },
+      {
+        label: "Close in π",
+        value: "thread:close314",
+        emoji: {
+          name: "DaveHangUp",
+          id: "815830349816659968",
+        }
+      }
     ]
-}]
+  }]
 }];
 
 const cancelClose = [{
@@ -124,23 +124,23 @@ const internalButtons = [{
   components: [
     {
       type: 2,
-      style: 1,
-      label: "Send User ID",
+      style: 2,
+      label: "Send UserID",
       emoji: {
         name: "DaveRing",
         id: "815827221549154355"
       },
-      custom_id: "thread:sendUserID"
+      custom_id: "thread:sendUserId"
     },
     {
       type: 2,
       style: 1,
-      label: "Send Thread ID",
+      label: "Greetings",
       emoji: {
-        name: "DaveRingRight",
-        id: "815830334163255326"
+        name: "DaveEgg",
+        id: "698046132605157396"
       },
-      custom_id: "thread:sendThreadID"
+      custom_id: "thread:greetings"
     },
     {
       type: 2,
@@ -155,17 +155,17 @@ const internalButtons = [{
     {
       type: 2,
       style: 1,
-      label: "Move to Council",
+      label: "Move",
       emoji: {
         name: "DaveBanana",
         id: "752731353266520084"
       },
-      custom_id: "thread:redirectAdmins"
+      custom_id: "thread:moveThread"
     },
     {
       type: 2,
       style: 4,
-      label: "Block User",
+      label: "Block",
       emoji: {
         name: "DaveCult",
         id: "827253899403722803"
@@ -175,20 +175,107 @@ const internalButtons = [{
   ]
 }];
 
-const moveToAdmins = [{
+const greetingMenu = [{
+  type: 1,
+  components: [{
+    type: 2,
+    style: 1,
+    label: "Help",
+    custom_id: "thread:greeting1"
+  },
+  {
+    type: 2,
+    style: 1,
+    label: "Not4This",
+    custom_id: "thread:greeting2"
+  },
+  {
+    type: 2,
+    style: 1,
+    label: "Moving",
+    custom_id: "thread:greeting3"
+  },
+  {
+    type: 2,
+    style: 1,
+    label: "Transfer",
+    custom_id: "thread:greeting4"
+  },
+  {
+    type: 2,
+    style: 1,
+    label: "ReportInfo",
+    custom_id: "thread:greeting5"
+  },
+  ]
+},
+{
   type: 1,
   components: [
     {
       type: 2,
       style: 1,
-      label: "Move Council & Ping",
-      custom_id: "movethread:council-ping"
+      label: "DiscordReport",
+      custom_id: "thread:greeting6"
     },
     {
       type: 2,
       style: 1,
-      label: "Move Council",
+      label: "DMAds",
+      custom_id: "thread:greeting7"
+    },
+    {
+      type: 2,
+      style: 1,
+      label: "Appeal",
+      custom_id: "thread:greeting8"
+    },
+    {
+      type: 2,
+      style: 1,
+      label: "Lockdown",
+      custom_id: "thread:greeting9"
+    },
+    {
+      type: 2,
+      style: 1,
+      label: "Status",
+      custom_id: "thread:greeting10"
+    },
+  ]
+}
+];
+
+const moveMenu = [{
+  type: 1,
+  components: [
+    {
+      type: 2,
+      style: 2,
+      label: "Council & Ping",
+      emoji: {
+        name: "report",
+        id: "986073682952716349"
+      },
+      custom_id: "movethread:council-ping"
+    },
+    {
+      type: 2,
+      style: 2,
+      label: "Council",
       custom_id: "movethread:council"
+    },
+    {
+      type: 2,
+      style: 2,
+      label: "Community",
+      custom_id: "movethread:community"
+    },
+    {
+      type: 2,
+      style: 2,
+      label: "ModMail",
+      custom_id: "movethread:modmail"
     },
     {
       type: 2,
@@ -308,7 +395,8 @@ module.exports = {
   cancelClose,
   cancelSuspend,
   internalButtons,
-  moveToAdmins,
+  greetingMenu,
+  moveMenu,
   blockUserModal,
   reportUserModal,
   moderationHelpReasons

@@ -14,9 +14,9 @@
   "mentionRole": null,
   "adminMentionRole": "203040224597508096",
 
+  "inboxAdminRoleIDs": ["203040224597508096", "523021576128692239"],
   "inboxServerRoleIDs": ["203040224597508096", "523021576128692239", "231095149508296704"],
   "inboxCTRoleIDs": ["855930038556950558"],
-  "inboxAdminRoleIDs": ["203040224597508096", "523021576128692239"],
   "ignoreAccidentalThreads": true,
   "allowMove": true,
   "typingProxy": true,

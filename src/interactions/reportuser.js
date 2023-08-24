@@ -1,5 +1,6 @@
 const Eris = require("eris");
 const threads = require("../data/threads");
+const utils = require("../utils/utils");
 
 module.exports = {
   name: "reporteduser",
@@ -25,7 +26,7 @@ module.exports = {
         break;
       }
       default: {
-        interaction.createMessage("Unknown action");
+        utils.postInteractionError(interaction, "Unknown action", null, true);
       }
     }
   }

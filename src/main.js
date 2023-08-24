@@ -53,7 +53,7 @@ let webInit = false;
 // Once the bot has connected, set the bot status & activity
 bot.on("ready", () => {
   bot.editStatus(null, {
-    name: config.status,
+    name: config.status ?? "DM me to contact staff!",
     type: 0
   });
 
@@ -352,37 +352,25 @@ bot.on("channelDelete", async (channel) => {
 
 bot.on("interactionCreate", async (interaction) => {
   if (interaction.type !== 3 && interaction.type !== 5) {
-    interaction.createMessage({
-      content: "Unknown Interaction...please let a staff member know you recieved this error!",
-      flags: 64
-    });
+    utils.postInteractionError(interaction, "Unknown Interaction. Please try again, If this issue persists let a staff member know.", null, true);
     throw new Error("Unknown/unhandled interaction type: " + interaction.type);
   }
 
   const [interactionName, customID] = (interaction.data.values?.[0] || interaction.data.custom_id).split(":");
 
   if (! interactionName || ! customID) {
-    interaction.createMessage({
-      content: "Something went wrong...please try again or let a staff member know you recieved this error!",
-      flags: 64
-    });
+    utils.postInteractionError(interaction, "Unknown Interaction. Please try again, If this issue persists let a staff member know.", null, true);
     throw new Error("Invalid custom_id value: " + interaction.data.custom_id);
   }
 
   if (! interactionList.has(interactionName)) {
-    interaction.createMessage({
-      content: "Unknown Interaction Name...please try again or let a staff member know you recieved this error!",
-      flags: 64
-    });
+    utils.postInteractionError(interaction, "Unknown Interaction. Please try again, If this issue persists let a staff member know.", null, true);
     throw new Error("Unknown Interaction Name: " + interactionName);
   }
 
   const interact = interactionList.get(interactionName);
   if (Array.isArray(interact.type) ? ! interact.type.includes(interaction.type) : interact.type !== interaction.type) {
-    interaction.createMessage({
-      content: "Something went wrong...please try again or let a staff member know you recieved this error!",
-      flags: 64
-    });
+    utils.postInteractionError(interaction, "Something went wrong. Please try again, If this issue persists let a staff member know.", null, true);
     throw new Error(`Mismatched interaction type for ${interactionName}. Expected: ${interact.type}. Received ${interaction.type}`);
   }
 
@@ -391,13 +379,10 @@ bot.on("interactionCreate", async (interaction) => {
   } catch (error) {
     awaitingOpen.delete(interaction.message.channel.id); // In case an error occurs in DM, allows user to immediately send another message
     if (! interaction.acknowledged) {
-      interaction.createMessage({
-        content: "Something went wrong...please try again or let a staff member know you recieved this error!",
-        flags: 64
-      });
+      utils.postInteractionError(interaction, "Something went wrong. Please try again, If this issue persists let a staff member know.", null, true);
     } else {
       interaction.createFollowup({
-        content: "Something went wrong...please try again or let a staff member know you recieved this error!",
+        content: "Something went wrong.",
         flags: 64
       });
     }
@@ -422,11 +407,11 @@ async function createThreadFromInteraction(interaction, originalMsg, systemMsg, 
     });
   } catch (error) {
     if (error.code === 50035 && error.message.includes("words not allowed")) {
-      utils.postErrorLog(`Tried to open a thread with ${originalMsg.author.username}#${originalMsg.author.discriminator} (${originalMsg.author.id}) but failed due to a restriction on channel names for servers in Server Discovery`);
-      return interaction.createMessage("Thread was unable to be opened - please change your username and try again!");
+      utils.postErrorLog(`Tried to open a thread with ${originalMsg.author.username} (${originalMsg.author.id}) but failed due to a restriction on channel names for servers in Server Discovery`);
+      return utils.postInteractionError(interaction, "Thread was unable to be opened - please change your username and try again!");
     }
-    utils.postErrorLog(`\`\`\`js\nError creating modmail channel for ${originalMsg.author.username}#${originalMsg.author.discriminator}!\n${error.stack}\n\`\`\``);
-    return interaction.createMessage("Thread was unable to be opened due to an unknown error. If this persists, please contact a member of the staff team!");
+    utils.postErrorLog(`\`\`\`js\nError creating modmail channel for ${originalMsg.author.username}!\n${error.stack}\n\`\`\``);
+    return utils.postInteractionError(interaction, "Thread was unable to be opened due to an unknown error. If this persists, please contact a member of the staff team!");
   }
 
   sse.send({ thread }, "threadOpen");
@@ -444,7 +429,7 @@ function updateSSE() {
 
   if (guild) {
     for (let member of guild.members.values())
-      data.users.push({ id: member.id, name: member.username, discrim: member.discriminator });
+      data.users.push({ id: member.id, name: member.username });
 
     for (let role of guild.roles.values())
       data.roles.push({ id: role.id, name: role.name, color: role.color });

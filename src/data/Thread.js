@@ -156,7 +156,7 @@ class Thread {
       }
     }
 
-    let threadContent = `**${msg.author.username}#${msg.author.discriminator}:** ${logContent}`;
+    let threadContent = `**${msg.author.username}:** ${logContent}`;
 
     if (config.threadTimestamps) {
       const timestamp = utils.getTimestamp(msg.timestamp, "x");
@@ -172,7 +172,7 @@ class Thread {
     await this.addThreadMessageToDB({
       message_type: THREAD_MESSAGE_TYPE.FROM_USER,
       user_id: this.user_id,
-      user_name: `${msg.author.username}#${msg.author.discriminator}`,
+      user_name: `${msg.author.username}`,
       body: logContent,
       is_anonymous: 0,
       dm_message_id: msg.id,
@@ -209,11 +209,11 @@ class Thread {
       if (closedAt.diff(now) <= 30000) {
         await this.cancelScheduledClose();
         systemMessage = await this.postSystemMessage({
-          content: `<@!${this.scheduled_close_id}> Thread that was scheduled to be closed got a new reply. Cancelling.`,
+          content: `<@${this.scheduled_close_id}> Thread that was scheduled to be closed got a new reply. Cancelling.`,
         });
       } else {
         systemMessage = await this.postSystemMessage({
-          content: `<@!${this.scheduled_close_id}> The thread was updated, use \`!close cancel\` or press the button below if you would like to cancel.`,
+          content: `<@${this.scheduled_close_id}> The thread was updated, use \`!close cancel\` or press the button below if you would like to cancel.`,
           components: cancelClose
         });
       }
@@ -349,7 +349,7 @@ class Thread {
     const accountAge = humanizeDuration(now - user.createdAt, {largest: 2});
     const memberFor = member ? humanizeDuration(now - member.joinedAt, {largest: 2}) : "Unavailable";
     const fields = [
-      {name: "User", value: `${user.username}#${user.discriminator} ${mainGuildNickname || ""}`, inline: true},
+      {name: "User", value: `${user.username} ${mainGuildNickname || ""}`, inline: true},
       {name: "Account age", value: accountAge, inline: true},
       {name: "Member for", value: memberFor, inline: true},
       {name: `Thread ID (${userLogCount} Logs)`, value: this.id, inline: true}
@@ -405,7 +405,7 @@ class Thread {
     return this.addThreadMessageToDB({
       message_type: THREAD_MESSAGE_TYPE.CHAT,
       user_id: msg.author.id,
-      user_name: `${msg.author.username}#${msg.author.discriminator}`,
+      user_name: `${msg.author.username}`,
       body: msg.content,
       is_anonymous: 0,
       dm_message_id: msg.id,
@@ -422,7 +422,7 @@ class Thread {
     return this.addThreadMessageToDB({
       message_type: THREAD_MESSAGE_TYPE.COMMAND,
       user_id: msg.author.id,
-      user_name: `${msg.author.username}#${msg.author.discriminator}`,
+      user_name: `${msg.author.username}`,
       body: msg.content,
       is_anonymous: 0,
       dm_message_id: msg.id,
@@ -542,7 +542,7 @@ class Thread {
   }
 
   /**
-   * @param {Eris.User|{ discriminator: string; id: string; username: string; }} author
+   * @param {Eris.User} author
    * @param {Boolean} [silent=false]
    * @param {SSE} [sse]
    * @returns {Promise<void>}
@@ -559,8 +559,7 @@ class Thread {
         .first();
       author = {
         id: newThread.scheduled_close_id,
-        username: newThread.scheduled_close_name.split("#").slice(0, -1).join("#"),
-        discriminator: newThread.scheduled_close_name.split("#").slice(-1)[0],
+        username: newThread.scheduled_close_name,
       };
     }
     // Update DB status
@@ -570,7 +569,7 @@ class Thread {
         status: THREAD_STATUS.CLOSED,
         scheduled_close_at: moment().utc().format("YYYY-MM-DD HH:mm:ss"),
         scheduled_close_id: author.id,
-        scheduled_close_name: `${author.username}#${author.discriminator}`,
+        scheduled_close_name: `${author.username}`,
         alert_users: null,
         staff_role_overrides: null
       });
@@ -614,7 +613,7 @@ class Thread {
       .update({
         scheduled_close_at: time,
         scheduled_close_id: user.id,
-        scheduled_close_name: `${user.username}#${user.discriminator}`
+        scheduled_close_name: `${user.username}`
       });
   }
 

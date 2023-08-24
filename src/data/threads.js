@@ -49,13 +49,12 @@ async function createNewThreadForUser(user, topic, quiet = false) {
     throw new Error("Attempted to create a new thread for a user with an existing open thread!");
   }
 
-  // Use the user's name+discrim for the thread channel's name
+  // Use the user's name for the thread channel's name
   // Channel names are particularly picky about what characters they allow, so we gotta do some clean-up
   let cleanName = transliterate.slugify(user.username);
   if (cleanName === "") cleanName = "unknown";
-  cleanName = cleanName.slice(0, 95); // Make sure the discrim fits
 
-  const channelName = `${cleanName}-${user.discriminator}`;
+  const channelName = `${cleanName}`;
 
   console.log(`[NOTE] Creating new thread channel ${channelName}`);
 
@@ -66,7 +65,7 @@ async function createNewThreadForUser(user, topic, quiet = false) {
   const newThreadId = await createThreadInDB({
     status: THREAD_STATUS.OPEN,
     user_id: user.id,
-    user_name: `${user.username}#${user.discriminator}`,
+    user_name: `${user.username}`,
     channel_id: createdChannel.id,
     created_at: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
     topic: topic

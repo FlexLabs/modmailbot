@@ -11,8 +11,8 @@ module.exports = bot => {
     bot.on("typingStart", async (channel, user) => {
       if (config.typingProxy && ! channel.guild) {
         const mailGuild = bot.guilds.get(config.mailGuildId);
-        const foundDiscrim = mailGuild && mailGuild.channels.find((c) => c.name.endsWith(user.discriminator));
-        if (! foundDiscrim) return;
+        const foundUser = mailGuild && mailGuild.channels.find((c) => c.name.startsWith(user.username));
+        if (! foundUser) return;
 
         const thread = await threads.findOpenThreadByUserId(user.id);
         if (! thread) return;

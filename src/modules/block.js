@@ -20,7 +20,7 @@ module.exports = bot => {
     }
 
     const isBlocked = await blocked.isBlocked(user.id);
-    if (isBlocked) return utils.postError(thread, `${user.username}#${user.discriminator} is already blocked!`, null, msg);
+    if (isBlocked) return utils.postError(thread, `${user.username} is already blocked!`, null, msg);
 
     const reason = args.join(" ").trim();
 
@@ -30,10 +30,10 @@ module.exports = bot => {
       await thread.replyToUser(msg.member, text, msg.attachments, config.replyAnonDefault);
     }
 
-    await blocked.block(user.id, `${user.username}#${user.discriminator}`, msg.author.id)
+    await blocked.block(user.id, `${user.username}`, msg.author.id)
       .then(() => {
         blocked.logBlock(user, msg.member, reason);
-        utils.postSuccess(thread, `***${user.username}#${user.discriminator} has been blocked from modmail!***`, null, msg);
+        utils.postSuccess(thread, `***${user.username} has been blocked from modmail!***`, null, msg);
       });
   });
 
@@ -48,14 +48,14 @@ module.exports = bot => {
     }
 
     const isBlocked = await blocked.isBlocked(user.id);
-    if (! isBlocked) return utils.postError(thread, `${user.username}#${user.discriminator} is not blocked from modmail!`, null, msg);
+    if (! isBlocked) return utils.postError(thread, `${user.username} is not blocked from modmail!`, null, msg);
 
     let reason = args.join(" ").trim();
 
     await blocked.unblock(userId)
       .then(() => {
         blocked.logBlock(user, msg.member, reason, true);
-        utils.postSuccess(thread, `***${user.username}#${user.discriminator} has been unblocked from modmail!***`, null, msg);
+        utils.postSuccess(thread, `***${user.username} has been unblocked from modmail!***`, null, msg);
       });
   });
 };

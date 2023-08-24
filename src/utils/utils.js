@@ -200,7 +200,7 @@ function postLog(thread, moderator, logLink, reason) {
       timestamp: new Date(),
       footer: {text: `UserID: ${thread.user_id}`},
       fields: [
-        {name: "User", value: `<@!${thread.user_id}>`, inline: true},
+        {name: "User", value: `<@${thread.user_id}>`, inline: true},
         {name: "Moderator", value: `${moderator.mention}`, inline: true},
         {name: "Thread", value: `[Log Link](${logLink})`, inline: true}
       ]

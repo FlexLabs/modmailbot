@@ -33,12 +33,12 @@ module.exports = {
     }
     const opening = awaitingOpen.get(message.channel.id);
     if (! opening || Date.now() - opening.timestamp > 300000) {
-      return interaction.createFollowup("Thread creation timed out. Please send another message and try again.");
+      return utils.postInteractionInfo(interaction, "Thread creation timed out. Please send another message and try again.", null, true);
     }
 
     switch(customID) {
       case "cancel": {
-        await interaction.createFollowup("Cancelled thread creation, your message has not been forwarded to staff members.");
+        await utils.postInteractionSuccess(interaction, "Thread creation cancelled. Your message has not been forwarded to staff.\nIf you would like to open a thread please send a new message.");
         break;
       }
       case "support": {
@@ -82,7 +82,7 @@ module.exports = {
           const search = mainGuild.members.get(userID);
 
           if (search) {
-            userID = `**${search.username}#${search.discriminator}** (\`${userID}\`)`;
+            userID = `**${search.username}** (\`${userID}\`)`;
           }
         }
 
