@@ -14,14 +14,8 @@ module.exports = bot => {
      */
     async function getLogs(userId) {
       let userThreads = await threads.getClosedThreadsByUserId(userId);
-      if (utils.isCommunityTeam(msg.member) && ! utils.isStaff(msg.member)){
-        userThreads = userThreads.filter((t) => t.isCT );
-      }
-      if (utils.isSeniorSupport(msg.member) && ! utils.isStaff(msg.member)){
-        userThreads = userThreads.filter((t) => t.isSupp );
-      }
       if (! utils.isAdmin(msg.member)) {
-        userThreads = userThreads.filter((t) => ! t.isPrivate);
+        userThreads = userThreads.filter((t) => (t.isCT && utils.isCommunityTeam(msg.member) || (t.isSupp && utils.isSeniorSupport(msg.member))));
       }
 
       if (! userThreads.length) return utils.postError(thread, "No logs found for that user.", null, msg);
@@ -83,7 +77,7 @@ module.exports = bot => {
 
   bot.registerCommand("loglink", async (msg, args) => {
     if (! (await utils.messageIsOnInboxServer(msg))) return;
-    if (! utils.isStaff(msg.member)) return;
+    if (! utils.isAllowed(msg.member)) return;
 
     if (args[0]) return msg.channel.createMessage(utils.getSelfUrl(`#thread/${args[0]}`));
 

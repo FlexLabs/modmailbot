@@ -14,7 +14,7 @@ module.exports = bot => {
    */
   bot.on("messageCreate", async msg => {
     if (! (await utils.messageIsOnInboxServer(msg))) return;
-    if (! utils.isStaff(msg.member)) return;
+    if (! utils.isAllowed(msg.member)) return;
 
     if (msg.author.bot) return;
     if (! msg.content) return;

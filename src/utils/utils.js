@@ -348,7 +348,7 @@ function isCommunityTeam(member) {
 function isAllowed(member) {
   if (! config.inboxServerRoleIDs.length) return true;
   if (! member) return false;
-  if (member.roles.some((r) => config.inboxCTRoleIDs.includes(r) || config.inboxSupportRoleIDs.includes(r) || config.inboxCTRoleIDs.includes(r) || config.inboxServerRoleIDs.includes(r) || config.inboxAdminRoleIDs.includes(r))) {
+  if (isAdmin(member) || isSeniorSupport(member) || isStaff(member) || isCommunityTeam(member)) {
     return true;
   }
 }

@@ -15,7 +15,7 @@ const GIT_DIR = path.join(__dirname, "..", "..", ".git");
 module.exports = bot => {
   bot.registerCommand("version", async (msg) => {
     if (! (await utils.messageIsOnInboxServer(msg))) return;
-    if (! utils.isStaff(msg.member)) return;
+    if (! utils.isAllowed(msg.member)) return;
 
     const packageJson = require("../../package.json");
     const packageVersion = packageJson.version;

@@ -4,7 +4,7 @@ const utils = require("../utils/utils");
 /** @param {import("eris").CommandClient} bot */
 module.exports = (bot) => {
   bot.registerCommand("stats", (msg) => {
-    if (! utils.isStaff(msg.member)) return;
+    if (! utils.isAllowed(msg.member)) return;
     bot.createMessage(msg.channel.id, {
       embeds: [{
         description: `**Version:** ${process.version}\n**Memory Usage:** ${(process.memoryUsage.rss() / 1024 / 1024).toFixed(2)}MB\n`
