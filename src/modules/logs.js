@@ -15,7 +15,12 @@ module.exports = bot => {
     async function getLogs(userId) {
       let userThreads = await threads.getClosedThreadsByUserId(userId);
       if (! utils.isAdmin(msg.member)) {
-        userThreads = userThreads.filter((t) => (t.isCT && utils.isCommunityTeam(msg.member)) || (t.isSupp && utils.isSeniorSupport(msg.member)) || ! t.isPrivate);
+        userThreads = userThreads.filter((t) => {
+          if (t.isPrivate) return false;
+          if (! utils.isCommunityTeam(msg.member) && t.isCT) return false;
+          if (! utils.isSeniorSupport(msg.member) && t.isSupp) return false;
+          return true;
+        });
       }
 
       if (! userThreads.length) return utils.postError(thread, "No logs found for that user.", null, msg);
