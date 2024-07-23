@@ -351,6 +351,7 @@ function isAllowed(member) {
   if (isAdmin(member) || isSeniorSupport(member) || isStaff(member) || isCommunityTeam(member)) {
     return true;
   }
+  return false;
 }
 
 /**
