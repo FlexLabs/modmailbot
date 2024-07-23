@@ -35,8 +35,12 @@ module.exports = bot => {
     /**
         * @type {Eris.CategoryChannel}
         */
-    const cat = await guild.channels.get(config.modmailCategories.modmail.id);
-    if (cat.channels.size <= 2) return;
+    const mainCat = guild.channels.get(config.newThreadCategoryId);
+    if (mainCat.channels.size <= 2) return;
+    const supportCat = guild.channels.get(config.supportThreadCategoryId);
+    if (supportCat.channels.size <= 1) return;
+    const adminCat = guild.channels.get(config.adminThreadCategoryId);
+    if (adminCat.channels.size <= 1) return;
 
     let thread = await threads.findOpenThreadByUserId(member.id);
     if (thread !== null) {
