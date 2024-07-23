@@ -160,11 +160,11 @@ bot.on("messageCreate", async msg => {
     if (! thread) {
       let isDisabled = await snippet.get("isDisabled");
       if (isDisabled && isDisabled.body.toLowerCase().includes("disabled")) {
-          let disabledSnippet = await snippet.get("disabled");
-          let disabledMessage = disabledSnippet ? disabledSnippet.body : "ModMail is currently unavailable while the server is closed.\n If there is an outage please check <#535189342898094081> for updates.";
-          return utils.sendInfo(msg, disabledMessage);
+        let disabledSnippet = await snippet.get("disabled");
+        let disabledMessage = disabledSnippet ? disabledSnippet.body : "ModMail is currently unavailable while the server is closed.\n If there is an outage please check <#535189342898094081> for updates.";
+        return utils.sendInfo(msg, disabledMessage);
       }
-      
+
       const opening = awaitingOpen.get(msg.channel.id);
 
       if (opening) {
@@ -224,7 +224,7 @@ bot.on("messageCreate", async msg => {
       // If none of the above are met, also require minimum character input to ignore spam and short character messages.
 
       if (config.ignoreAccidentalThreads && msg.content && msg.content.length <= 5) {
-        return utils.sendInfo(msg, "You must submit a longer message to open a new thread.\n  Please avoid sending one word as we cannot answer a non-existant question!");
+        return utils.sendInfo(msg, "You must submit a longer message to open a new thread.\n  Please ask a specific question or state your issue in detail, that way we can help you more efficiently!");
       }
 
       awaitingOpen.set(msg.channel.id, msg);
