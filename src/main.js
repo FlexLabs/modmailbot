@@ -283,7 +283,7 @@ bot.on("messageUpdate", async (msg, oldMessage) => {
     if (msg.content.length > 1900) return utils.sendError(msg, `Your edited message (<${utils.discordURL("@me", msg.channel.id, msg.id)}>) is too long to be recieved. (${msg.content.length}/1900)`);
 
     const oldThreadMessage = await thread.getThreadMessageFromDM(msg);
-    const editMessage = `**EDITED <${utils.discordURL(mainGuildId, thread.channel_id, oldThreadMessage.thread_message_id)}>:**\n${newContent}`;
+    const editMessage = `**EDITED ${utils.discordURL(mainGuildId, thread.channel_id, oldThreadMessage.thread_message_id)}:**\n${newContent}`;
     const newThreadMessage = await thread.postSystemMessage(editMessage);
 
     thread.updateChatMessage(msg, newThreadMessage);
