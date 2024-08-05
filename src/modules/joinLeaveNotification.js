@@ -15,10 +15,12 @@ module.exports = bot => {
 
     // Attempt to limit database calls by checking if there are existing modmail channels.
     /**
-        * @type {Eris.CategoryChannel}
-        */
-    const cat = guild.channels.get(config.modmailCategories.modmail.id);
-    if (cat.channels.size <= 2) return;
+     * @type {Eris.CategoryChannel}
+     */
+    const mainCat = guild.channels.get(config.newThreadCategoryId);
+    const supportCat = guild.channels.get(config.supportThreadCategoryId);
+    const adminCat = guild.channels.get(config.adminThreadCategoryId);
+    if (mainCat.channels.size <= 2 && supportCat.channels.size <= 1 && adminCat.channels.size <= 1) return;
 
     let thread = await threads.findOpenThreadByUserId(member.id);
     if (thread !== null) {
@@ -33,14 +35,12 @@ module.exports = bot => {
 
     // Attempt to limit database calls by checking if there are existing modmail channels.
     /**
-        * @type {Eris.CategoryChannel}
-        */
+     * @type {Eris.CategoryChannel}
+     */
     const mainCat = guild.channels.get(config.newThreadCategoryId);
-    if (mainCat.channels.size <= 2) return;
     const supportCat = guild.channels.get(config.supportThreadCategoryId);
-    if (supportCat.channels.size <= 1) return;
     const adminCat = guild.channels.get(config.adminThreadCategoryId);
-    if (adminCat.channels.size <= 1) return;
+    if (mainCat.channels.size <= 2 && supportCat.channels.size <= 1 && adminCat.channels.size <= 1) return;
 
     let thread = await threads.findOpenThreadByUserId(member.id);
     if (thread !== null) {
